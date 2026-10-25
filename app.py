@@ -1,3 +1,4 @@
+
 """
 SHIMADZU UV-1700 — UV-Vis Analytical Workbench (Python / Streamlit, SATU BERKAS)
 Politeknik AKA Bogor · Analisis Spektrofotometri · instrumen acuan Shimadzu UV-1700 PharmaSpec
@@ -976,6 +977,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 <div class="tools"><button data-z="0.85" title="Perbesar">+</button><button data-z="1.18" title="Perkecil">−</button><button id="rs" title="Tampilan awal">⟲</button></div>
 <div class="views"><button data-v="iso" class="on">Isometrik</button><button data-v="depan">Depan</button><button data-v="samping">Kanan</button><button data-v="belakang">Belakang</button><button data-v="atas">Atas</button><button data-v="kompartemen">Kompartemen</button></div></div>
 <div class="side"><div class="card tourcard"><div class="steps" id="steps"></div><div class="tt" id="tt"></div><div class="tx" id="tx"></div><div class="nav2"><button id="prev">◀ Sebelumnya</button><button id="next" class="pri">Berikutnya ▶</button></div></div>
+<div class="card tourcard"><h4>Animasi jalur cahaya</h4><div class="hint" id="lstage" style="min-height:34px;color:#2b2f55;font-size:12.5px">Tekan tombol untuk melihat perjalanan cahaya dari lampu sampai nilai absorbansi (contoh: C = 2,5 mg/L).</div>
+<div class="meter" style="margin:6px 0"><span>I₀</span><span class="b"><i id="lb0" style="background:#4f46e5;width:0"></i></span><b id="lv0">0</b><span>I</span><span class="b"><i id="lb1" style="background:#0d9488;width:0"></i></span><b id="lv1">0</b><span>T</span><span></span><b id="lvT">–</b><span>A</span><span></span><b id="lvA">–</b></div>
+<div class="nav2"><button id="lplay" class="pri">▶ Putar animasi cahaya</button></div></div>
 <div class="card tourcard" style="display:none!important"><h4>Eksperimen: λ dan konsentrasi</h4>
 <div class="rg"><span>λ = <b id="lv2"></b> nm</span><span id="lamp2" class="hint"></span></div><input type="range" id="lam2" min="190" max="1100" step="1">
 <div class="rg"><span>C = <b id="cv2"></b> mg/L</span><span class="hint">ε·b = 0,20 L mg⁻¹ (b = 1 cm)</span></div><input type="range" id="conc" min="0" max="10" step="0.1" value="2.5">
@@ -1048,7 +1052,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       this.cv = canvas; this.ctx = canvas.getContext('2d'); this.opt = opt || {};
       this.yaw = -32; this.pitch = 24; this.dist = 84; this.target = [0, 9, 0];
       this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.topX = 0; this.topT = 0; this.sideX = 0; this.sideT = 0; this.xray = 0; this.xrayT = 0;
-      this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false;
+      this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false; this.ph = null; this.dispAbs = null; this.onLight = null; this._dots = [];
       this.lam = 550; this.lampSwitch = 340.8; this.abs = 0; this.status = 'READY'; this.solColor = '#8e2c8f';
       this._build(); this._bind(); this._loop = this._loop.bind(this);
       this._ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.draw()) : null;
@@ -1189,11 +1193,50 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         if (a.full) { this.dist = a.from[2] + (a.to[2] - a.from[2]) * k; this.target = [0, 1, 2].map(i => a.from[3][i] + (a.to[3][i] - a.from[3][i]) * k); }
         if (a.t >= 1) this._anim = null;
       }
+      if (this.ph) this._phStep(dt);
       if (this.auto && !this._drag) this.yaw += dt * 18;
       if (this.flow && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
       this._ld = now; this.draw();
-      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam);
+      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam) || this.ph;
       if (busy) requestAnimationFrame(this._loop); else this._running = false;
+    }
+    _phPath() {
+      const y = 9.5, lampUV = this.lam < this.lampSwitch, src = lampUV ? [19.1, y, -19.8] : [19.1, y, -13];
+      return { com: [src, [15.3, y, -16], [11.2, y, -15], [3.5, y, -21], [3, y, -9.2], [3, y, 3]], R: [[3, y, 3], [-8.5, y, 3], [-19.6, y, 3]], S: [[3, y, 3], [3, y, 13], [-8.5, y, 13], [-19.6, y, 13]] };
+    }
+    lightStart() {
+      const P = this._phPath(), len = pl => pl.slice(1).reduce((a, p, i) => a + Math.hypot(p[0] - pl[i][0], p[2] - pl[i][2]), 0);
+      this.ph = { t: 0, N: 30, gap: 0.22, speed: 17, T: Math.pow(10, -Math.max(0, this.abs)), P, Lc: len(P.com), LR: len(P.R), LS: len(P.S), LCell: len(P.S.slice(0, 3)), arrR: 0, arrS: 0, cnt: {}, stage: 0 };
+      this.dispAbs = 0; this.xrayT = 1; this._kick();
+    }
+    _phAt(pl, d) {
+      let acc = 0;
+      for (let i = 1; i < pl.length; i++) { const L = Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][2] - pl[i - 1][2]); if (d <= acc + L || i === pl.length - 1) { const u = Math.max(0, Math.min(1, (d - acc) / L)); return [pl[i - 1][0] + (pl[i][0] - pl[i - 1][0]) * u, pl[i - 1][1], pl[i - 1][2] + (pl[i][2] - pl[i - 1][2]) * u]; } acc += L; }
+      return pl[pl.length - 1];
+    }
+    _phStep(dt) {
+      const h = this.ph; h.t += dt; this._dots = [];
+      const col = this.lam < 380 ? '#c4b5fd' : lamColor(this.lam), pre = '#fffbe8';
+      const cum = [0]; for (let i = 1; i < h.P.com.length; i++) cum.push(cum[i - 1] + Math.hypot(h.P.com[i][0] - h.P.com[i - 1][0], h.P.com[i][2] - h.P.com[i - 1][2]));
+      for (let k = 0; k < h.N; k++) {
+        const d = (h.t - k * h.gap) * h.speed; if (d < 0) continue;
+        const absorbed = (((k + 0.5) * 0.6180339887) % 1) >= h.T;
+        if (d <= h.Lc) { const seg = cum.findIndex((c, i) => i > 0 && d <= c); this._dots.push({ p: this._phAt(h.P.com, d), c: seg <= 2 ? pre : col, a: 1 }); if (k === 0) h.stage = Math.max(h.stage, Math.max(0, seg - 1)); continue; }
+        const e = d - h.Lc;
+        if (k === 0) h.stage = Math.max(h.stage, 5);
+        if (e <= h.LR + 2) { if (e <= h.LR) this._dots.push({ p: this._phAt(h.P.R, e), c: col, a: 1 }); else if (!h.cnt['r' + k]) { h.cnt['r' + k] = 1; h.arrR++; } }
+        if (e <= h.LS + 2) {
+          if (absorbed && e > h.LCell - 2.5) { const f = Math.max(0, 1 - (e - (h.LCell - 2.5)) / 2.5); if (f > 0) this._dots.push({ p: this._phAt(h.P.S, Math.min(e, h.LCell)), c: '#f97316', a: f }); }
+          else if (e <= h.LS) this._dots.push({ p: this._phAt(h.P.S, e), c: col, a: 1 });
+          else if (!h.cnt['s' + k]) { h.cnt['s' + k] = 1; h.arrS++; }
+        }
+      }
+      if (h.arrR + h.arrS > 0) h.stage = Math.max(h.stage, 6);
+      const end = (h.N - 1) * h.gap + (h.Lc + h.LS + 2) / h.speed + 0.3;
+      const done = h.t >= end;
+      if (done) { h.stage = 7; this.dispAbs = this.abs; }
+      if (this.onLight) this.onLight({ stage: h.stage, arrR: h.arrR, arrS: h.arrS, N: h.N, done });
+      if (done) { this.ph = null; this._dots = []; }
     }
     _xf(p, part) {
       let q = p;
@@ -1278,6 +1321,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
           }
         });
       }
+      if (this.ph) for (const d of this._dots) { const c = this._cam(d.p), pr = this._proj(c); items.push({ dot: true, pa: pr, depth: this.dist - c[2] - 0.6, col: d.c, a: d.a, r: Math.max(2.5, 0.5 * this._f / pr[2]) }); }
       items.sort((a, b) => b.depth - a.depth);
       this._drawn = [];
       ctx.lineJoin = 'round';
@@ -1289,6 +1333,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
           ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke(); ctx.restore();
           continue;
         }
+        if (it.dot) { ctx.save(); ctx.fillStyle = it.col; ctx.globalAlpha = 0.3 * it.a; ctx.beginPath(); ctx.arc(it.pa[0], it.pa[1], it.r * 2.3, 0, 6.2832); ctx.fill(); ctx.globalAlpha = it.a; ctx.beginPath(); ctx.arc(it.pa[0], it.pa[1], it.r, 0, 6.2832); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); continue; }
         const p = it.pts; ctx.globalAlpha = it.alpha;
         ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]); for (let i = 1; i < 4; i++) ctx.lineTo(p[i][0], p[i][1]); ctx.closePath();
         ctx.fillStyle = it.fill; ctx.fill();
@@ -1310,7 +1355,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         ctx.fillStyle = 'rgba(255,255,255,.85)'; [16, 44, 72].forEach(yy => ctx.fillRect(8, yy - 6, 24, 5));
         ctx.fillStyle = '#1b1248'; ctx.font = '500 17px "JetBrains Mono", monospace'; ctx.textAlign = 'right';
         ctx.fillText(this.lam.toFixed(1) + 'nm', 124, 22);
-        ctx.fillText((this.status === 'OFF' ? '-----' : (this.abs > 3 ? 'OVER' : this.abs.toFixed(3))) + ' ABS', 124, 50);
+        ctx.fillText((this.status === 'OFF' ? '-----' : (function (a) { return a > 3 ? 'OVER' : a.toFixed(3); })(this.dispAbs == null ? this.abs : this.dispAbs)) + ' ABS', 124, 50);
         ctx.font = '500 13px "JetBrains Mono", monospace'; ctx.textAlign = 'left'; ctx.fillText(this.lam < this.lampSwitch ? 'D2' : 'WI', 40, 77);
         ctx.textAlign = 'right'; ctx.fillStyle = '#4a3fa0'; ctx.font = '500 10px "JetBrains Mono", monospace'; ctx.fillText(this.status, 124, 90);
       } else {
@@ -1425,6 +1470,20 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     $('#prev').addEventListener('click', function () { goStep(cur - 1); }); $('#next').addEventListener('click', function () { goStep(cur === TOUR.length - 1 ? 0 : cur + 1); });
     $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
     INIT.xray = true;
+  }
+  var LST = ['1. Lampu D₂/WI memancarkan radiasi kontinu; cermin memilih sumber.', '2. Celah masuk membentuk berkas sempit menuju monokromator.', '3. Kisi difraksi menguraikan cahaya menjadi spektrum.', '4. Celah keluar meloloskan satu panjang gelombang (monokromatik).', '5. Berkas menuju pembagi berkas.', '6. Pembagi membelah berkas: referensi melewati blanko, sampel melewati kuvet sampel dan sebagian diserap (titik oranye).', '7. Fotodioda menghitung cahaya yang tiba: I₀ (referensi) dan I (sampel).', '8. Rangkaian elektronik menghitung A = log(I₀/I); nilai tampil di LCD.'];
+  if (INIT.tour) {
+    m.onLight = function (s) {
+      $('#lstage').textContent = LST[s.stage]; $('#lb0').style.width = (s.arrR / s.N * 100) + '%'; $('#lb1').style.width = (s.arrS / s.N * 100) + '%';
+      $('#lv0').textContent = s.arrR; $('#lv1').textContent = s.arrS;
+      if (s.done) { var A = m.abs, T = Math.pow(10, -A); $('#lvT').textContent = fm(T * 100, 1) + ' %'; $('#lvA').textContent = fm(A, 3) + '  (A = log I₀/I)'; $('#lplay').textContent = '↺ Ulangi animasi'; }
+    };
+    $('#lplay').addEventListener('click', function () {
+      m.hl = new Set(['d2', 'wi', 'mirror', 'slit1', 'grating', 'slit2', 'split', 'holderR', 'holderS', 'detR', 'detS', 'pcb', 'lcd']); m.beamLimit = 9; m.labels = false; m.sel = null;
+      if (m.lidT) m.toggle('lid'); m.focus([-28, 52, 100, [-2, 9, -4]]);
+      $('#lv0').textContent = 0; $('#lv1').textContent = 0; $('#lb0').style.width = '0'; $('#lb1').style.width = '0'; $('#lvT').textContent = '–'; $('#lvA').textContent = '–';
+      $('#lplay').textContent = '… animasi berjalan'; m.lightStart(); sync();
+    });
   }
   m.toggle('beam', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
   setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
