@@ -956,17 +956,35 @@ button:hover{border-color:var(--acc)} .views button{border:0;background:none;col
 h4{margin:0 0 6px;font-size:13px}.hint{color:var(--muted);font-size:12px}
 input[type=range]{width:100%;accent-color:var(--acc)}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid rgba(0,0,0,.15)}
-@media (max-width:640px){.wrap{grid-template-columns:1fr}.stage{height:360px}}
+.wrap.tour{grid-template-columns:minmax(0,1fr) 330px}
+.tourcard{display:none}.wrap.tour .tourcard{display:block}.wrap.tour .plain{display:none}
+.steps{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.steps button{width:28px;height:28px;padding:0;border-radius:50%;font:600 12px 'JetBrains Mono',monospace;color:var(--muted)}
+.steps button.on{background:var(--acc);border-color:var(--acc);color:#fff}.steps button.seen{background:#e8ecff}
+.tt{font:700 15px 'Space Grotesk',Inter,sans-serif;margin:0 0 4px;color:#1e1b4b}.tx{font-size:12.5px;color:#2b2f55;margin:0 0 8px}
+.eq{font:500 12.5px 'JetBrains Mono',monospace;background:linear-gradient(135deg,#eef0ff,#f5efff);border:1px solid #e0dcff;border-radius:10px;padding:7px 10px;color:#2b2177;margin-bottom:8px}
+.nav2{display:flex;gap:6px}.nav2 button{flex:1;font-weight:600}.nav2 .pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.meter{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font:500 11px 'JetBrains Mono',monospace;color:var(--muted)}
+.meter .b{height:9px;border-radius:5px;background:#eceef9;overflow:hidden}.meter .b i{display:block;height:100%;border-radius:5px}
+.meter b{color:var(--fg)}
+.rg{margin:6px 0 2px;font-size:12px;display:flex;justify-content:space-between}
+@media (max-width:760px){.wrap,.wrap.tour{grid-template-columns:1fr}.stage{height:380px}}
 </style></head><body>
 <div class="wrap" id="wrap"><div class="stage"><canvas id="c" aria-label="Model 3D spektrofotometer UV-1700"></canvas>
-<div class="badge">UV-1700 · MODEL 3D</div>
+<div class="badge" id="badge">UV-1700 · MODEL 3D</div>
 <div class="tools"><button data-z="0.85" title="Perbesar">+</button><button data-z="1.18" title="Perkecil">−</button><button id="rs" title="Tampilan awal">⟲</button></div>
 <div class="views"><button data-v="iso" class="on">Isometrik</button><button data-v="depan">Depan</button><button data-v="samping">Kanan</button><button data-v="belakang">Belakang</button><button data-v="atas">Atas</button><button data-v="kompartemen">Kompartemen</button></div></div>
-<div class="side"><div class="card"><h4>Tampilan</h4><div class="tg">
+<div class="side"><div class="card tourcard"><div class="steps" id="steps"></div><div class="tt" id="tt"></div><div class="tx" id="tx"></div><div class="eq" id="eq"></div>
+<div class="nav2"><button id="prev">◀ Sebelumnya</button><button id="next" class="pri">Berikutnya ▶</button></div></div>
+<div class="card tourcard"><h4>Eksperimen: λ dan konsentrasi</h4>
+<div class="rg"><span>λ = <b id="lv2"></b> nm</span><span id="lamp2" class="hint"></span></div><input type="range" id="lam2" min="190" max="1100" step="1">
+<div class="rg"><span>C = <b id="cv2"></b> mg/L</span><span class="hint">ε·b = 0,20 L mg⁻¹ (b = 1 cm)</span></div><input type="range" id="conc" min="0" max="10" step="0.1" value="2.5">
+<div class="meter" style="margin-top:6px"><span>I₀</span><span class="b"><i id="b0" style="background:#4f46e5;width:100%"></i></span><b id="v0">100</b><span>I</span><span class="b"><i id="b1" style="background:#0d9488"></i></span><b id="v1"></b><span>%T</span><span class="b"><i id="b2" style="background:#d4a017"></i></span><b id="v2"></b><span>A</span><span class="b"><i id="b3" style="background:#e11d48"></i></span><b id="v3"></b></div></div>
+<div class="card"><h4>Tampilan</h4><div class="tg">
 <button data-t="lid" aria-pressed="false">Buka tutup</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="expl" aria-pressed="false">Terurai</button><button data-t="beam" aria-pressed="false">Jalur cahaya</button><button data-t="labels" aria-pressed="false">Label</button><button data-t="auto" aria-pressed="false">Putar otomatis</button></div></div>
-<div class="card"><h4><span class="sw" id="sw"></span>λ = <span id="lv"></span> nm</h4><input type="range" id="lam" min="190" max="1100" step="1"><div class="hint" id="lamp"></div></div>
+<div class="card plain"><h4><span class="sw" id="sw"></span>λ = <span id="lv"></span> nm</h4><input type="range" id="lam" min="190" max="1100" step="1"><div class="hint" id="lamp"></div></div>
 <div class="card"><h4 id="ti">Komponen</h4><div class="hint" id="info">Seret untuk memutar, roda/cubit untuk zoom, klik komponen untuk penjelasan.</div></div>
-<div class="hint">Model skematis disederhanakan; proporsi mengikuti unit UV-1700 PharmaSpec di laboratorium, bukan gambar teknik pabrikan.</div></div></div>
+<div class="hint plain">Model skematis disederhanakan; proporsi mengikuti unit UV-1700 PharmaSpec di laboratorium, bukan gambar teknik pabrikan.</div></div></div>
 <script>
 (function (root) {
   'use strict';
@@ -1029,7 +1047,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       this.cv = canvas; this.ctx = canvas.getContext('2d'); this.opt = opt || {};
       this.yaw = -32; this.pitch = 24; this.dist = 84; this.target = [0, 9, 0];
       this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.xray = 0; this.xrayT = 0;
-      this.beam = true; this.labels = false; this.auto = false; this.sel = null;
+      this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false;
       this.lam = 550; this.lampSwitch = 340.8; this.abs = 0; this.status = 'READY'; this.solColor = '#8e2c8f';
       this._build(); this._bind(); this._loop = this._loop.bind(this);
       this._ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.draw()) : null;
@@ -1153,7 +1171,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       const V = { depan: [0, 8], samping: [90, 10], atas: [0, 88], belakang: [180, 14], iso: [-32, 24], kompartemen: [-8, 55] };
       const v = V[name] || V.iso; this._anim = { from: [this.yaw, this.pitch], to: v, t: 0 }; this._kick();
     }
-    zoom(f) { this.dist = Math.max(55, Math.min(260, this.dist * f)); this.draw(); }
+    zoom(f) { this.dist = Math.max(38, Math.min(260, this.dist * f)); this.draw(); }
+    focus(v) { this._anim = { from: [this.yaw, this.pitch, this.dist, this.target.slice()], to: v, t: 0, full: true }; this._kick(); }
     reset() { this.dist = 84; this.view('iso'); this.sel = null; if (this.opt.onPick) this.opt.onPick(null); }
     _kick() { if (!this._running) { this._running = true; this._last = performance.now(); requestAnimationFrame(this._loop); } }
     _loop(now) {
@@ -1163,11 +1182,14 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (this._anim) {
         const a = this._anim; a.t = Math.min(1, a.t + dt * 2.2); const k = a.t < 0.5 ? 2 * a.t * a.t : 1 - Math.pow(-2 * a.t + 2, 2) / 2;
         let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
-        this.yaw = a.from[0] + dy * k; this.pitch = a.from[1] + (a.to[1] - a.from[1]) * k; if (a.t >= 1) this._anim = null;
+        this.yaw = a.from[0] + dy * k; this.pitch = a.from[1] + (a.to[1] - a.from[1]) * k;
+        if (a.full) { this.dist = a.from[2] + (a.to[2] - a.from[2]) * k; this.target = [0, 1, 2].map(i => a.from[3][i] + (a.to[3][i] - a.from[3][i]) * k); }
+        if (a.t >= 1) this._anim = null;
       }
       if (this.auto && !this._drag) this.yaw += dt * 18;
-      this.draw();
-      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag);
+      if (this.flow && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
+      this._ld = now; this.draw();
+      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam);
       if (busy) requestAnimationFrame(this._loop); else this._running = false;
     }
     _xf(p, part) {
@@ -1175,6 +1197,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
       if (part.grp === 'lid') { q = rotX(q, [0, 15, -2.2], -102 * this.lid * D2R); q = [q[0], q[1] + 16 * this.expl, q[2]]; }
       if (part.grp === 'cover') q = [q[0], q[1] + 16 * this.expl, q[2]];
+      if (part.id === 'grating') q = rotY(q, [3.5, 0, -21.2], (this.lam - 600) * 0.012 * D2R);
       return q;
     }
     _cam(p) {
@@ -1224,13 +1247,15 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         const facing = dot(n, sub(camPos, cen)) > 0;
         if (!facing && alpha > 0.97) continue;
         const wn = norm(cross(sub(wv[1], wv[0]), sub(wv[3], wv[0])));
-        const k = 0.5 + 0.55 * Math.max(0, dot(wn, light));
+        let k = 0.5 + 0.55 * Math.max(0, dot(wn, light));
+        if (this.tour && part.grp === 'inner' && !this.hl.has(part.id)) k *= 0.62;
         let col = part.col, emi = part.emi;
         if (part.dyn === 'd2') { emi = lampUV ? 0.45 : 0.0; col = lampUV ? '#e4dcff' : '#9a96b5'; }
         if (part.dyn === 'wi') { emi = !lampUV ? 0.45 : 0.0; col = !lampUV ? '#ffe7a0' : '#a89c74'; }
         if (part.dyn === 'glow') { col = !lampUV && this.status !== 'OFF' ? '#f0873a' : '#bfa868'; emi = !lampUV && this.status !== 'OFF' ? 0.22 : 0; }
         if (part.dyn === 'cuvS') col = this.solColor;
         if (this.sel && part.id === this.sel) emi += 0.18;
+        if (this.hl.has(part.id)) emi += 0.2;
         items.push({ part, pts: cvs.map(c => this._proj(c)), depth: this.dist - cen[2] + part.bias + (part.grp === 'inner' ? 0.35 : 0) + (facing ? 0 : 0.02), fill: shade(col, k, emi), alpha, facing });
       }
       if (this.beam) {
@@ -1243,7 +1268,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
             const A = [a[0] + (b[0] - a[0]) * t0, a[1], a[2] + (b[2] - a[2]) * t0], B = [a[0] + (b[0] - a[0]) * t1, a[1], a[2] + (b[2] - a[2]) * t1];
             const ca = this._cam(A), cb = this._cam(B);
             if (closed && !(this.lid > 0.05 && si >= 6)) continue;
-            const atten = si === 9 ? Math.max(0.12, Math.pow(10, -Math.max(0, Math.min(3, this.abs)))) : 1;
+            const atten = (si === 9 ? Math.max(0.12, Math.pow(10, -Math.max(0, Math.min(3, this.abs)))) : 1) * (si > this.beamLimit ? 0.12 : 1);
             items.push({ beam: true, pa: this._proj(ca), pb: this._proj(cb), depth: this.dist - (ca[2] + cb[2]) / 2 - 0.3, color: si <= 2 ? '#fffbe8' : lamColor(this.lam), uv: si > 2 && this.lam < 380, atten, show: by });
           }
         });
@@ -1255,7 +1280,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         if (it.beam) {
           ctx.save(); ctx.globalAlpha = 0.28 * it.atten * (it.show ? 1 : 0.55); ctx.strokeStyle = it.color; ctx.lineWidth = 7; ctx.lineCap = 'round';
           ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke();
-          ctx.globalAlpha = 0.95 * it.atten; ctx.lineWidth = 2.2; if (it.uv) ctx.setLineDash([5, 4]);
+          ctx.globalAlpha = 0.95 * it.atten; ctx.lineWidth = 2.2; if (it.uv) ctx.setLineDash([5, 4]); if (this.flow) { ctx.setLineDash([7, 6]); ctx.lineDashOffset = -(performance.now() / 35) % 13; }
           ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke(); ctx.restore();
           continue;
         }
@@ -1290,7 +1315,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       ctx.restore();
     }
     _labels(ctx) {
-      const A = [['d2', [19, 12, -20]], ['wi', [19, 11, -13]], ['mirror', [15.3, 12, -16]], ['slit1', [11.2, 13.5, -15]], ['grating', [3.5, 13, -21]], ['slit2', [3, 13.5, -9.2]], ['split', [3, 12.5, 3]], ['holderR', [-8.5, 13, 3]], ['holderS', [-8.5, 13, 13]], ['detS', [-20.6, 12, 13]], ['detR', [-20.6, 12, 3]], ['pcb', [-17, 5, -14]], ['lcd', [11.5, 29, 6]], ['keypad', [12, 17, 22]], ['lid', [-8.5, 17, 9]], ['card', [23.3, 12, 6]]];
+      const A0 = [['mono', [4, 12.6, -22.5]], ['lamphouse', [16, 4.5, -22]], ['d2', [19, 12, -20]], ['fan', [-18, 9.5, -22.5]], ['wi', [19, 11, -13]], ['mirror', [15.3, 12, -16]], ['slit1', [11.2, 13.5, -15]], ['grating', [3.5, 13, -21]], ['slit2', [3, 13.5, -9.2]], ['split', [3, 12.5, 3]], ['holderR', [-8.5, 13, 3]], ['holderS', [-8.5, 13, 13]], ['detS', [-20.6, 12, 13]], ['detR', [-20.6, 12, 3]], ['pcb', [-17, 5, -14]], ['lcd', [11.5, 29, 6]], ['keypad', [12, 17, 22]], ['lid', [-8.5, 17, 9]], ['card', [23.3, 12, 6]]];
+      const A = this.tour ? A0.filter(([id]) => this.hl.has(id)) : A0.filter(([id]) => id !== 'mono' && id !== 'lamphouse');
       ctx.font = '600 11px Inter, Arial';
       const placed = [];
       const L = A.map(([id, p0]) => { const part = this.parts.find(q => q.id === id); const p = part ? this._xf(p0, part) : p0; return { id, s: this._proj(this._cam(p)) }; }).sort((a, b) => a.s[1] - b.s[1]);
@@ -1343,16 +1369,60 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
 <script>
-var INIT = Object.assign({lam: 550, abs: 0, status: "READY", solColor: "#8e2c8f", lampSwitch: 340.8, xray: true, lid: false, compact: false, auto: false}, /*__INIT__*/null || {});
+var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solColor: "#8e2c8f", lampSwitch: 340.8, xray: true, lid: false, compact: false, auto: false}, /*__INIT__*/null || {});
 (function(){
   var SL = window.SL, $ = function(s){return document.querySelector(s)};
   if (INIT.compact) $('#wrap').classList.add('compact');
   var m = new SL.Model3D($('#c'), { onPick: function(i){ $('#ti').textContent = i ? i.title : 'Komponen'; $('#info').textContent = i ? i.text : 'Klik komponen untuk penjelasan.'; } });
   m.lampSwitch = INIT.lampSwitch; m.abs = INIT.abs; m.status = INIT.status; m.solColor = INIT.solColor;
   function sync(){ var st = m.state(); document.querySelectorAll('[data-t]').forEach(function(b){ b.setAttribute('aria-pressed', String(!!st[b.dataset.t])); }); }
-  function setLam(l){ m.setLam(l); $('#lv').textContent = l; $('#lam').value = l; $('#sw').style.background = SL.lamColor(l); $('#lamp').textContent = (l < m.lampSwitch ? 'Lampu D2 aktif' : 'Lampu WI aktif') + ' · ' + (l < 400 ? 'UV' : l <= 780 ? 'sinar tampak' : 'NIR'); }
+  function setLam(l){ m.setLam(l); $('#lv').textContent = l; $('#lam').value = l; if ($('#lv2')) { $('#lv2').textContent = l; $('#lam2').value = l; $('#lamp2').textContent = (l < m.lampSwitch ? 'Lampu D₂ · ' : 'Lampu WI · ') + (l < 400 ? 'UV' : l <= 780 ? 'tampak' : 'NIR'); } $('#sw').style.background = SL.lamColor(l); $('#lamp').textContent = (l < m.lampSwitch ? 'Lampu D2 aktif' : 'Lampu WI aktif') + ' · ' + (l < 400 ? 'UV' : l <= 780 ? 'sinar tampak' : 'NIR'); }
+  var TOUR = [
+    { t: 'Sumber radiasi: lampu D₂ dan WI', ids: ['d2', 'wi', 'lamphouse'], lim: 0, v: [-38, 42, 80, [17, 8, -16]],
+      x: 'Lampu deuterium (D₂) memancarkan kontinum UV ≈190–350 nm, sedangkan lampu wolfram-iodin (WI) memancarkan kontinum tampak–inframerah dekat ≈330–1100 nm. Instrumen memilih salah satu lampu secara otomatis; pada model ini pergantian terjadi di 340,8 nm. Geser λ untuk melihat lampu berganti. Karena intensitas lampu bergantung pada λ, pengukuran memerlukan baseline.', e: 'P₀(λ) berbeda untuk tiap lampu → baseline / auto zero' },
+    { t: 'Cermin pemilih sumber dan celah masuk', ids: ['mirror', 'slit1'], lim: 1, v: [-30, 50, 74, [13, 9, -16]],
+      x: 'Cermin pemilih mengarahkan berkas dari lampu aktif ke celah masuk. Celah masuk membentuk berkas sempit sebagai sumber titik bagi monokromator; lebarnya menentukan kompromi antara resolusi dan energi yang tersedia.', e: 'Lebar pita spektral nominal (SBW) ≈ 1 nm' },
+    { t: 'Monokromator: kisi difraksi', ids: ['grating', 'mono'], lim: 2, v: [-20, 56, 74, [5, 9, -17]],
+      x: 'Kisi holografik mendispersikan cahaya polikromatik; sudut kisi menentukan panjang gelombang yang menuju celah keluar. Geser λ: kisi berputar dan warna berkas berubah. Dinding gelap monokromator menekan sinar sesat.', e: 'nλ = d (sin α + sin β)' },
+    { t: 'Celah keluar dan lebar pita spektral', ids: ['slit2'], lim: 3, v: [-26, 56, 71, [3, 9, -10]],
+      x: 'Celah keluar hanya meneruskan pita sempit di sekitar λ terpilih. SBW menentukan resolusi puncak tajam (mis. rasio puncak toluena 269/266 nm pada uji kinerja) dan banyaknya cahaya yang mencapai detektor.', e: 'SBW ≈ lebar celah × dispersi linear terbalik' },
+    { t: 'Pembagi berkas (double-beam)', ids: ['split', 'mirror2'], lim: 5, v: [-46, 46, 68, [3, 9, 8]],
+      x: 'Berkas monokromatis dibagi menjadi berkas referensi dan berkas sampel yang diukur serempak. Rasio kedua detektor meniadakan fluktuasi intensitas lampu dan drift sehingga baseline lebih stabil daripada instrumen berkas tunggal.', e: 'A = log₁₀ (I₀ / I)' },
+    { t: 'Kompartemen sampel dan kuvet', ids: ['holderR', 'holderS', 'cuvR', 'cuvS'], lim: 9, v: [-16, 52, 65, [-8, 9, 8]],
+      x: 'Berkas referensi melewati kuvet blanko; berkas sampel melewati kuvet berisi analit (jalur optik b = 1 cm, kuarsa untuk UV). Geser konsentrasi: intensitas yang diteruskan turun secara eksponensial menurut hukum Lambert–Beer, dan warna larutan memekat.', e: 'A = ε · b · C' },
+    { t: 'Detektor fotodioda', ids: ['detR', 'detS'], lim: 9, v: [-32, 40, 74, [-18, 9, 8]],
+      x: 'Fotodioda silikon mengubah intensitas cahaya menjadi arus. Detektor referensi mengukur I₀ dan detektor sampel mengukur I. Sinar sesat dan derau gelap membatasi absorbansi tertinggi yang masih andal (umumnya A < 2).', e: 'T = I / I₀ ; %T = 100 T ; A = −log₁₀ T' },
+    { t: 'Pengolahan sinyal', ids: ['pcb', 'fan'], lim: 9, v: [-30, 42, 91, [-16, 4, -12]],
+      x: 'Arus detektor dikuatkan, didigitalkan oleh ADC, lalu dikoreksi terhadap baseline atau auto zero oleh prosesor pada papan elektronik. Data ditampilkan di LCD atau dikirim ke komputer (UVProbe) melalui kabel RS-232C.', e: 'A_terlapor = A_sampel − A_baseline' },
+    { t: 'Layar dan keluaran', ids: ['lcd', 'keypad'], lim: 9, v: [-24, 30, 94, [12, 18, 10]],
+      x: 'LCD UV-1700 menampilkan λ, absorbansi atau %T, dan lampu aktif (D2/WI). Pada mode PC CONTROL, hasil ditampilkan dan disimpan oleh UVProbe. Rantai lengkap: lampu → pemilih sumber → monokromator → pembagi berkas → kuvet → detektor → pengolah sinyal → layar.', e: 'Sumber → λ → I₀ & I → T → A → tampilan' }
+  ];
+  var EPSB = 0.2, cur = 0, seen = {};
+  function mixc(a, b, t) { var p = function (h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }, x = p(a), y = p(b); return '#' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0'); }).join(''); }
+  function fm(v, d) { return v.toFixed(d).replace('.', ','); }
+  function meter() {
+    var c = +$('#conc').value, A = EPSB * c, T = Math.pow(10, -A), I = 100 * T;
+    m.abs = A; m.solColor = mixc('#eaf6f8', '#8e2c8f', Math.min(1, c / 10)); $('#cv2').textContent = fm(c, 1);
+    $('#v1').textContent = fm(I, 1); $('#v2').textContent = fm(100 * T, 1) + ' %'; $('#v3').textContent = fm(A, 3);
+    $('#b1').style.width = I + '%'; $('#b2').style.width = (100 * T) + '%'; $('#b3').style.width = Math.min(100, A / 2 * 100) + '%'; m._kick();
+  }
+  function goStep(i) {
+    cur = Math.max(0, Math.min(TOUR.length - 1, i)); var s = TOUR[cur]; seen[cur] = 1;
+    m.hl = new Set(s.ids); m.beamLimit = s.lim; m.focus(s.v); m.sel = null;
+    $('#tt').textContent = (cur + 1) + '. ' + s.t; $('#tx').textContent = s.x; $('#eq').textContent = s.e;
+    document.querySelectorAll('#steps button').forEach(function (b, k) { b.classList.toggle('on', k === cur); b.classList.toggle('seen', k !== cur && !!seen[k]); });
+    $('#prev').disabled = cur === 0; $('#next').textContent = cur === TOUR.length - 1 ? 'Ulangi tur ↺' : 'Berikutnya ▶';
+    m.labels = true; sync();
+  }
+  if (INIT.tour) {
+    $('#wrap').classList.add('tour'); $('#badge').textContent = 'BAGIAN DALAM UV-1700 · PRINSIP KERJA'; m.tour = true; m.flow = true;
+    var sb = $('#steps'); TOUR.forEach(function (_, k) { var b = document.createElement('button'); b.textContent = k + 1; b.title = TOUR[k].t; b.addEventListener('click', function () { goStep(k); }); sb.appendChild(b); });
+    $('#prev').addEventListener('click', function () { goStep(cur - 1); }); $('#next').addEventListener('click', function () { goStep(cur === TOUR.length - 1 ? 0 : cur + 1); });
+    $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
+    INIT.xray = true;
+  }
   m.toggle('beam', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
-  setLam(INIT.lam); sync();
+  setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
   document.addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return;
     if (b.dataset.t){ m.toggle(b.dataset.t); sync(); }
     if (b.dataset.v){ m.view(b.dataset.v); document.querySelectorAll('.views button').forEach(function(x){ x.classList.toggle('on', x===b); }); }
@@ -1372,84 +1442,130 @@ LAB_HTML = r'''<!doctype html>
 :root{--fg:#14123a;--muted:#5b6386;--line:#e1e4f2;--acc:#4f46e5;--ok:#0d9488;--bad:#e11d48}
 *{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--fg);font:13px/1.45 Inter,system-ui,sans-serif}
 .top{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:10px}
-.stage{position:relative;height:640px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#eef0f8}
+.stage{position:relative;height:575px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#eef0f8}
 canvas#c{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
-.views{position:absolute;left:8px;top:8px;display:flex;flex-wrap:wrap;gap:3px;background:rgba(255,255,255,.9);padding:4px;border-radius:10px;max-width:calc(100% - 150px)}
+.views{position:absolute;left:8px;top:8px;display:flex;flex-wrap:wrap;gap:3px;background:rgba(255,255,255,.92);padding:4px;border-radius:10px;max-width:calc(100% - 170px)}
 .views button{border:0;background:none;color:var(--muted);font:500 12px Inter,sans-serif;padding:4px 8px;border-radius:7px;cursor:pointer}
 .views button.on{background:var(--acc);color:#fff}
-.tools{position:absolute;left:8px;bottom:8px;display:flex;gap:4px}
-.tools button{border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:8px;padding:4px 9px;cursor:pointer;font:500 12px Inter,sans-serif}
+.tools{position:absolute;left:8px;bottom:8px;display:flex;gap:4px;flex-wrap:wrap}
+.tools button{border:1px solid var(--line);background:rgba(255,255,255,.94);border-radius:8px;padding:4px 9px;cursor:pointer;font:500 12px Inter,sans-serif}
 .tools button[aria-pressed=true]{background:#eef0ff;border-color:var(--acc);color:#3f37c9}
-.hud{position:absolute;right:8px;top:8px;background:rgba(20,18,58,.88);color:#fff;border-radius:12px;padding:8px 12px;font:600 11px 'JetBrains Mono',monospace;text-align:right;min-width:120px}
+.hud{position:absolute;right:8px;top:8px;background:rgba(20,18,58,.9);color:#fff;border-radius:12px;padding:8px 12px;font:600 11px 'JetBrains Mono',monospace;text-align:right;min-width:150px}
 .hud .sc{font-size:22px;line-height:1.1}.hud .tm{color:#a5b4fc}
-.toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
+.bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a3e635);width:0}
+.toast{position:absolute;left:50%;top:50px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 .toast.show{opacity:1}.toast.info{background:#14123a;color:#fff}.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#e11d48;color:#fff}.toast.warn{background:#f59e0b;color:#1f1300}
-.side{display:flex;flex-direction:column;gap:8px;height:640px;overflow:auto;padding-right:2px}
+.modal{position:absolute;inset:0;background:rgba(20,18,58,.45);display:none;align-items:center;justify-content:center;z-index:5}
+.modal.show{display:flex}
+.mcard{background:#fff;border-radius:18px;padding:20px 22px;width:min(520px,92%);box-shadow:0 30px 60px -20px rgba(0,0,0,.5);max-height:94%;overflow:auto}
+.mcard h2{margin:0 0 6px;font:700 20px 'Space Grotesk',Inter,sans-serif}.mcard p{margin:4px 0 10px;color:var(--muted)}
+.mcard ol{padding-left:18px;margin:6px 0 12px}.mcard li{margin:4px 0}
+.mcard label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+.mcard input,.mcard textarea{width:100%;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:9px}
+.mcard .row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.big{font:600 14px Inter,sans-serif;border:0;border-radius:11px;padding:10px 16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;cursor:pointer;width:100%;margin-top:12px}
+.side{display:flex;flex-direction:column;gap:8px;height:575px;overflow:auto;padding-right:2px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
-.card h4{margin:0 0 7px;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card h4{margin:0 0 7px;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
 .chip{font:500 11px 'JetBrains Mono',monospace;padding:3px 8px;border-radius:99px;background:#f1f2f8;color:#6b7194}
 .chip.on{background:#dff7f1;color:#0b7a6e}.chip.mid{background:#fff4d6;color:#9a6a00}
-.next{background:linear-gradient(135deg,#eef0ff,#f5efff);border-color:#d9d4ff}.next b{color:#3f37c9}
+.now{background:linear-gradient(135deg,#eef0ff,#f5efff);border-color:#d9d4ff}
+.now .sec{font:600 11px 'JetBrains Mono',monospace;color:#7c3aed;letter-spacing:.06em}
+.now .tx{font-weight:600;font-size:14px;margin:4px 0 8px;color:#1e1b4b}
+.now .why{color:var(--muted);font-size:12px;margin-bottom:8px}
+.go{font:600 13px Inter,sans-serif;border:0;border-radius:10px;padding:9px 12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;cursor:pointer;width:100%}
+.go:disabled{opacity:.5;cursor:wait}
+.ik{max-height:none}.ik .grp{font:600 11px 'JetBrains Mono',monospace;color:#3f37c9;margin:10px 0 4px;letter-spacing:.05em}
+.ik .it{display:flex;gap:8px;padding:5px 6px;border-radius:8px;font-size:12px;align-items:flex-start}
+.ik .it .d{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 10px 'JetBrains Mono',monospace;background:#eef0ff;color:#4f46e5}
+.ik .it.done{color:#6b7280}.ik .it.done .d{background:#0d9488;color:#fff}
+.ik .it.cur{background:#f5f3ff;box-shadow:inset 0 0 0 1px #c4b5fd;color:#1e1b4b;font-weight:600}
+.ik .rk{font:500 9px 'JetBrains Mono',monospace;color:#9a6a00;background:#fff4d6;border-radius:5px;padding:1px 5px;margin-left:4px}
+details.man summary{cursor:pointer;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 button.a{font:500 12px Inter,sans-serif;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:9px;padding:7px 8px;cursor:pointer;text-align:left}
 button.a:hover{border-color:var(--acc)}button.a:disabled{opacity:.45;cursor:not-allowed}
-button.a.hl{border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.35);background:#faf8ff}
-select,input[type=number]{width:100%;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--fg)}
-.seg{display:flex;gap:4px;margin-bottom:6px}.seg label{flex:1;text-align:center;border:1px solid var(--line);border-radius:9px;padding:5px;cursor:pointer;font-size:12px}
+select,input[type=number],input[type=text]{width:100%;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--fg)}
+.seg{display:flex;gap:4px;margin:6px 0}.seg label{flex:1;text-align:center;border:1px solid var(--line);border-radius:9px;padding:5px;cursor:pointer;font-size:12px}
 .seg input{display:none}.seg label:has(input:checked){border-color:var(--acc);background:#eef0ff;color:#3f37c9;font-weight:600}
-.bottom{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:10px;margin-top:10px}
-.pcwrap{background:#1b1d22;border-radius:16px;padding:10px 10px 14px;box-shadow:inset 0 0 0 2px #2c2f36}
+.bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.pip{position:absolute;right:8px;bottom:8px;width:35%;min-width:250px;max-width:460px;background:#111214;border-radius:12px;padding:5px 6px 7px;box-shadow:0 14px 34px -10px rgba(0,0,0,.65),inset 0 0 0 2px #2a2c31;z-index:3;transition:width .25s}
+.pip.big{width:70%;max-width:none}.pip.hide{display:none}
+.pip .ph{display:flex;justify-content:space-between;align-items:center;color:#9aa1b5;font:500 10px 'JetBrains Mono',monospace;letter-spacing:.1em;padding:0 2px 4px}
+.pip .ph button{border:0;background:#2a2c31;color:#cfd3e4;border-radius:6px;padding:2px 7px;font:500 10px 'JetBrains Mono',monospace;cursor:pointer;margin-left:4px}
+.pip canvas{width:100%;display:block;border-radius:4px;background:#000;cursor:pointer}
+.prog{height:6px;border-radius:4px;background:#e6e8f5;overflow:hidden;margin:2px 0 8px}.prog i{display:block;height:100%;background:linear-gradient(90deg,#4f46e5,#22c55e);width:0;transition:width .3s}
+.pcwrap{background:#111214;border-radius:16px;padding:10px 10px 14px;box-shadow:inset 0 0 0 2px #26282d}
 .pchead{color:#9aa1b5;font:500 11px 'JetBrains Mono',monospace;letter-spacing:.1em;margin:0 0 6px 4px;display:flex;justify-content:space-between}
-canvas#pc{width:100%;display:block;border-radius:6px;background:#000;cursor:pointer}
-textarea{width:100%;height:118px;font:12px 'JetBrains Mono',monospace;border:1px solid var(--line);border-radius:9px;padding:6px;resize:vertical}
-.log{font:11.5px 'JetBrains Mono',monospace;color:#4a5072;max-height:190px;overflow:auto;white-space:pre-wrap}
+canvas#pc{width:100%;display:block;border-radius:4px;background:#000;cursor:pointer}
+textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px solid var(--line);border-radius:9px;padding:6px;resize:vertical}
+.log{font:11.5px 'JetBrains Mono',monospace;color:#4a5072;max-height:170px;overflow:auto;white-space:pre-wrap}
 .log .e{color:#be123c}.log .o{color:#0b7a6e}.log .w{color:#9a6a00}
+.prints{display:flex;gap:6px;flex-wrap:wrap}.prints a{display:block;border:1px solid var(--line);border-radius:6px;overflow:hidden;width:72px;text-decoration:none;color:var(--muted);font-size:10px;text-align:center}
+.prints img{width:100%;display:block}
 .row{display:flex;gap:6px;align-items:center}.hint{color:var(--muted);font-size:12px}
-@media (max-width:900px){.top,.bottom{grid-template-columns:1fr}.side{height:auto}.stage{height:440px}}
+@media (max-width:980px){.top,.bottom{grid-template-columns:1fr}.side{height:auto}.stage{height:520px}.pip{width:62%}}
 </style></head><body>
 <div class="top">
   <div class="stage"><canvas id="c" aria-label="Meja praktikum 3D"></canvas>
     <div class="views">
-      <button data-v="meja" class="on">Meja</button><button data-v="alat">Alat</button><button data-v="kompartemen">Kompartemen</button>
-      <button data-v="kerja">Rak & tisu</button><button data-v="komputer">Komputer</button><button data-v="ups">UPS</button><button data-v="belakang">Kabel</button>
+      <button data-v="meja" class="on">Meja</button><button data-v="alat">UV-1700</button><button data-v="kompartemen">Kompartemen</button>
+      <button data-v="isi">Labu & kuvet</button><button data-v="komputer">Komputer</button><button data-v="belakang">Kabel & UPS</button>
     </div>
-    <div class="hud"><div>SKOR PROSEDUR</div><div class="sc" id="score">100</div><div class="tm" id="clock">00:00</div></div>
-    <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="autox" aria-pressed="true">Tembus saat mengukur</button><button data-t="sound" aria-pressed="true">Suara</button></div>
+    <div class="hud"><div>SKOR PROSEDUR</div><div class="sc" id="score">100</div><div class="tm" id="clock">00:00</div><div class="bar"><i id="prog"></i></div></div>
+    <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="sound" aria-pressed="true">Suara</button><button data-t="help">Bantuan</button><button data-t="pip">Layar komputer</button></div>
+    <div class="pip" id="pip"><div class="ph"><span>MONITOR · <span id="pcst" style="color:#8b93b8">MATI</span></span><span><button data-t="pipbig" id="pipbig">Perbesar</button><button data-t="pipx">Tutup</button></span></div><canvas id="pc" width="1040" height="610"></canvas></div>
     <div class="toast" id="toast"></div>
+    <div class="modal show" id="welcome"><div class="mcard">
+      <h2>Praktikum Virtual UV-1700</h2>
+      <p>Simulasi penggunaan Spektrofotometer UV-Vis Shimadzu UV-1700 PharmaSpec mengikuti Instruksi Kerja IK/LAB.INST/6 Laboratorium Instrumentasi.</p>
+      <ol><li>Isi nama, kelas, dan kelompok (dipakai untuk nama file dan Log Book).</li>
+      <li>Baca kotak <b>Langkah sekarang</b> di kanan, lalu tekan <b>Kerjakan langkah ini</b>. Meja 3D dan layar komputer menunjukkan hasilnya.</li>
+      <li>Ingin mencoba sendiri? Buka <b>Kontrol manual</b>; urutan yang salah mengurangi skor.</li></ol>
+      <div class="row3"><div><label>Nama praktikan</label><input id="nm" placeholder="Nama lengkap"></div><div><label>Kelas</label><input id="kl" placeholder="mis. 2A"></div><div><label>Kelompok</label><input id="kp" placeholder="mis. 2" value="2"></div></div>
+      <button class="big" id="startbtn">Mulai praktikum</button></div></div>
+    <div class="modal" id="logm"><div class="mcard">
+      <h2>Log Book Alat UV-1700</h2><p>Catat semua kejadian selama penggunaan dan tanda tangani dengan nama jelas (IK C.1).</p>
+      <label>Tanggal</label><input id="lg_t" readonly><label>Nama pengguna</label><input id="lg_n">
+      <label>Kejadian / kondisi alat</label><textarea id="lg_k" style="height:80px"></textarea>
+      <label>Tanda tangan (ketik nama jelas)</label><input id="lg_s">
+      <button class="big" id="lg_ok">Simpan ke Log Book</button></div></div>
   </div>
   <div class="side">
-    <div class="card"><h4>Status</h4><div class="chips" id="chips"></div></div>
-    <div class="card next"><h4>Langkah berikutnya</h4><div id="next"></div></div>
-    <div class="card"><h4>A · Persiapan alat</h4><div class="grid2">
-      <button class="a" data-act="cables">Sambungkan kabel</button><button class="a" data-act="ups">Nyalakan UPS</button>
-      <button class="a" data-act="pc">Nyalakan komputer</button><button class="a" data-act="inst">Nyalakan UV-1700</button>
-      <button class="a" data-act="skipwarm">Lewati pemanasan</button><button class="a" data-act="software">Buka software</button>
-      <button class="a" data-act="connect">Hubungkan PC–alat</button><button class="a" data-act="shutdown">Matikan semua</button></div></div>
-    <div class="card"><h4>B · Kuvet</h4>
-      <div class="seg"><label><input type="radio" name="cv" value="R" checked><span>Kuvet referensi</span></label><label><input type="radio" name="cv" value="S"><span>Kuvet sampel</span></label></div>
+    <div class="card now"><div class="sec" id="nowsec">LANGKAH SEKARANG</div><div class="tx" id="nowtx"></div><div class="prog"><i id="prog2"></i></div><div class="why" id="nowwhy"></div>
+      <button class="go" id="gobtn">Kerjakan langkah ini</button></div>
+    <div class="card"><details class="man"><summary>Semua langkah IK/LAB.INST/6 <span id="ikn"></span></summary><div class="ik" id="iklist" style="margin-top:6px"></div>
+      <div class="hint" style="margin-top:6px"><span class="rk">REK</span> halaman 1 IK belum difoto; langkah bagian A dan B-Spektrum 1–5 disusun dari prosedur baku UVProbe dan perlu dicocokkan dengan IK asli.</div></details></div>
+    <div class="card"><details class="man"><summary>Status alat <span id="ident" style="text-transform:none;letter-spacing:0"></span></summary><div class="chips" id="chips" style="margin-top:6px"></div></details></div>
+    <div class="card"><details class="man"><summary>Kontrol manual (mode bebas)</summary>
+      <div class="grid2" style="margin-top:8px">
+        <button class="a" data-act="cables">Sambungkan kabel</button><button class="a" data-act="ups">UPS ON/OFF</button>
+        <button class="a" data-act="silica">Silica gel keluar/masuk</button><button class="a" data-act="inst">Power UV-1700</button>
+        <button class="a" data-act="pc">Nyalakan CPU, monitor, printer</button><button class="a" data-act="pcctrl">MODE → PC CTRL</button>
+        <button class="a" data-act="software">Buka UVProbe</button><button class="a" data-act="connect">Connect</button>
+        <button class="a" data-act="skipwarm">Lewati pemanasan</button><button class="a" data-act="lid">Buka/tutup kompartemen</button></div>
+      <div class="seg"><label><input type="radio" name="cv" value="R"><span>Kuvet referensi</span></label><label><input type="radio" name="cv" value="S" checked><span>Kuvet sampel</span></label></div>
       <select id="sol"></select>
       <div class="grid2" style="margin-top:6px">
-      <button class="a" data-act="fill">Bilas & isi kuvet</button><button class="a" data-act="wipe">Lap dengan tisu</button>
-      <button class="a" data-act="lid">Buka/tutup kompartemen</button><button class="a" data-act="insert">Masukkan ke alat</button>
-      <button class="a" data-act="remove">Keluarkan kuvet</button><button class="a" data-act="empty">Buang isi kuvet</button></div></div>
-    <div class="card"><h4>C · Pengukuran</h4>
-      <div class="row"><input type="number" id="lam" min="190" max="1100" step="0.5"><button class="a" data-act="goto" style="white-space:nowrap">GOTO WL</button></div>
+        <button class="a" data-act="fill">Bilas & isi kuvet</button><button class="a" data-act="wipe">Lap dengan tisu</button>
+        <button class="a" data-act="insert">Masukkan ke alat</button><button class="a" data-act="remove">Keluarkan kuvet</button>
+        <button class="a" data-act="empty">Buang isi kuvet</button><button class="a" data-act="dry">Keringkan (etanol, aseton)</button></div>
+      <div class="row" style="margin-top:6px"><input type="number" id="lam" min="190" max="1100" step="0.5"><button class="a" data-act="goto" style="white-space:nowrap">Go To WL</button></div>
       <div class="grid2" style="margin-top:6px">
-      <button class="a" data-act="autozero">Auto zero</button><button class="a" data-act="baseline">Koreksi baseline</button>
-      <button class="a" data-act="measure">Ukur (fotometri)</button><button class="a" data-act="scan">Scan spektrum</button></div>
-      <div class="hint" style="margin-top:6px" id="scaninfo"></div></div>
-    <div class="card"><h4 id="ti">Info komponen</h4><div class="hint" id="info">Seret untuk memutar, roda/cubit untuk zoom, klik objek untuk penjelasan.</div></div>
+        <button class="a" data-act="baseline">Baseline</button><button class="a" data-act="autozero">Auto Zero</button>
+        <button class="a" data-act="scan">Start (scan)</button><button class="a" data-act="readstd">Read Std</button>
+        <button class="a" data-act="readunk">Read Unk</button><button class="a" data-act="disconnect">Disconnect</button></div>
+      <div class="hint" style="margin-top:6px" id="scaninfo"></div></details></div>
+    <div class="card"><h4 id="ti">Info objek</h4><div class="hint" id="info">Klik objek pada meja untuk penjelasan.</div></div>
   </div>
 </div>
 <div class="bottom">
-  <div class="pcwrap"><div class="pchead"><span>LAYAR KOMPUTER · PERANGKAT LUNAK INSTRUMEN (SIMULASI)</span><span id="pcst">MATI</span></div><canvas id="pc" width="1040" height="600"></canvas></div>
-  <div class="side" style="height:auto">
-    <div class="card"><h4>Data untuk Kurva Kalibrasi</h4><textarea id="out" readonly></textarea>
-      <div class="grid2" style="margin-top:6px"><button class="a" data-act="copy">Salin data</button><button class="a" data-act="csv">Unduh CSV</button></div>
-      <div class="hint" style="margin-top:6px">Tempel teks ini di kotak "Impor hasil praktikum" di bawah aplikasi untuk mengirim ke Kurva Kalibrasi.</div></div>
-    <div class="card"><h4>Catatan kerja</h4><div class="log" id="log"></div></div>
-  </div>
+  <div class="card"><h4>Hasil cetak printer</h4><div class="prints" id="prints"><span class="hint">Belum ada cetakan.</span></div></div>
+  <div class="card"><h4>Data untuk Kurva Kalibrasi</h4><textarea id="out" readonly></textarea>
+    <div class="grid2" style="margin-top:6px"><button class="a" data-act="copy">Salin data</button><button class="a" data-act="csv">Unduh CSV</button></div>
+    <div class="hint" style="margin-top:6px">Tempel di kotak <b>Impor hasil praktikum</b> di bawah halaman.</div></div>
+  <div class="card"><h4>Catatan kerja</h4><div class="log" id="log"></div></div>
 </div>
 <script>
 (function () {
@@ -1483,27 +1599,34 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const norm = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
 const lerp3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 function rotX(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const y = p[1] - piv[1], z = p[2] - piv[2]; return [p[0], piv[1] + y * c - z * s, piv[2] + y * s + z * c]; }
-function rotY(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const x = p[0] - piv[0], z = p[2] - piv[2]; return [piv[0] + x * c + z * s, p[1], piv[2] - x * s + z * c]; }
 function rotZ(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const x = p[0] - piv[0], y = p[1] - piv[1]; return [piv[0] + x * c - y * s, piv[1] + x * s + y * c, p[2]]; }
+function rotY(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const x = p[0] - piv[0], z = p[2] - piv[2]; return [piv[0] + x * c + z * s, p[1], piv[2] - x * s + z * c]; }
 
-/* ---------------- larutan ---------------- */
-const SOL = { blank: { id: 'blank', label: 'Blanko (' + AN.pelarut + ')', c: 0, col: '#dff4f8' } };
-AN.std.forEach((c, i) => { SOL['s' + i] = { id: 's' + i, label: 'Standar ' + (i + 1) + ' · ' + fx(c, c < 1 ? 2 : 1) + ' ' + INIT.unit, c, std: true }; });
-SOL.X = { id: 'X', label: 'Sampel X (tak diketahui)', c: INIT.hidden, sample: true };
+/* ================= larutan & identitas ================= */
+const SOL = { blank: { id: 'blank', label: 'Blanko (' + AN.pelarut + ')', short: 'Blanko', c: 0, col: '#dff4f8' } };
+AN.std.forEach((c, i) => { SOL['s' + i] = { id: 's' + i, label: 'Standar ' + (i + 1) + ' · ' + fx(c, c < 1 ? 2 : 1) + ' ' + INIT.unit, short: 'Std ' + (i + 1), c, std: true, idx: i }; });
+SOL.X = { id: 'X', label: 'Sampel X (tak diketahui)', short: 'Sampel X', c: INIT.hidden, sample: true };
 const cmax = Math.max(...AN.std, INIT.hidden);
 Object.values(SOL).forEach(s => { if (s.c > 0) s.col = mix('#eef6f8', AN.warna, Math.min(1, 0.25 + 0.75 * s.c / cmax)); });
 const SOL_KEYS = Object.keys(SOL);
+const ID = { nama: '', kelas: 'Kelas', kel: 'Kelompok' };
+const today = new Date(); const dstr = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + today.getFullYear();
+const fname = () => dstr + '_' + (ID.kelas || 'Kelas').replace(/\s+/g, '') + '_' + (ID.kel || 'Kelompok').replace(/\s+/g, '');
+const scanRange = () => { const lo = AN.lam_ref < 320 ? 200 : Math.max(190, Math.round((AN.lam_ref - 150) / 10) * 10); return [lo, Math.min(1100, lo + 320)]; };
 
-/* ---------------- keadaan ---------------- */
-const RACK = { R: [-36, 0.2, 4], S: [-36, 0.2, 10] }, CELL = { R: [-8.5, 6.6, 3], S: [-8.5, 6.6, 13] };
+/* ================= keadaan ================= */
+const RACK = { R: [-31, 0.2, 4], S: [-31, 0.2, 10] }, CELL = { R: [-8.5, 6.6, 3], S: [-8.5, 6.6, 13] }, DRY = { R: [-16, -1.25, 30], S: [-11, -1.25, 30] };
 const ST = {
-  cab: [0, 0, 0, 0, 0, 0], cabled: false, ups: false, pc: 0, inst: 'off', initLines: [], warmLeft: 0, warmSkipped: false, connected: false,
-  lid: 0, lidT: 0, xray: 0, xrayT: 0, xrayUser: false, autoX: true, sound: true, lam: AN.lam_ref, lastA: 0, lcdMode: 'PHOTOMETRIC',
-  cuv: { R: { where: 'rak', pos: RACK.R.slice(), content: null, level: 0, dirty: false, smudge: 0 }, S: { where: 'rak', pos: RACK.S.slice(), content: null, level: 0, dirty: false, smudge: 0 } },
-  zero: null, readings: [], spectrum: null, pcTab: 'foto', score: 100, errs: new Set(), busy: false, tissue: null, beam: 0, t0: performance.now(), pcBoot: 0
+  cab: [0, 0, 0, 0, 0, 0, 0, 0, 0], cabled: false, ups: false, pc: 0, pcBoot: 0, printer: false, inst: 'off', initLines: [], warmLeft: 0, warmSkipped: false,
+  pcctrl: false, sw: false, connected: false, lid: 0, xray: 0, xrayT: 0, xrayUser: false, autoX: true, sound: true, lam: AN.lam_ref, lastA: 0, lcdFold: 0,
+  silica: 'comp', silicaPos: [-8.5, 6, 8], logbook: null, tidy: false, paper: 0, chairZ: 66, wash: null, pour: null, stream: null,
+  cuv: { R: { where: 'rak', pos: RACK.R.slice(), content: null, level: 0, dirty: false, smudge: 0, flip: 0, wet: false }, S: { where: 'rak', pos: RACK.S.slice(), content: null, level: 0, dirty: false, smudge: 0, flip: 0, wet: false } },
+  zero: null, win: null, menu: null, dlg: null, busyMsg: null, ptab: 'std',
+  spectrum: null, peaks: null, smethod: null, pmethod: null, stdTable: [], unkTable: [], files: [], prints: [],
+  score: 100, errs: new Set(), done: new Set(), busy: false, tissue: null, beam: 0, t0: performance.now()
 };
 
-/* ---------------- geometri ---------------- */
+/* ================= geometri ================= */
 const P = [];
 function quad(id, grp, v, col, o) { P.push({ id, grp, v, col, alpha: o.alpha == null ? 1 : o.alpha, emi: o.emi || 0, bias: o.bias || 0, tf: o.tf || null, dyn: o.dyn || null, text: o.text || null, ds: !!o.ds, bg: !!o.bg }); }
 function box(id, grp, x0, x1, y0, y1, z0, z1, col, o) {
@@ -1533,31 +1656,58 @@ function cyl(id, grp, cx, cz, r, y0, y1, col, o, n) {
     if (!o.open) quad(id, grp, [[cx, y1, cz], [p1[0], y1, p1[1]], [p0[0], y1, p0[1]], [p0[0], y1, p0[1]]], o.topCol || col, o);
   }
 }
-const BEIGE = '#d8bf7f', BEIGE2 = '#e2cb8e', GREY = '#4a5058', DARK = '#1e2126', CREAM = '#efe9d6';
-// --- ruang: dinding, meja ---
-box('wall', 'room', -125, 85, -6, 75, -40, -38.5, '#f3f4f7', { bg: true, cell: 14, bias: 400 });
-for (let x = -125; x <= 85; x += 15) quad('wall', 'room', [[x, -6, -38.4], [x + 0.25, -6, -38.4], [x + 0.25, 75, -38.4], [x, 75, -38.4]], '#dfe2ea', { bg: true, bias: 390 });
-box('wall', 'room', -125, 85, 30, 75, -38.6, -38.4, '#f7f7f9', { bg: true, cell: 30, bias: 395, skip: ['b', 'u', 't', 'l', 'r'] });
-box('bench', 'room', -125, 85, -8, -1.4, -38.5, 36, '#fbfbfc', { bg: true, cell: 15, bias: 300, faceCol: { f: '#e9ebf1' } });
-for (let x = -120; x <= 85; x += 15) quad('bench', 'room', [[x, -1.38, -38.5], [x + 0.2, -1.38, -38.5], [x + 0.2, -1.38, 36], [x, -1.38, 36]], '#e3e6ee', { bg: true, bias: 290 });
-for (let z = -35; z <= 36; z += 15) quad('bench', 'room', [[-125, -1.37, z], [85, -1.37, z], [85, -1.37, z + 0.2], [-125, -1.37, z + 0.2]], '#e3e6ee', { bg: true, bias: 290 });
-// stop kontak dinding
-box('outlet', 'room', 30, 44, 14, 22, -38.4, -37.6, '#f4f1e6', { bias: -2 });
-box('outlet', 'room', 32.2, 35.8, 16.2, 19.8, -37.6, -37.4, '#d9d4c3', { bias: -3 }); box('outlet', 'room', 38.2, 41.8, 16.2, 19.8, -37.6, -37.4, '#d9d4c3', { bias: -3 });
-// --- spektrofotometer (origin) ---
+function lathe(id, grp, cx, cz, prof, col, o, n) {
+  o = Object.assign({ ds: true }, o || {}); n = n || 14; const off = o.off || 0;
+  const a0s = o.arc ? o.arc[0] : 0, a1s = o.arc ? o.arc[1] : 360, nn = o.arc ? Math.max(1, Math.round(n * (a1s - a0s) / 360)) : n;
+  for (let k = 0; k < prof.length - 1; k++) {
+    const [r0, y0] = prof[k], [r1, y1] = prof[k + 1];
+    for (let i = 0; i < nn; i++) {
+      const A0 = (a0s + (a1s - a0s) * i / nn + off) * D2R, A1 = (a0s + (a1s - a0s) * (i + 1) / nn + off) * D2R;
+      const c0 = Math.cos(A0), s0 = Math.sin(A0), c1 = Math.cos(A1), s1 = Math.sin(A1);
+      if (r0 === 0 && y0 === y1) { quad(id, grp, [[cx, y0, cz], [cx + r1 * c1, y1, cz + r1 * s1], [cx + r1 * c0, y1, cz + r1 * s0], [cx + r1 * c0, y1, cz + r1 * s0]], o.topCol || col, o); continue; }
+      if (r1 === 0 && y0 === y1) { quad(id, grp, [[cx, y0, cz], [cx + r0 * c1, y0, cz + r0 * s1], [cx + r0 * c0, y0, cz + r0 * s0], [cx + r0 * c0, y0, cz + r0 * s0]], o.topCol || col, o); continue; }
+      quad(id, grp, [[cx + r0 * c1, y0, cz + r0 * s1], [cx + r0 * c0, y0, cz + r0 * s0], [cx + r1 * c0, y1, cz + r1 * s0], [cx + r1 * c1, y1, cz + r1 * s1]], col, o);
+    }
+  }
+}
+function clipProf(prof, ymax, dr) {
+  const out = [];
+  for (let k = 0; k < prof.length; k++) { const [r, y] = prof[k]; if (y <= ymax) out.push([Math.max(0, r - dr), y]); else { const [r0, y0] = prof[k - 1]; const t = (ymax - y0) / (y - y0); out.push([Math.max(0, r0 + (r - r0) * t - dr), ymax]); break; } }
+  return out;
+}
+const BEIGE = '#d8bf7f', BEIGE2 = '#e2cb8e', GREY = '#4a5058', DARK = '#1e2126', CREAM = '#efe9d6', Y0 = -1.1;
+// ruang
+box('wall', 'room', -200, 200, -80, 85, -40, -38.5, '#f6f7fb', { bg: true, cell: 40, bias: 400, emi: 0.1 });
+box('bench', 'room', -130, 90, -8, -1.4, -38.5, 38, '#fbfbfc', { bg: true, cell: 15, bias: 300, faceCol: { f: '#e9ebf1' } });
+for (let x = -130; x <= 90; x += 15) quad('bench', 'room', [[x, -1.38, -38.5], [x + 0.2, -1.38, -38.5], [x + 0.2, -1.38, 38], [x, -1.38, 38]], '#e3e6ee', { bg: true, bias: 290 });
+for (let z = -35; z <= 38; z += 15) quad('bench', 'room', [[-130, -1.37, z], [90, -1.37, z], [90, -1.37, z + 0.2], [-130, -1.37, z + 0.2]], '#e3e6ee', { bg: true, bias: 290 });
+box('outlet', 'room', 66, 80, 14, 22, -38.4, -37.6, '#f4f1e6', { bias: -2 });
+box('outlet', 'room', 68.2, 71.8, 16.2, 19.8, -37.6, -37.4, '#d9d4c3', { bias: -3 }); box('outlet', 'room', 74.2, 77.8, 16.2, 19.8, -37.6, -37.4, '#d9d4c3', { bias: -3 });
+// kabel perpanjangan (terminal)
+box('strip', 'room', 50, 68, -1.4, 0.4, -32, -28, '#f2f0e8', { cell: 6 });
+[52, 56, 60, 64].forEach(x => box('strip', 'room', x, x + 2.4, 0.4, 0.5, -31, -29, '#2b2b2b', { bias: -0.5 }));
+box('strip', 'room', 66, 67.6, 0.4, 0.6, -30.6, -29.4, '#e25555', { bias: -0.6 });
+// lantai ubin putih, kaki meja, kursi
+box('floor', 'room', -200, 200, -82, -80, -90, 150, '#eceff4', { bg: true, cell: 40, bias: 600 });
+for (let x = -200; x <= 200; x += 40) quad('floor', 'room', [[x, -79.9, -90], [x + 0.4, -79.9, -90], [x + 0.4, -79.9, 150], [x, -79.9, 150]], '#d5dae4', { bg: true, bias: 590 });
+for (let z = -80; z <= 150; z += 40) quad('floor', 'room', [[-200, -79.9, z], [200, -79.9, z], [200, -79.9, z + 0.4], [-200, -79.9, z + 0.4]], '#d5dae4', { bg: true, bias: 590 });
+[[-128, -36], [-128, 34], [88, -36], [88, 34]].forEach(([x, z]) => box('bench', 'room', x - 1.6, x + 1.6, -80, -8, z - 1.6, z + 1.6, '#c9ced8', { bg: true, bias: 310 }));
+const CHAIR0 = 66;
+box('chair', 'chair', -34, -16, -33, -31, CHAIR0 - 9, CHAIR0 + 9, '#2f3a56', { cell: 5, faceCol: { t: '#3a4768' } });
+box('chair', 'chair', -34, -16, -31, -6, CHAIR0 + 8, CHAIR0 + 10, '#2f3a56', { cell: 5 });
+[[-33, CHAIR0 - 8], [-17, CHAIR0 - 8], [-33, CHAIR0 + 8], [-17, CHAIR0 + 8]].forEach(([x, z]) => box('chair', 'chair', x - .7, x + .7, -80, -33, z - .7, z + .7, '#9aa3b5', { cell: 99 }));
+// ---------- UV-1700 ----------
 box('base', 'inst', -23, 23, 0, 3, -24.5, 24.5, GREY, { cell: 6 });
 [[-19, 20], [19, 20], [-19, -20], [19, -20]].forEach(([x, z]) => box('base', 'inst', x - 1.6, x + 1.6, -1.4, 0, z - 1.6, z + 1.6, '#363b42', { skip: ['u'] }));
-box('base', 'inst', 4, 7, 0.6, 2.2, -24.8, -24.5, '#c73a3a', { bias: -4, cell: 99 });
-box('base', 'inst', 12, 18, 0.7, 2.0, -24.8, -24.5, '#2b2f35', { bias: -4, cell: 99 });
+box('base', 'inst', 4, 7, 0.6, 2.2, -24.8, -24.5, '#c73a3a', { bias: -4, cell: 99 }); box('base', 'inst', 12, 18, 0.7, 2.0, -24.8, -24.5, '#2b2f35', { bias: -4, cell: 99 });
 box('base', 'inst', 19, 21.5, 0.6, 2.4, -24.8, -24.5, '#15171a', { bias: -4, cell: 99 });
 box('body', 'walls', -23, 23, 3, 13.5, 23.9, 24.5, BEIGE, { cell: 3 }); box('body', 'walls', -23, 23, 3, 13.5, -24.5, -23.9, BEIGE, { cell: 3 });
 box('body', 'walls', -23, -22.4, 3, 13.5, -23.9, 23.9, BEIGE, { cell: 3 }); box('body', 'walls', 22.4, 23, 3, 13.5, -23.9, 23.9, BEIGE, { cell: 3 });
-box('power', 'walls', -23.35, -23, 5, 8, 16, 19, '#2a2d33', { bias: -4, cell: 99, dyn: 'pwr' });
+box('power', 'walls', -23.4, -23, 5, 8.4, 15.5, 19.5, '#2a2d33', { bias: -4, cell: 99, dyn: 'pwr' });
 box('compartment', 'walls', -16, -1, 4, 12.5, 24.5, 24.8, '#cfb575', { bias: -4, skip: ['b'], cell: 99 });
 box('plate', 'walls', 9, 20, 6.5, 10.5, 24.5, 24.7, '#f7f6f0', { bias: -4.5, skip: ['b'], cell: 99, text: { face: 'f', w: 110, h: 40, lines: [['UV-1700', 8, 18, 'left', '700 15px Arial', '#22263a'], ['PharmaSpec', 70, 18, 'left', 'italic 9px Arial', '#22263a'], ['UV-VIS SPECTROPHOTOMETER', 8, 30, 'left', '6.5px Arial', '#c0392b']] } });
 for (let i = 0; i < 8; i++) box('vent', 'walls', 23, 23.25, 5.6 + i * 0.95, 6.1 + i * 0.95, -20, -11, '#bfa868', { bias: -4, cell: 99, dyn: i === 4 ? 'glow' : null });
-box('card', 'walls', 23, 23.2, 11, 11.8, 1, 10, '#2b2f36', { bias: -4, cell: 99 });
-box('card', 'walls', 23, 23.45, 10.9, 11.9, 11.2, 13.4, '#ebe6d6', { bias: -4.2, cell: 99 });
+box('card', 'walls', 23, 23.2, 11, 11.8, 1, 10, '#2b2f36', { bias: -4, cell: 99 }); box('card', 'walls', 23, 23.45, 10.9, 11.9, 11.2, 13.4, '#ebe6d6', { bias: -4.2, cell: 99 });
 box('warn', 'walls', 23, 23.15, 4.6, 8.4, 4, 13, '#fafafa', { bias: -4.3, cell: 99 }); box('warn', 'walls', 23, 23.2, 7, 8.2, 7.5, 12.6, '#f6d21f', { bias: -4.5, cell: 99 });
 box('pcb', 'inner', -21.8, -12, 3, 3.6, -22, -6, '#1d6b45');
 box('lamphouse', 'inner', 14, 22.2, 3, 4, -23.4, -9, '#3a4048');
@@ -1583,43 +1733,78 @@ box('cover', 'cover', -15, -2, 13.5, 15, -24.5, -2, BEIGE2); box('cover', 'cover
 for (let i = 0; i < 14; i++) box('vent', 'cover', 6 + i * 1.15, 6.55 + i * 1.15, 15, 15.25, -23.5, -15.5, '#c6ae6c');
 box('lid', 'lid', -15.2, -1.8, 15, 16.6, -2.2, 20.2, '#dcc589', { cell: 4, faceCol: { u: '#111215' } });
 box('keypad', 'cover', 2, 21, 15, 16.2, 13, 23.5, CREAM, { bias: -0.6 });
-for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) box('keypad', 'cover', 2.8 + c * 3.0, 4.7 + c * 3.0, 16.2, 16.55, 14.2 + r * 2.2, 15.5 + r * 2.2, c === 5 ? '#7c93c9' : '#cfd4dc', { bias: -0.8 });
+for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) box('keypad', 'cover', 2.8 + c * 3.0, 4.7 + c * 3.0, 16.2, 16.55, 14.2 + r * 2.2, 15.5 + r * 2.2, c === 5 ? '#7c93c9' : '#cfd4dc', { bias: -0.8, dyn: r === 0 && c === 0 ? 'modekey' : null });
 box('lcd', 'cover', 9, 14, 15, 17.5, 7.5, 10, '#ddd6bd', { bias: -0.6 });
 const tilt = [['x', [11.5, 16.5, 9], -18]];
-box('lcd', 'cover', 3.5, 19.5, 16.5, 28.5, 8.2, 10.2, '#ebe5cf', { tf: tilt, bias: -0.7, cell: 99 });
-box('lcd', 'cover', 6, 17, 18.3, 26.6, 10.2, 10.35, '#a99af2', { tf: tilt, bias: -4, dyn: 'lcd', dynFace: 'f', text: { face: 'f', w: 130, h: 96, lcd: true } });
-// --- UPS ---
-box('ups', 'room', 30, 48, -1.4, 22, -20, 8, '#2c2f35', { cell: 6, faceCol: { f: '#3b3f47' } });
-box('ups', 'room', 33, 45, 14, 19, 8, 8.2, '#9fb5a8', { bias: -3, dyn: 'upslcd', text: { face: 'f', w: 120, h: 50, ups: true } });
-box('ups', 'room', 37.5, 40.5, 8, 11, 8, 8.4, '#1a1c20', { bias: -3 });
-box('ups', 'room', 38.4, 39.6, 11.6, 12.4, 8, 8.3, '#555', { bias: -3.2, dyn: 'upsled' });
-box('ups', 'room', 33, 45, 1, 5, 8, 8.15, '#45484f', { bias: -3, text: { face: 'f', w: 120, h: 40, lines: [['UPS 1200 VA', 60, 26, 'center', '600 13px Arial', '#e6e6e6']] } });
-[[33, 9], [40, 9], [33, 2], [40, 2]].forEach(([x, y]) => box('ups', 'room', x, x + 5, y, y + 5, -20.3, -20, '#1b1d21', { bias: -3 }));
-for (let i = 0; i < 6; i++) box('ups', 'room', 48, 48.2, 6 + i * 2, 7 + i * 2, -14, 2, '#22252a', { bias: -3 });
-// --- komputer: CPU, monitor, keyboard, mouse ---
-box('cpu', 'room', -106, -88, -1.4, 40, -22, 14, '#1f2227', { cell: 7, faceCol: { f: '#2a2e35' } });
-box('cpu', 'room', -103, -91, 30, 32, 14, 14.3, '#121417', { bias: -3 });
-box('cpu', 'room', -98.5, -95.5, 34.5, 37.5, 14, 14.4, '#3a3f47', { bias: -3, dyn: 'pcled' });
-for (let i = 0; i < 6; i++) box('cpu', 'room', -103, -91, 6 + i * 2.2, 6.8 + i * 2.2, 14, 14.2, '#15171a', { bias: -3 });
-box('monitor', 'room', -66, -50, -1.4, 0, -21, -11, '#202328'); box('monitor', 'room', -60, -56, 0, 13, -17.5, -15.5, '#2a2e34');
-box('monitor', 'room', -80, -36, 12, 40, -17, -14.4, '#17191d', { cell: 8 });
-box('screen', 'room', -78.3, -37.7, 13.6, 38.4, -14.4, -14.2, '#000000', { bias: -3, dyn: 'screen', dynFace: 'f', text: { face: 'f', w: 1040, h: 600, screen: true } });
-box('keyboard', 'room', -76, -44, -1.4, -0.3, 2, 12, '#e8e9ee', { cell: 6 });
-for (let r = 0; r < 4; r++) for (let c = 0; c < 14; c++) box('keyboard', 'room', -75 + c * 2.15, -73.4 + c * 2.15, -0.3, 0.2, 3 + r * 2.3, 4.7 + r * 2.3, '#cfd2da', { bias: -0.5 });
-box('mouse', 'room', -40, -35.5, -1.4, 0.3, 4, 10, '#e8e9ee');
-// --- meja kerja: rak kuvet, kotak tisu, botol semprot, gelas buangan, labu standar ---
-box('rack', 'room', -42, -30, -1.4, 1.6, 0, 14, '#3d5a80', { cell: 4 });
-box('rack', 'room', -37.6, -34.4, 1.6, 1.7, 2.4, 5.6, '#11161f', { bias: -0.5 }); box('rack', 'room', -37.6, -34.4, 1.6, 1.7, 8.4, 11.6, '#11161f', { bias: -0.5 });
-box('tissue', 'room', -42, -28, -1.4, 5, 17, 29, '#2f6f6a', { cell: 5, faceCol: { t: '#3a7f79' }, text: { face: 'f', w: 140, h: 64, lines: [['TISSUE', 70, 30, 'center', '700 20px Arial', '#e8f5f3'], ['lens & cuvette', 70, 48, 'center', 'italic 11px Arial', '#cde9e5']] } });
-box('tissue', 'room', -37, -33, 5, 5.1, 21, 25, '#16302e', { bias: -0.4 });
-box('tissue', 'room', -36.5, -33.5, 5, 10.5, 22.6, 22.9, '#ffffff', { tf: [['x', [-35, 5, 22.75], 12]], ds: true });
-cyl('bottle', 'room', -50, 25, 2.6, -1.4, 9, '#f2f6f8', { alpha: 0.9 }); cyl('bottle', 'room', -50, 25, 0.9, 9, 11, '#e94b4b');
-box('bottle', 'room', -50.3, -49.7, 10.5, 11.1, 25, 29, '#e94b4b');
-cyl('beaker', 'room', -58, 26, 3.2, -1.4, 6.5, '#dfeff5', { alpha: 0.45, open: true }); cyl('beaker', 'room', -58, 26, 3.0, -1.3, 1.6, '#c7dce6', { alpha: 0.6 });
-const FL = SOL_KEYS.map((k, i) => ({ k, x: 52 + (i % 4) * 6.5, z: 16 + Math.floor(i / 4) * 7 }));
-FL.forEach(f => { cyl('flask', 'room', f.x, f.z, 2.4, -1.4, 3.5, '#eef6f8', { alpha: 0.5 }); cyl('flask', 'room', f.x, f.z, 2.1, -1.3, 2.6, SOL[f.k].col, { alpha: 0.85 });
-  cyl('flask', 'room', f.x, f.z, 0.6, 3.5, 11, '#eef6f8', { alpha: 0.55 }); cyl('flask', 'room', f.x, f.z, 0.75, 11, 12.2, '#3a6fd8'); });
-// --- kuvet (geometri lokal; dipindah melalui posisi) ---
+box('lcd', 'lcdp', 3.5, 19.5, 16.5, 28.5, 8.2, 10.2, '#ebe5cf', { tf: tilt, bias: -0.7, cell: 99 });
+box('lcd', 'lcdp', 6, 17, 18.3, 26.6, 10.2, 10.35, '#a99af2', { tf: tilt, bias: -4, dyn: 'lcd', dynFace: 'f', text: { face: 'f', w: 130, h: 96, lcd: true } });
+box('silica', 'silica', -2.4, 2.4, 0, 0.8, -1.4, 1.4, '#f5f7fb', { cell: 99, faceCol: { t: '#e6ecf8' }, text: { face: 't', w: 60, h: 36, lines: [['SILICA GEL', 30, 15, 'center', '700 9px Arial', '#1d4ed8'], ['• • • • •', 30, 27, 'center', '10px Arial', '#3b82f6']] } });
+// ---------- UPS ICA ----------
+box('ups', 'room', 28, 44, -1.4, 17, -22, 8, '#141518', { cell: 6 });
+quad('ups', 'room', [[33.6, 9.4, 8.06], [38.4, 9.4, 8.06], [43.6, 16.6, 8.06], [28.4, 16.6, 8.06]], '#c9a24a', { bias: -3 });
+box('ups', 'room', 35.1, 36.9, 11.2, 13.0, 8.06, 8.5, '#0d0e10', { bias: -3.4, dyn: 'upsbtn' });
+for (let i = 0; i < 5; i++) box('upsled', 'room', 35.6, 36.4, 3.4 + i * 1.15, 4.0 + i * 1.15, 8.06, 8.3, '#2b2f2b', { bias: -3.3, dyn: 'upsled' + i });
+box('ups', 'room', 29, 43, -1.2, 2.2, 8.06, 8.2, '#b8923f', { bias: -3, text: { face: 'f', w: 140, h: 34, lines: [['ICA', 70, 22, 'center', '700 14px Arial', '#2b1d05']] } });
+[[30.5, 9], [35.5, 9], [30.5, 3], [35.5, 3]].forEach(([x, y]) => box('ups', 'room', x, x + 4, y, y + 4, -22.3, -22, '#1b1d21', { bias: -3 }));
+// ---------- komputer (CPU, monitor HP, keyboard, mouse, printer) ----------
+box('cpu', 'room', -106, -88, -1.4, 40, -22, 14, '#18191c', { cell: 7 });
+box('cpu', 'room', -105.2, -88.8, 1, 39, 14, 14.25, '#c9ccd2', { bias: -2.5, cell: 99 });
+box('cpu', 'room', -105.2, -88.8, -1.4, 1, 14, 14.3, '#0f1012', { bias: -2.6, cell: 99 });
+box('cpu', 'room', -104, -90, 33.5, 35.6, 14.25, 14.45, '#101113', { bias: -3, cell: 99 });
+box('cpu', 'room', -104, -90, 26.5, 31.5, 14.25, 14.4, '#f8f8f6', { bias: -3.2, cell: 99, text: { face: 'f', w: 140, h: 50, lines: [['19.01.01.24.2005', 70, 21, 'center', '700 14px Courier New', '#111'], ['2.08.01.11.138.', 70, 41, 'center', '700 14px Courier New', '#111']] } });
+box('cpu', 'room', -101, -93, 18, 19.2, 14.25, 14.4, '#111214', { bias: -3, cell: 99 });
+box('cpu', 'room', -98.6, -95.4, 9, 12.2, 14.25, 14.7, '#7d838c', { bias: -3.2, cell: 99, dyn: 'pcled' });
+box('monitor', 'room', -66, -50, -1.4, -0.2, -22, -10, '#141518'); box('monitor', 'room', -60, -56, -0.2, 13, -18, -15.8, '#1b1c20');
+box('monitor', 'room', -82, -34, 12, 40, -17, -14.6, '#0e0f12', { cell: 8 });
+box('screen', 'room', -81, -35, 13.6, 39.2, -14.6, -14.4, '#000000', { bias: -3, dyn: 'screen', dynFace: 'f', text: { face: 'f', w: 1040, h: 610, screen: true } });
+box('monitor', 'room', -37.6, -36.6, 12.6, 13.2, -14.6, -14.3, '#222', { bias: -3.3, dyn: 'monled' });
+box('keyboard', 'room', -84, -52, -1.4, -0.4, 0, 11, '#16171a', { cell: 6 });
+for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) box('keyboard', 'room', -83 + c * 2.2, -81.3 + c * 2.2, -0.4, 0.1, 0.8 + r * 2.0, 2.3 + r * 2.0, '#2a2c31', { bias: -0.5 });
+box('mousepad', 'room', -50, -39, -1.4, -1.15, 0, 11, '#efe08a'); box('mouse', 'room', -46, -42, -1.15, 0.5, 3, 8.5, '#111214', { faceCol: { t: '#9aa0a8' } });
+box('printer', 'room', -126, -108, -1.4, 8, -16, 6, '#d6d3c8', { cell: 6, faceCol: { t: '#c5c1b4' } });
+box('printer', 'room', -123, -111, 4, 7, 6, 6.2, '#3f4247', { bias: -2.5 });
+box('printer', 'room', -110.5, -109.5, 6, 7, 6, 6.3, '#444', { bias: -3, dyn: 'prled' });
+box('paper', 'paper', -122, -112, 4.6, 4.7, 0, 12, '#ffffff', { ds: true, cell: 99 });
+// ---------- meja kerja ----------
+box('rack', 'room', -37, -25, -1.4, 1.6, 0, 14, '#3d5a80', { cell: 4 });
+box('rack', 'room', -32.6, -29.4, 1.6, 1.7, 2.4, 5.6, '#11161f', { bias: -0.5 }); box('rack', 'room', -32.6, -29.4, 1.6, 1.7, 8.4, 11.6, '#11161f', { bias: -0.5 });
+box('tissue', 'room', -38, -25, -1.4, 5, 17, 29, '#2f6f6a', { cell: 5, faceCol: { t: '#3a7f79', f: '#2c6762' } });
+box('tissue', 'room', -35.6, -27.4, 0.2, 3.9, 29, 29.18, '#fbfbf8', { bias: -3, cell: 99, text: { face: 'f', w: 160, h: 74, lines: [['KOTAK TISU', 80, 28, 'center', '700 16px Arial', '#1f3a37'], ['Lab. Instrumentasi', 80, 48, 'center', '500 11px Arial', '#44605d'], ['Politeknik AKA Bogor', 80, 63, 'center', '500 9px Arial', '#44605d']] } });
+box('tissue', 'room', -33.5, -29.5, 5, 5.1, 21, 25, '#16302e', { bias: -0.4 });
+box('tissue', 'room', -33, -30, 5, 10.5, 22.6, 22.9, '#ffffff', { tf: [['x', [-31.5, 5, 22.75], 12]], ds: true });
+[[-35, 19.6], [-30.6, 19.6]].forEach(([x, z]) => { cyl('tissue', 'room', x, z, 1.35, 5, 9.4, '#f7f9fa', { alpha: 0.95 }, 10); cyl('tissue', 'room', x, z, 0.95, 9.4, 10.6, '#ffffff', {}, 10); });
+box('cuvcase', 'room', -50, -41, -1.4, 1.8, 16, 23, '#2952a3', { cell: 99, faceCol: { t: '#3563c0' }, text: { face: 't', w: 90, h: 70, lines: [['QUARTZ', 45, 30, 'center', '700 13px Arial', '#e6edff'], ['CUVETTE', 45, 46, 'center', '700 13px Arial', '#e6edff']] } });
+// botol semprot akuades (LDPE putih tembus cahaya, tutup biru, nozel bengkok)
+const WASH0 = [-47, -1.4, 30.5];
+{ const [wx, , wz] = WASH0, by = -1.4;
+  const body = [[0, 0], [2.6, 0], [3.1, 0.5], [3.3, 1.6], [3.3, 11.2], [3.15, 12.5], [2.5, 13.7], [1.6, 14.4], [1.35, 15.0]].map(([r, y]) => [r, y + by]);
+  lathe('bottle', 'wash', wx, wz, body, '#eef4f8', { alpha: 0.62 }, 14);
+  lathe('bottle', 'wash', wx, wz, clipProf(body.map(([r, y]) => [r, y]), by + 9.2, 0.18), '#bfe2ff', { alpha: 0.7, topCol: '#d6eeff' }, 14);
+  lathe('bottle', 'wash', wx, wz, [[1.5, by + 15], [1.75, by + 15.1], [1.75, by + 16.6], [1.3, by + 16.95], [0, by + 16.95]], '#2b6fd6', {}, 14);
+  lathe('bottle', 'wash', wx, wz, [[0.5, by + 16.95], [0.5, by + 19.4]], '#d8e6f2', {}, 8);
+  box('bottle', 'wash', wx - 0.1, wx + 5.2, by + 19.0, by + 19.8, wz - 0.4, wz + 0.4, '#e4eef6', { cell: 99, tf: [['z', [wx, by + 19.4, wz], 40]], ds: true });
+  box('bottle', 'wash', wx + 5.0, wx + 6.4, by + 19.15, by + 19.65, wz - 0.22, wz + 0.22, '#d0dde8', { cell: 99, tf: [['z', [wx, by + 19.4, wz], 40]], ds: true });
+  box('bottle', 'wash', wx - 1.6, wx + 1.6, by + 3.4, by + 9.6, wz + 3.34, wz + 3.5, '#ffffff', { bias: -3, cell: 99, text: { face: 'f', w: 110, h: 130, lines: [['AKUADES', 55, 40, 'center', '700 17px Arial', '#1d4ed8'], ['H\u2082O', 55, 72, 'center', '600 22px Arial', '#1d4ed8'], ['bebas ion', 55, 104, 'center', '500 11px Arial', '#475569']] } });
+}
+const WASHTIP = [WASH0[0] + 4.9, WASH0[1] + 19.4 + 4.11, WASH0[2]];
+// gelas piala buangan (berparuh), etanol dan aseton
+cyl('beaker', 'room', 8, 30, 3.2, -1.4, 6.5, '#dfeff5', { alpha: 0.4, open: true }, 16); cyl('beaker', 'room', 8, 30, 3.0, -1.3, 1.6, '#c7dce6', { alpha: 0.55 }, 16);
+box('beaker', 'room', 10.8, 12, 5.6, 6.5, 29.4, 30.6, '#dfeff5', { alpha: 0.5, cell: 99 });
+cyl('etanol', 'room', -3, 31, 1.9, -1.4, 8, '#f4efe6', { alpha: 0.85 }); cyl('etanol', 'room', -3, 31, 0.7, 8, 9.6, '#2563eb');
+cyl('aseton', 'room', 2, 31, 1.9, -1.4, 8, '#e9f2f3', { alpha: 0.85 }); cyl('aseton', 'room', 2, 31, 0.7, 8, 9.6, '#16a34a');
+box('logbook', 'room', -104, -88, -1.4, -0.4, 20, 33, '#1e3a8a', { cell: 99, faceCol: { t: '#22409a' }, text: { face: 't', w: 120, h: 100, lines: [['LOG BOOK', 60, 40, 'center', '700 15px Arial', '#e0e7ff'], ['UV-1700', 60, 60, 'center', '600 12px Arial', '#c7d2fe']] } });
+box('logbook', 'room', -86, -85.4, -0.6, -0.1, 21, 31, '#111', {});
+box('drymat', 'room', -20, -7, -1.4, -1.25, 26, 34, '#ffffff', { cell: 99 });
+// labu takar 50 mL: alas datar, badan bulat, leher panjang bergaris tera, sumbat biru
+const FLY = -1.4, FS = 0.74;
+const FPROF = [[0, 0], [2.5, 0], [3.4, 0.5], [4.0, 1.6], [4.25, 3.1], [4.0, 4.7], [3.2, 6.1], [2.0, 7.3], [1.1, 8.3], [0.78, 9.4], [0.74, 15.2], [0.9, 15.7], [0.98, 16.2]].map(([r, y]) => [r * FS, FLY + y * FS]);
+const FMARK = FLY + 12.9 * FS, FTOP = FLY + 16.2 * FS;
+const FL = {}; SOL_KEYS.forEach((k, i) => { FL[k] = { x: -83 + (i % 4) * 8, z: 21 + Math.floor(i / 4) * 10 }; });
+SOL_KEYS.forEach(k => { const f = FL[k], g = 'fl_' + k;
+  lathe('flask', g, f.x, f.z, FPROF, '#e9f4f8', { alpha: 0.34 }, 10);
+  lathe('flask', g, f.x, f.z, clipProf(FPROF, FMARK, 0.13), SOL[k].col, { alpha: 0.9, topCol: mix(SOL[k].col, '#ffffff', 0.35) }, 10);
+  lathe('flask', g, f.x, f.z, [[0.78 * FS + 0.02, FMARK - 0.05], [0.78 * FS + 0.02, FMARK + 0.1]], '#1f2937', {}, 10);
+  lathe('flask', 'st_' + k, f.x, f.z, [[0.5, FTOP - 0.9], [0.62, FTOP - 0.1], [0.62, FTOP + 0.35], [0.95, FTOP + 0.35], [0.95, FTOP + 1.45], [0, FTOP + 1.45]], '#2f6fe0', {}, 10); });
 ['R', 'S'].forEach(k => {
   box('cuv' + k, 'cuv' + k, -1.3, 1.3, 0, 7.6, -1.3, 1.3, '#e3f4f8', { alpha: 0.38, ds: true, cell: 99, faceCol: { l: '#f4f6f6', r: '#f4f6f6' } });
   box('cuv' + k, 'liq' + k, -1.1, 1.1, 0.3, 6.2, -1.1, 1.1, '#ffffff', { alpha: 0.7, cell: 99, dyn: 'liq' + k });
@@ -1627,91 +1812,101 @@ FL.forEach(f => { cyl('flask', 'room', f.x, f.z, 2.4, -1.4, 3.5, '#eef6f8', { al
 });
 box('tw', 'tw', -1.4, 1.4, -1.8, 1.8, -0.1, 0.1, '#ffffff', { ds: true, cell: 99 });
 
-/* ---------------- kabel ---------------- */
-const Y0 = -1.1;
+/* ================= kabel ================= */
 const CABLES = [
-  { nm: 'UPS → stop kontak', col: '#1a1a1a', w: 1.0, pts: [[36, 6, -20.2], [36, 4, -27], [36, Y0, -30], [36, Y0, -36], [34, 4, -37.8], [34, 18, -37.6]] },
-  { nm: 'UV-1700 → UPS', col: '#111', w: 1.0, pts: [[20, 1.5, -24.8], [20, Y0, -28], [28, Y0, -28], [35, Y0, -24], [35.5, 4.5, -20.3], [35.5, 11.5, -20.3]] },
-  { nm: 'CPU → UPS', col: '#111', w: 1.0, pts: [[-97, 8, -22.2], [-97, Y0, -27], [-60, Y0, -33], [10, Y0, -33], [40, Y0, -30], [42.5, 4.5, -20.3], [42.5, 11.5, -20.3]] },
-  { nm: 'Monitor → UPS', col: '#111', w: 0.9, pts: [[-58, 20, -17.1], [-58, Y0, -19], [-40, Y0, -31], [20, Y0, -31.5], [38, Y0, -29], [42.5, 2, -20.3], [42.5, 4.5, -20.3]] },
-  { nm: 'Monitor → CPU (video)', col: '#2b4fae', w: 0.8, pts: [[-62, 22, -17.1], [-62, Y0, -20], [-80, Y0, -24], [-92, 14, -22.2]] },
-  { nm: 'UV-1700 → CPU (RS-232C)', col: '#9aa0a8', w: 0.8, pts: [[5.5, 1.4, -24.8], [5.5, Y0, -27], [-30, Y0, -29], [-80, Y0, -27], [-94, 18, -22.2]] }
+  { nm: 'Kabel perpanjangan → stop kontak dinding', col: '#e8e6df', w: 1.1, pts: [[68, -0.5, -30], [72, Y0, -31], [72, Y0, -36.5], [72.5, 5, -37.8], [73, 18, -37.6]] },
+  { nm: 'UPS → kabel perpanjangan', col: '#111', w: 1.0, pts: [[32.5, 5, -22.3], [32.5, Y0, -27], [44, Y0, -30], [53.2, Y0, -30], [53.2, 0.4, -30]] },
+  { nm: 'UV-1700 → UPS', col: '#111', w: 1.0, pts: [[20, 1.5, -24.8], [20, Y0, -27.5], [33, Y0, -27], [37.5, Y0, -24], [37.5, 5, -22.3]] },
+  { nm: 'CPU → UPS', col: '#111', w: 1.0, pts: [[-97, 8, -22.2], [-97, Y0, -27], [-60, Y0, -34], [20, Y0, -34.5], [32, Y0, -30], [32.5, 11, -22.3]] },
+  { nm: 'Monitor → UPS', col: '#111', w: 0.9, pts: [[-58, 20, -17.1], [-58, Y0, -19], [-40, Y0, -31.5], [22, Y0, -32], [37, Y0, -28], [37.5, 11, -22.3]] },
+  { nm: 'Printer → kabel perpanjangan', col: '#1d1d1d', w: 0.9, pts: [[-116, 3, -16.2], [-116, Y0, -22], [-100, Y0, -36], [57, Y0, -36], [57.2, Y0, -31], [57.2, 0.4, -30]] },
+  { nm: 'Monitor → CPU (VGA)', col: '#2b4fae', w: 0.8, pts: [[-62, 22, -17.1], [-62, Y0, -20], [-80, Y0, -24], [-92, 14, -22.2]] },
+  { nm: 'UV-1700 → CPU (RS-232C)', col: '#9aa0a8', w: 0.8, pts: [[5.5, 1.4, -24.8], [5.5, Y0, -27], [-30, Y0, -29], [-80, Y0, -27], [-94, 18, -22.2]] },
+  { nm: 'Printer → CPU (USB)', col: '#6b7280', w: 0.7, pts: [[-112, 4, -16.2], [-106, Y0, -20], [-100, Y0, -24], [-99, 22, -22.2]] }
 ];
 CABLES.forEach(c => { const p = []; for (let i = 0; i < c.pts.length - 1; i++) for (let k = 0; k < 6; k++) p.push(lerp3(c.pts[i], c.pts[i + 1], k / 6)); p.push(c.pts[c.pts.length - 1]); c.seg = p; });
 
 const INFO = {
-  wall: ['Dinding laboratorium', 'Stop kontak dinding menjadi satu-satunya sumber listrik; semua beban dilewatkan melalui UPS.'],
-  bench: ['Meja kerja', 'Meja keramik putih bebas getaran; jauhkan sumber panas dan sinar matahari langsung dari instrumen.'],
-  outlet: ['Stop kontak', 'Sumber listrik 220–230 V AC dengan arde. Pastikan terhubung ke arde agar tidak ada tegangan bocor pada rangka alat.'],
-  ups: ['UPS 1200 VA', 'Uninterruptible Power Supply: menstabilkan tegangan dan menyediakan daya cadangan saat listrik padam sehingga pengukuran dan data tidak hilang. Nyalakan sebelum alat dan komputer.'],
-  cpu: ['CPU (unit komputer)', 'Menjalankan perangkat lunak instrumen; terhubung ke UV-1700 melalui kabel RS-232C dan menerima data pengukuran.'],
-  monitor: ['Monitor', 'Menampilkan perangkat lunak instrumen: tabel fotometri, kurva kalibrasi, dan spektrum.'], screen: ['Layar monitor', 'Klik tombol pada layar komputer di bawah untuk mengoperasikan perangkat lunak.'],
-  keyboard: ['Papan ketik', 'Input identitas sampel dan parameter metode.'], mouse: ['Mouse', 'Navigasi perangkat lunak.'],
+  wall: ['Dinding laboratorium', 'Stop kontak dinding menyuplai kabel perpanjangan; UPS mengambil daya dari kabel perpanjangan.'],
+  bench: ['Meja kerja', 'Meja keramik bebas getaran.'], outlet: ['Stop kontak dinding', 'Sumber 220–230 V AC berarde.'],
+  strip: ['Kabel perpanjangan', 'Menyalurkan daya ke UPS dan printer. Saat selesai, cabut semua kabel dari perpanjangan kecuali kabel UPS (IK C.9).'],
+  ups: ['UPS ICA', 'Uninterruptible Power Supply: menstabilkan tegangan dan memberi daya cadangan bagi UV-1700, CPU, dan monitor. Dinyalakan pertama dan dimatikan terakhir (IK C.8).'],
+  upsled: ['Indikator UPS', 'Lampu hijau menunjukkan UPS aktif dan tingkat beban.'],
+  cpu: ['CPU (unit komputer)', 'Menjalankan UVProbe dan berkomunikasi dengan UV-1700 melalui kabel RS-232C. Label inventaris 19.01.01.24.2005 / 2.08.01.11.138.'],
+  monitor: ['Monitor HP', 'Menampilkan UVProbe. Matikan dengan tombol power monitor setelah komputer shutdown (IK C.5).'], screen: ['Layar monitor', 'Tampilan UVProbe; lihat juga layar besar di bawah.'],
+  keyboard: ['Papan ketik', 'Mengetik nama file, sample ID, dan konsentrasi.'], mouse: ['Mouse', 'Klik menu UVProbe.'], mousepad: ['Mouse pad', ''],
+  printer: ['Printer', 'Mencetak tabel peak pick, kurva kalibrasi standar, dan data sampel.'], paper: ['Kertas cetak', 'Hasil cetak dari UVProbe.'],
   rack: ['Rak kuvet', 'Tempat kuvet referensi (belakang) dan kuvet sampel (depan) saat diisi dan dilap.'],
-  tissue: ['Kotak tisu lensa', 'Tisu bebas serat untuk mengelap dinding bening kuvet dari tetesan dan sidik jari sebelum dimasukkan ke alat.'],
-  bottle: ['Botol semprot akuades', 'Membilas kuvet sebelum diisi larutan berikutnya.'], beaker: ['Gelas buangan', 'Menampung bilasan dan larutan bekas.'],
-  flask: ['Labu takar standar', 'Larutan blanko, deret standar (warna makin pekat seiring konsentrasi), dan Sampel X.'],
-  cuvR: ['Kuvet referensi', 'Kuvet kuarsa 1 cm untuk blanko; ditempatkan di sel referensi (belakang).'], cuvS: ['Kuvet sampel', 'Kuvet kuarsa 1 cm untuk standar atau sampel; ditempatkan di sel sampel (depan).'],
-  lid: ['Tutup kompartemen', 'Buka untuk memasukkan kuvet; tutup rapat sebelum auto zero dan pengukuran.'], compartment: ['Kompartemen sampel', 'Ruang gelap berisi sel referensi dan sel sampel.'],
-  holderR: ['Sel referensi', 'Dudukan kuvet blanko (I₀).'], holderS: ['Sel sampel', 'Dudukan kuvet sampel (I).'],
-  power: ['Saklar daya UV-1700', 'Saklar di sisi kiri instrumen. Nyalakan setelah UPS aktif.'],
-  lcd: ['Layar LCD UV-1700', 'Menampilkan λ, absorbansi, lampu aktif, dan status.'], keypad: ['Papan tombol alat', 'Operasi mandiri tanpa komputer.'],
-  plate: ['Pelat identitas', 'UV-1700 PharmaSpec · UV-VIS SPECTROPHOTOMETER.'], body: ['Rumah instrumen', 'Rangka UV-1700.'], cover: ['Penutup atas', 'Menutupi bangku optik.'],
-  base: ['Rangka dasar & port belakang', 'Port RS-232C (merah), Centronics, dan soket daya.'], vent: ['Kisi ventilasi', 'Membuang panas lampu; berpendar oranye saat lampu WI menyala.'],
-  card: ['Slot IC card · CONTRAST', 'Kartu memori metode dan pengatur kontras LCD.'], warn: ['Label HOT SURFACE', 'Dinginkan lampu sebelum diganti.'],
+  tissue: ['Kotak tisu', 'Tisu untuk mengelap dinding bening kuvet dari tetesan dan sidik jari sebelum dimasukkan. Dua botol kecil putih di atasnya berisi cairan pembersih lensa/kuvet.'],
+  cuvcase: ['Kotak kuvet kuarsa', 'Wadah penyimpanan kuvet kuarsa setelah kering.'], bottle: ['Botol semprot akuades', 'Botol semprot (wash bottle) berisi akuades untuk membilas kuvet sebelum dibilas dengan larutan yang akan diukur.'], chair: ['Kursi kerja', 'Setelah selesai, kursi dirapikan ke tempat aman (IK C.11).'], floor: ['Lantai', ''],
+  beaker: ['Gelas piala buangan', 'Menampung bilasan dan larutan bekas.'], etanol: ['Etanol', 'Pembilas pertama saat mengeringkan kuvet (IK D.1).'], aseton: ['Aseton', 'Pembilas terakhir; cepat menguap sehingga kuvet kering sempurna (IK D.1).'],
+  logbook: ['Log Book alat', 'Catat semua kejadian dan tanda tangani dengan nama jelas (IK C.1).'], drymat: ['Alas tisu pengering', 'Tempat kuvet dibalik hingga kering.'],
+  flask: ['Labu takar 50 mL', 'Berisi blanko, deret standar, atau Sampel X; larutan mencapai garis tera di leher, warna makin pekat seiring konsentrasi. Sumbat dibuka saat larutan dituang ke kuvet.'],
+  silica: ['Silica gel', 'Penyerap lembap di kompartemen. Dikeluarkan sebelum pengukuran dan dimasukkan kembali setelah alat dimatikan (IK C.7).'],
+  cuvR: ['Kuvet referensi', 'Kuvet kuarsa 1 cm berisi blanko, di sel referensi (belakang).'], cuvS: ['Kuvet sampel', 'Kuvet kuarsa 1 cm untuk blanko, standar, atau sampel, di sel sampel (depan).'],
+  lid: ['Tutup kompartemen', 'Buka untuk memasukkan kuvet; tutup rapat sebelum Baseline, Auto Zero, dan pembacaan.'], compartment: ['Kompartemen sampel', 'Ruang gelap berisi sel referensi dan sel sampel.'],
+  holderR: ['Sel referensi', 'Dudukan kuvet blanko.'], holderS: ['Sel sampel', 'Dudukan kuvet sampel.'],
+  power: ['Tombol power UV-1700', 'Terletak di bagian kiri alat (IK C.7).'], lcd: ['Monitor (LCD) UV-1700', 'Menampilkan λ, absorbansi, lampu, dan status. Ditutup (dilipat) setelah alat dimatikan (IK C.7).'],
+  keypad: ['Papan tombol UV-1700', 'Tombol MODE digunakan untuk keluar dari mode PC CONTROL sebelum mematikan alat (IK C.6).'],
+  plate: ['Pelat identitas', 'UV-1700 PharmaSpec.'], body: ['Rumah instrumen', ''], cover: ['Penutup atas', ''], base: ['Port belakang', 'RS-232C (merah), Centronics, soket daya.'],
+  vent: ['Kisi ventilasi', 'Berpendar oranye saat lampu WI menyala.'], card: ['IC card · CONTRAST', ''], warn: ['Label HOT SURFACE', 'Dinginkan lampu sebelum diganti.'],
   d2: ['Lampu D₂', 'Sumber UV.'], wi: ['Lampu WI', 'Sumber tampak–NIR.'], mirror: ['Cermin sumber', ''], slit1: ['Celah masuk', ''], mono: ['Monokromator', ''], grating: ['Kisi difraksi', ''],
-  slit2: ['Celah keluar', ''], split: ['Pembagi berkas', ''], mirror2: ['Cermin pengarah', ''], detR: ['Detektor referensi', ''], detS: ['Detektor sampel', ''], pcb: ['Papan elektronik', ''], lamphouse: ['Rumah lampu', ''], tw: ['Tisu', 'Sedang mengelap kuvet.']
+  slit2: ['Celah keluar', ''], split: ['Pembagi berkas', ''], mirror2: ['Cermin pengarah', ''], detR: ['Detektor referensi', ''], detS: ['Detektor sampel', ''], pcb: ['Papan elektronik', ''], lamphouse: ['Rumah lampu', ''], tw: ['Tisu', '']
 };
 
-/* ---------------- kamera ---------------- */
+/* ================= kamera & render ================= */
 const cv = $('#c'), ctx = cv.getContext('2d'), pcc = $('#pc'), pctx = pcc.getContext('2d');
-const VIEWS = { meja: [-18, 24, 250, [-12, 6, 0]], alat: [-30, 24, 100, [0, 9, 0]], kompartemen: [-12, 58, 62, [-8, 8, 8]], kerja: [-28, 38, 80, [-40, 3, 15]],
-  komputer: [-4, 8, 92, [-62, 22, -8]], ups: [-38, 18, 95, [40, 10, -4]], belakang: [205, 32, 200, [-25, 4, -25]] };
-const CAM = { yaw: -18, pitch: 24, dist: 250, target: [-12, 6, 0] };
+const VIEWS = { meja: [-14, 26, 270, [-18, 6, 0]], alat: [-30, 24, 100, [0, 9, 0]], kompartemen: [-12, 58, 62, [-8, 8, 8]], kerja: [-26, 34, 100, [-40, 3, 16]],
+  komputer: [-6, 10, 105, [-62, 20, -6]], ups: [-34, 18, 115, [44, 8, -12]], belakang: [200, 34, 230, [-25, 4, -25]], printer: [-30, 22, 75, [-116, 4, -4]],
+  kering: [-20, 45, 70, [-20, 2, 22]], log: [-15, 50, 70, [-96, 0, 20]], isi: [-18, 32, 128, [-52, 5, 18]], kursi: [-24, 24, 210, [-24, -26, 50]] };
+const CAM = { yaw: -14, pitch: 26, dist: 270, target: [-18, 6, 0] };
 let camAnim = null, viewName = 'meja';
-function setView(name) { const v = VIEWS[name]; if (!v) return; viewName = name; camAnim = { from: [CAM.yaw, CAM.pitch, CAM.dist, CAM.target.slice()], to: v, t: 0 };
+function setView(name) { const v = VIEWS[name]; if (!v || name === viewName && !camAnim) { if (v) viewName = name; return; } viewName = name; camAnim = { from: [CAM.yaw, CAM.pitch, CAM.dist, CAM.target.slice()], to: v, t: 0 };
   $$('.views button').forEach(b => b.classList.toggle('on', b.dataset.v === name)); dirty = true; }
-function camXf(p) {
-  const t = CAM.target; const x = p[0] - t[0], y = p[1] - t[1], z = p[2] - t[2];
+function camXf(p) { const t = CAM.target; const x = p[0] - t[0], y = p[1] - t[1], z = p[2] - t[2];
   const cy = Math.cos(-CAM.yaw * D2R), sy = Math.sin(-CAM.yaw * D2R); const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
-  const cp = Math.cos(CAM.pitch * D2R), sp = Math.sin(CAM.pitch * D2R); return [x1, y * cp - z1 * sp, y * sp + z1 * cp];
-}
+  const cp = Math.cos(CAM.pitch * D2R), sp = Math.sin(CAM.pitch * D2R); return [x1, y * cp - z1 * sp, y * sp + z1 * cp]; }
 let W = 800, H = 600, CX = 400, CY = 300, FOC = 800;
 function proj(c) { const zc = CAM.dist - c[2]; return [CX + FOC * c[0] / zc, CY - FOC * c[1] / zc, zc]; }
-
-/* ---------------- transformasi objek ---------------- */
 function xf(p, part) {
   let q = p;
-  if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : ax === 'y' ? rotY(q, piv, deg * D2R) : rotZ(q, piv, deg * D2R);
+  if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : ax === 'z' ? rotZ(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
   const g = part.grp;
   if (g === 'lid') q = rotX(q, [0, 15, -2.2], -102 * ST.lid * D2R);
+  else if (g === 'lcdp') q = rotX(q, [11.5, 16.5, 9], 84 * ST.lcdFold * D2R);
   else if (g === 'cuvR' || g === 'cuvS' || g === 'liqR' || g === 'liqS') {
-    const k = g[3]; const c = ST.cuv[k];
+    const c = ST.cuv[g[3]];
     if (g[0] === 'l') q = [q[0] * 0.98, 0.3 + (q[1] - 0.3) * Math.max(0.001, c.level), q[2] * 0.98];
+    if (c.flip) q = rotX(q, [0, 3.8, 0], 180 * c.flip * D2R);
     q = [q[0] + c.pos[0], q[1] + c.pos[1], q[2] + c.pos[2]];
-  } else if (g === 'tw') {
-    const t = ST.tissue; if (t) { q = rotY(q, [0, 0, 0], t.rot * D2R); q = [q[0] + t.pos[0], q[1] + t.pos[1], q[2] + t.pos[2]]; }
-  }
+  } else if (g === 'tw') { const t = ST.tissue; if (t) { q = rotY(q, [0, 0, 0], t.rot * D2R); q = [q[0] + t.pos[0], q[1] + t.pos[1], q[2] + t.pos[2]]; } }
+  else if (g === 'silica') q = [q[0] + ST.silicaPos[0], q[1] + ST.silicaPos[1], q[2] + ST.silicaPos[2]];
+  else if (g === 'paper') q = [q[0], q[1], 6 + (q[2] / 12) * 12 * ST.paper];
+  else if (g === 'chair') q = [q[0], q[1], q[2] + ST.chairZ - CHAIR0];
+  else if (g === 'wash' && ST.wash) { q = rotZ(q, WASH0, ST.wash.ang * D2R); q = [q[0] + ST.wash.d[0], q[1] + ST.wash.d[1], q[2] + ST.wash.d[2]]; }
+  else if (g.startsWith('fl_') && ST.pour && ST.pour.k === g.slice(3)) { const f = FL[ST.pour.k]; q = rotZ(q, [f.x, FLY, f.z], ST.pour.ang * D2R); q = [q[0] + ST.pour.d[0], q[1] + ST.pour.d[1], q[2] + ST.pour.d[2]]; }
   return q;
 }
 function visible(part) {
   const g = part.grp; const closed = ST.xray < 0.04;
   if (g === 'tw') return !!ST.tissue;
-  if (g[0] === 'l' && g.startsWith('liq')) { const c = ST.cuv[g[3]]; if (!c.content || c.level < 0.02) return false; }
-  if (g.startsWith('cuv') || g.startsWith('liq')) { const c = ST.cuv[g[3]]; if (c.where === 'sel' && closed && ST.lid < 0.05) return false; return true; }
+  if (g === 'paper') return ST.paper > 0.02;
+  if (g.startsWith('fl_')) return !ST.tidy;
+  if (g.startsWith('st_')) return !ST.tidy && !(ST.pour && ST.pour.k === g.slice(3));
+  if (g.startsWith('liq')) { const c = ST.cuv[g[3]]; if (!c.content || c.level < 0.02) return false; }
+  if (g.startsWith('cuv') || g.startsWith('liq')) { const c = ST.cuv[g[3]]; return !(c.where === 'sel' && closed && ST.lid < 0.05); }
+  if (g === 'silica') return !(ST.silica === 'comp' && closed && ST.lid < 0.05);
   if (g === 'inner' && closed) return false;
   if (g === 'comp' && closed && ST.lid < 0.05) return false;
   return true;
 }
-
-/* ---------------- gambar 3D ---------------- */
 const LIGHT = norm([0.45, 0.85, 0.55]);
-let dirty = true, drawn = [];
+let dirty = true, drawn = [], selId = null;
 function draw() {
   const r = cv.getBoundingClientRect(); W = Math.max(300, r.width || 800); H = Math.max(240, r.height || 600);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); CX = W / 2; CY = H / 2 + 10; FOC = Math.min(W, H * 1.45);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); CX = W * 0.46; CY = H * 0.43; FOC = Math.min(W, H * 1.45);
   const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#f6f7fb'); g.addColorStop(1, '#e4e7f1'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   const lampUV = ST.lam < 340.8, on = ST.inst !== 'off';
   const coverA = 1 - 0.82 * ST.xray, wallA = 1 - 0.75 * ST.xray;
@@ -1719,7 +1914,7 @@ function draw() {
   for (const part of P) {
     if (!visible(part)) continue;
     let alpha = part.alpha;
-    if (part.grp === 'cover' || part.grp === 'lid') alpha *= coverA;
+    if (part.grp === 'cover' || part.grp === 'lid' || part.grp === 'lcdp') alpha *= coverA;
     if (part.grp === 'walls') alpha *= wallA;
     if (alpha < 0.02) continue;
     const wv = part.v.map(p => xf(p, part)); const cs = wv.map(camXf);
@@ -1730,30 +1925,31 @@ function draw() {
     if (!facing && alpha > 0.97 && !part.ds) continue;
     const wn = norm(cross(sub(wv[1], wv[0]), sub(wv[3], wv[0])));
     const lk = 0.5 + 0.55 * (part.ds ? Math.abs(dot(wn, LIGHT)) : Math.max(0, dot(wn, LIGHT)));
-    let col = part.col, emi = part.emi;
-    switch (part.dyn) {
-      case 'd2': emi = on && lampUV ? 0.45 : 0; col = on && lampUV ? '#e4dcff' : '#9a96b5'; break;
-      case 'wi': emi = on && !lampUV ? 0.45 : 0; col = on && !lampUV ? '#ffe7a0' : '#a89c74'; break;
-      case 'glow': col = on && !lampUV ? '#f0873a' : '#bfa868'; emi = on && !lampUV ? 0.22 : 0; break;
-      case 'lcd': col = on ? '#a99af2' : '#5c5777'; emi = on ? 0.08 : 0; break;
-      case 'upsled': col = ST.ups ? '#22c55e' : '#555'; emi = ST.ups ? 0.5 : 0; break;
-      case 'upslcd': col = ST.ups ? '#9be3c0' : '#3c4a44'; emi = ST.ups ? 0.1 : 0; break;
-      case 'pcled': col = ST.pc ? '#38bdf8' : '#3a3f47'; emi = ST.pc ? 0.5 : 0; break;
-      case 'pwr': col = on ? '#3d9a5a' : '#2a2d33'; break;
-      case 'liqR': case 'liqS': { const c = ST.cuv[part.dyn[3]]; col = c.content ? SOL[c.content].col : '#fff'; break; }
+    let col = part.col, emi = part.emi; const dy = part.dyn;
+    if (dy) {
+      if (dy === 'd2') { emi = on && lampUV ? 0.45 : 0; col = on && lampUV ? '#e4dcff' : '#9a96b5'; }
+      else if (dy === 'wi') { emi = on && !lampUV ? 0.45 : 0; col = on && !lampUV ? '#ffe7a0' : '#a89c74'; }
+      else if (dy === 'glow') { col = on && !lampUV ? '#f0873a' : '#bfa868'; emi = on && !lampUV ? 0.22 : 0; }
+      else if (dy === 'lcd') { col = on ? '#a99af2' : '#5c5777'; emi = on ? 0.08 : 0; }
+      else if (dy.startsWith('upsled')) { const i = +dy[6]; const lit = ST.ups && i <= (1 + (ST.inst !== 'off') + (ST.pc ? 1 : 0) + 1); col = lit ? (i === 4 ? '#f59e0b' : '#22c55e') : '#2b2f2b'; emi = lit ? 0.5 : 0; if (i === 4) { col = ST.ups ? '#22c55e' : '#2b2f2b'; } }
+      else if (dy === 'upsbtn') { col = ST.ups ? '#16351f' : '#0d0e10'; }
+      else if (dy === 'pcled') { col = ST.pc ? '#38bdf8' : '#7d838c'; emi = ST.pc ? 0.35 : 0; }
+      else if (dy === 'monled') { col = ST.pc ? '#3b82f6' : '#222'; emi = ST.pc ? 0.5 : 0; }
+      else if (dy === 'prled') { col = ST.printer ? '#22c55e' : '#444'; emi = ST.printer ? 0.5 : 0; }
+      else if (dy === 'pwr') { col = on ? '#3d9a5a' : '#2a2d33'; }
+      else if (dy === 'modekey') { col = ST.keyFlash > 0 ? '#facc15' : '#cfd4dc'; emi = ST.keyFlash > 0 ? 0.3 : 0; }
+      else if (dy === 'liqR' || dy === 'liqS') { const c = ST.cuv[dy[3]]; col = c.content ? SOL[c.content].col : '#fff'; }
     }
     if (selId && part.id === selId) emi += 0.15;
     const it = { part, pts: cs.map(proj), depth: CAM.dist - cen[2] + part.bias + (part.grp === 'inner' || part.grp === 'comp' ? 0.35 : 0) + (facing ? 0 : 0.02), fill: shade(col, lk, emi), alpha, facing };
     (part.bg ? bg : items).push(it);
   }
   bg.sort((a, b) => b.depth - a.depth); paint(bg);
-  // bayangan objek pada meja
   ctx.fillStyle = 'rgba(20,18,58,.10)';
-  [[-25, 25, -26.5, 26.5], [29, 49, -21, 9], [-107, -87, -23, 15], [-82, -34, -22, -10], [-43, -27, -1, 30]].forEach(([x0, x1, z0, z1]) => {
+  [[-25, 25, -26.5, 26.5], [27, 45, -23, 9], [-107, -87, -23, 15], [-84, -32, -22, -10], [-127, -107, -17, 7], [-88, -55, 16, 36]].forEach(([x0, x1, z0, z1]) => {
     const pts = [[x0 + 1, z0 + 1], [x1 + 1.5, z0 + 1], [x1 + 1.5, z1 + 1.5], [x0 + 1, z1 + 1.5]].map(([x, z]) => proj(camXf([x, -1.36, z])));
     if (pts.some(p => p[2] < 4)) return; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill();
   });
-  // kabel
   CABLES.forEach((c, ci) => {
     const prog = ST.cab[ci]; if (prog <= 0) return;
     const nseg = c.seg.length - 1, upto = prog * nseg;
@@ -1763,7 +1959,7 @@ function draw() {
       items.push({ cable: true, pa: proj(ca), pb: proj(cb), depth: CAM.dist - (ca[2] + cb[2]) / 2 - 0.2, col: c.col, w: c.w, end: i === nseg - 1 && prog >= 1 });
     }
   });
-  // berkas cahaya
+  if (ST.stream) { const ca = camXf(ST.stream.a), cb = camXf(ST.stream.b); if (CAM.dist - ca[2] > 4 && CAM.dist - cb[2] > 4) items.push({ cable: true, pa: proj(ca), pb: proj(cb), depth: CAM.dist - (ca[2] + cb[2]) / 2 - 0.5, col: ST.stream.col, w: ST.stream.w, end: false }); }
   if (on && (ST.beam > 0.01 || ST.xray > 0.5)) {
     const y = 9.5, src = lampUV ? [19.1, y, -19.8] : [19.1, y, -13];
     const path = [[src, [15.3, y, -16]], [[15.3, y, -16], [11.2, y, -15]], [[11.2, y, -15], [3.5, y, -21]], [[3.5, y, -21], [3, y, -9.2]], [[3, y, -9.2], [3, y, 3]], [[3, y, 3], [3, y, 13]], [[3, y, 3], [-8.5, y, 3]], [[-8.5, y, 3], [-19.6, y, 3]], [[3, y, 13], [-8.5, y, 13]], [[-8.5, y, 13], [-19.6, y, 13]]];
@@ -1776,18 +1972,13 @@ function draw() {
 function paint(list) {
   ctx.lineJoin = 'round';
   for (const it of list) {
-    if (it.cable) {
-      ctx.save(); const wpx = Math.max(1.2, it.w * FOC / Math.max(10, it.pa[2]) * 0.9);
+    if (it.cable) { ctx.save(); const wpx = Math.max(1.2, it.w * FOC / Math.max(10, it.pa[2]) * 0.9);
       ctx.strokeStyle = it.col; ctx.lineWidth = wpx; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke();
-      if (it.end) { ctx.fillStyle = '#2b2b2b'; ctx.beginPath(); ctx.arc(it.pb[0], it.pb[1], wpx * 1.3, 0, 7); ctx.fill(); }
-      ctx.restore(); continue;
-    }
-    if (it.beam) {
-      ctx.save(); ctx.globalAlpha = 0.3 * it.att * it.a; ctx.strokeStyle = it.col; ctx.lineWidth = 7; ctx.lineCap = 'round';
+      if (it.end) { ctx.fillStyle = '#2b2b2b'; ctx.beginPath(); ctx.arc(it.pb[0], it.pb[1], wpx * 1.3, 0, 7); ctx.fill(); } ctx.restore(); continue; }
+    if (it.beam) { ctx.save(); ctx.globalAlpha = 0.3 * it.att * it.a; ctx.strokeStyle = it.col; ctx.lineWidth = 7; ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke();
       ctx.globalAlpha = 0.95 * it.att * it.a; ctx.lineWidth = 2.2; if (ST.lam < 380) ctx.setLineDash([5, 4]);
-      ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke(); ctx.restore(); continue;
-    }
+      ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke(); ctx.restore(); continue; }
     const p = it.pts; ctx.globalAlpha = it.alpha;
     ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]); for (let i = 1; i < 4; i++) ctx.lineTo(p[i][0], p[i][1]); ctx.closePath();
     ctx.fillStyle = it.fill; ctx.fill();
@@ -1799,130 +1990,178 @@ function paint(list) {
   }
 }
 function faceText(part, p) {
-  const t = part.text, TL = p[3], TR = p[2], BL = p[0];
-  const dpr = cv.width / Math.max(1, W);
-  ctx.save();
-  ctx.setTransform((TR[0] - TL[0]) / t.w * dpr, (TR[1] - TL[1]) / t.w * dpr, (BL[0] - TL[0]) / t.h * dpr, (BL[1] - TL[1]) / t.h * dpr, TL[0] * dpr, TL[1] * dpr);
-  if (t.screen) { ctx.drawImage(pcc, 0, 0, t.w, t.h); }
-  else if (t.lcd) drawLCD(ctx);
-  else if (t.ups) { if (ST.ups) { ctx.fillStyle = '#0b3a26'; ctx.font = '600 15px "JetBrains Mono",monospace'; ctx.textAlign = 'center'; ctx.fillText('IN 221V  OUT 220V', 60, 22); ctx.fillText('LOAD ' + (12 + (ST.inst !== 'off' ? 18 : 0) + (ST.pc ? 22 : 0)) + '%', 60, 40); } }
+  const t = part.text, TL = p[3], TR = p[2], BL = p[0]; const dpr = cv.width / Math.max(1, W);
+  ctx.save(); ctx.setTransform((TR[0] - TL[0]) / t.w * dpr, (TR[1] - TL[1]) / t.w * dpr, (BL[0] - TL[0]) / t.h * dpr, (BL[1] - TL[1]) / t.h * dpr, TL[0] * dpr, TL[1] * dpr);
+  if (t.screen) ctx.drawImage(pcc, 0, 0, t.w, t.h); else if (t.lcd) drawLCD(ctx);
   else for (const [s, x, y, al, font, col] of t.lines) { ctx.font = font; ctx.fillStyle = col; ctx.textAlign = al; ctx.fillText(s, x, y); }
   ctx.restore();
 }
+const mmss = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 function drawLCD(c) {
-  if (ST.inst === 'off') return;
-  c.fillStyle = '#1b1248';
-  if (ST.inst === 'init') {
-    c.font = '500 8.5px "JetBrains Mono",monospace'; c.textAlign = 'left';
-    ST.initLines.slice(-9).forEach((s, i) => c.fillText(s, 6, 11 + i * 9.6)); return;
-  }
+  if (ST.inst === 'off') return; c.fillStyle = '#1b1248';
+  if (ST.inst === 'init') { c.font = '500 8.5px "JetBrains Mono",monospace'; c.textAlign = 'left'; ST.initLines.slice(-9).forEach((s, i) => c.fillText(s, 6, 11 + i * 9.6)); return; }
+  if (ST.pcctrl) { c.font = '600 15px "JetBrains Mono",monospace'; c.textAlign = 'center'; c.fillText('PC CONTROL', 65, 36);
+    c.font = '500 10px "JetBrains Mono",monospace'; c.fillText(ST.connected ? 'CONNECTED' : 'WAITING FOR PC', 65, 54); c.fillText(fx(ST.lam, 1).replace(',', '.') + 'nm  ' + (ST.lastA > 3 ? 'OVER' : ST.lastA.toFixed(3)) + ' A', 65, 72);
+    c.fillStyle = '#4a3fa0'; c.fillText(ST.inst === 'warm' ? 'WARM-UP ' + mmss(ST.warmLeft) : (ST.lam < 340.8 ? 'D2' : 'WI'), 65, 89); return; }
   c.fillStyle = 'rgba(255,255,255,.85)'; [16, 44, 72].forEach(yy => c.fillRect(8, yy - 6, 24, 5));
   c.fillStyle = '#1b1248'; c.font = '500 17px "JetBrains Mono",monospace'; c.textAlign = 'right';
-  c.fillText(ST.lam.toFixed(1) + 'nm', 124, 22);
-  c.fillText((ST.lastA > 3 ? 'OVER' : ST.lastA.toFixed(3)) + ' ABS', 124, 50);
+  c.fillText(ST.lam.toFixed(1) + 'nm', 124, 22); c.fillText((ST.lastA > 3 ? 'OVER' : ST.lastA.toFixed(3)) + ' ABS', 124, 50);
   c.font = '500 13px "JetBrains Mono",monospace'; c.textAlign = 'left'; c.fillText(ST.lam < 340.8 ? 'D2' : 'WI', 40, 77);
-  c.textAlign = 'right'; c.fillStyle = '#4a3fa0'; c.font = '500 9.5px "JetBrains Mono",monospace';
-  c.fillText(ST.inst === 'warm' ? 'WARM-UP ' + mmss(ST.warmLeft) : (ST.connected ? 'PC CONTROL' : 'READY'), 124, 90);
+  c.textAlign = 'right'; c.fillStyle = '#4a3fa0'; c.font = '500 9.5px "JetBrains Mono",monospace'; c.fillText(ST.inst === 'warm' ? 'WARM-UP ' + mmss(ST.warmLeft) : 'MODE MENU', 124, 90);
 }
-const mmss = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 
-/* ---------------- layar komputer ---------------- */
+/* ================= layar UVProbe ================= */
 let pcBtns = [];
-function pcButton(c, x, y, w, h, label, act, on) {
-  c.fillStyle = on === false ? '#e5e7eb' : '#f3f4f6'; c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.fillRect(x, y, w, h); c.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
-  c.fillStyle = on === false ? '#9ca3af' : '#111827'; c.font = '500 13px Inter,Arial'; c.textAlign = 'center'; c.fillText(label, x + w / 2, y + h / 2 + 4.5);
-  if (act) pcBtns.push({ x, y, w, h, act });
+const F = (w, s) => (w || 400) + ' ' + (s || 12) + 'px Segoe UI, Inter, Arial';
+function btn3(c, x, y, w, h, label, act, enabled, hi) {
+  c.fillStyle = hi ? '#cce4f7' : '#f0f0f0'; c.fillRect(x, y, w, h); c.strokeStyle = hi ? '#0078d4' : '#adadad'; c.lineWidth = 1; c.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  c.fillStyle = enabled === false ? '#9ca3af' : '#111'; c.font = F(400, 12); c.textAlign = 'center'; c.fillText(label, x + w / 2, y + h / 2 + 4);
+  if (act && enabled !== false) pcBtns.push({ x, y, w, h, act });
 }
-function linreg(x, y) {
-  const n = x.length; if (n < 2) return null; const mx = x.reduce((a, b) => a + b) / n, my = y.reduce((a, b) => a + b) / n;
-  let sxx = 0, sxy = 0, syy = 0; for (let i = 0; i < n; i++) { sxx += (x[i] - mx) ** 2; sxy += (x[i] - mx) * (y[i] - my); syy += (y[i] - my) ** 2; }
-  if (!(sxx > 0)) return null; const a = sxy / sxx, b = my - a * mx; return { a, b, r2: syy > 0 ? (sxy * sxy) / (sxx * syy) : 1 };
-}
-function calData() {
-  const last = [...ST.readings].reverse().find(r => r.std); if (!last) return null;
-  const lam = last.lam; const std = {}; ST.readings.filter(r => r.std && Math.abs(r.lam - lam) < 0.05).forEach(r => { (std[r.c] = std[r.c] || []).push(r.A); });
-  const xs = Object.keys(std).map(Number).sort((a, b) => a - b); const ys = xs.map(c => std[c].reduce((a, b) => a + b) / std[c].length);
-  const reg = linreg(xs, ys); const smp = ST.readings.filter(r => r.sample && Math.abs(r.lam - lam) < 0.05).map(r => r.A);
-  return { lam, xs, ys, reg, smp };
+function regress() {
+  const rows = ST.stdTable.filter(r => r.A != null); if (rows.length < 1) return null;
+  const zero = !ST.pmethod || ST.pmethod.zero;
+  const xs = rows.map(r => r.conc), ys = rows.map(r => r.A), n = xs.length;
+  let a, b = 0;
+  if (zero) { const sxy = xs.reduce((s, x, i) => s + x * ys[i], 0), sxx = xs.reduce((s, x) => s + x * x, 0); a = sxy / sxx; }
+  else { if (n < 2) return null; const mx = xs.reduce((s, v) => s + v) / n, my = ys.reduce((s, v) => s + v) / n; let sxx = 0, sxy = 0; xs.forEach((x, i) => { sxx += (x - mx) ** 2; sxy += (x - mx) * (ys[i] - my); }); a = sxy / sxx; b = my - a * mx; }
+  const my = ys.reduce((s, v) => s + v) / n; let ssr = 0, sst = 0; xs.forEach((x, i) => { ssr += (ys[i] - (a * x + b)) ** 2; sst += (ys[i] - my) ** 2; });
+  return { a, b, r2: sst > 0 ? 1 - ssr / sst : 1, zero, n };
 }
 function drawPC() {
   const c = pctx, Wp = pcc.width, Hp = pcc.height; pcBtns = []; c.setTransform(1, 0, 0, 1, 0, 0);
-  $('#pcst').textContent = !ST.pc ? 'MATI' : ST.pc === 1 ? 'MEMULAI' : ST.connected ? 'TERHUBUNG KE UV-1700' : 'SIAP';
-  if (!ST.pc) { c.fillStyle = '#030405'; c.fillRect(0, 0, Wp, Hp); c.fillStyle = '#1f2937'; c.font = '500 16px Inter,Arial'; c.textAlign = 'center'; c.fillText(ST.ups ? 'Komputer mati — tekan "Nyalakan komputer"' : 'Tidak ada daya', Wp / 2, Hp / 2); return; }
-  if (ST.pc === 1) {
-    c.fillStyle = '#0b1020'; c.fillRect(0, 0, Wp, Hp); c.fillStyle = '#c7d2fe'; c.font = '600 26px Inter,Arial'; c.textAlign = 'center'; c.fillText('Memulai sistem…', Wp / 2, Hp / 2 - 20);
-    c.fillStyle = '#1e293b'; c.fillRect(Wp / 2 - 160, Hp / 2 + 6, 320, 8); c.fillStyle = '#6366f1'; c.fillRect(Wp / 2 - 160, Hp / 2 + 6, 320 * ST.pcBoot, 8); return;
+  $('#pcst').textContent = !ST.pc ? 'MATI' : ST.pc === 1 ? 'MEMULAI' : ST.pc === 4 ? 'SHUTDOWN' : ST.connected ? 'UVPROBE · TERHUBUNG' : ST.sw ? 'UVPROBE · TIDAK TERHUBUNG' : 'DESKTOP';
+  if (!ST.pc) { c.fillStyle = '#020203'; c.fillRect(0, 0, Wp, Hp); c.fillStyle = '#1f2937'; c.font = F(500, 16); c.textAlign = 'center'; c.fillText(ST.ups ? 'Komputer mati' : 'Tidak ada daya', Wp / 2, Hp / 2); return; }
+  if (ST.pc === 1 || ST.pc === 4) { c.fillStyle = '#0a1b3d'; c.fillRect(0, 0, Wp, Hp); c.fillStyle = '#e0e7ff'; c.font = F(300, 26); c.textAlign = 'center';
+    c.fillText(ST.pc === 1 ? 'Memulai Windows…' : 'Mematikan komputer…', Wp / 2, Hp / 2 - 24);
+    for (let i = 0; i < 5; i++) { const a = performance.now() / 300 + i * 0.6; c.beginPath(); c.arc(Wp / 2 + 26 * Math.cos(a), Hp / 2 + 26 + 26 * Math.sin(a), 3.5, 0, 7); c.fill(); } return; }
+  // desktop
+  const gr = c.createLinearGradient(0, 0, Wp, Hp); gr.addColorStop(0, '#0b3a75'); gr.addColorStop(1, '#0e7490'); c.fillStyle = gr; c.fillRect(0, 0, Wp, Hp);
+  const TB = Hp - 32; c.fillStyle = '#101418'; c.fillRect(0, TB, Wp, 32); c.fillStyle = '#fff'; c.fillRect(10, TB + 8, 16, 16);
+  c.fillStyle = '#2b2f36'; c.fillRect(36, TB + 5, 260, 22); c.fillStyle = '#9ca3af'; c.font = F(400, 12); c.textAlign = 'left'; c.fillText('Search the web and Windows', 46, TB + 20);
+  const d = new Date(); c.fillStyle = '#e5e7eb'; c.textAlign = 'right'; c.fillText(String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + '   ' + dstr.replace(/-/g, '/'), Wp - 12, TB + 20);
+  if (!ST.sw) {
+    c.fillStyle = 'rgba(255,255,255,.12)'; c.fillRect(24, 24, 84, 84); c.fillStyle = '#ffffff'; c.fillRect(44, 36, 44, 34); c.fillStyle = '#2563eb'; c.fillRect(48, 40, 36, 26);
+    c.strokeStyle = '#fbbf24'; c.lineWidth = 2; c.beginPath(); c.moveTo(50, 62); c.quadraticCurveTo(60, 38, 70, 56); c.quadraticCurveTo(76, 64, 82, 46); c.stroke();
+    c.fillStyle = '#fff'; c.font = F(500, 12); c.textAlign = 'center'; c.fillText('UVProbe', 66, 96); pcBtns.push({ x: 24, y: 24, w: 84, h: 84, act: 'software' });
+    if (ST.pc === 2 && ST.done.size) { c.fillStyle = 'rgba(255,255,255,.85)'; c.font = F(400, 14); c.fillText('Klik dua kali ikon UVProbe untuk membuka perangkat lunak', Wp / 2, Hp / 2); }
+    drawDlg(c, Wp, Hp); return;
   }
-  const gr = c.createLinearGradient(0, 0, Wp, Hp); gr.addColorStop(0, '#1e1b4b'); gr.addColorStop(1, '#0f766e'); c.fillStyle = gr; c.fillRect(0, 0, Wp, Hp);
-  c.fillStyle = 'rgba(10,12,20,.85)'; c.fillRect(0, Hp - 34, Wp, 34); c.fillStyle = '#e5e7eb'; c.font = '500 13px Inter,Arial'; c.textAlign = 'right';
-  const d = new Date(); c.fillText(String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), Wp - 14, Hp - 12);
-  if (ST.pc === 2) {
-    c.fillStyle = 'rgba(255,255,255,.14)'; c.fillRect(30, 30, 92, 92); c.fillStyle = '#a5b4fc'; c.fillRect(52, 44, 48, 40); c.fillStyle = '#fff'; c.font = '600 12px Inter,Arial'; c.textAlign = 'center'; c.fillText('Spectra', 76, 102); c.fillText('Control', 76, 116);
-    pcBtns.push({ x: 30, y: 30, w: 92, h: 92, act: 'software' }); c.fillStyle = 'rgba(255,255,255,.8)'; c.font = '500 14px Inter,Arial'; c.fillText('Klik ikon untuk membuka perangkat lunak instrumen', Wp / 2, Hp / 2); return;
-  }
-  // jendela perangkat lunak
-  const X = 16, Y = 14, WW = Wp - 32, HH = Hp - 62;
-  c.fillStyle = '#ffffff'; c.fillRect(X, Y, WW, HH); c.fillStyle = '#1f3a8a'; c.fillRect(X, Y, WW, 28);
-  c.fillStyle = '#fff'; c.font = '600 13px Inter,Arial'; c.textAlign = 'left'; c.fillText('Spectra Control — UV-1700 (simulasi)   ·   ' + AN.nama, X + 10, Y + 19);
-  c.fillStyle = '#f3f4f6'; c.fillRect(X, Y + 28, WW, 40);
-  pcButton(c, X + 8, Y + 34, 96, 28, ST.connected ? 'Terhubung' : 'Connect', 'connect', !ST.connected);
-  pcButton(c, X + 110, Y + 34, 96, 28, 'Auto Zero', 'autozero', ST.connected); pcButton(c, X + 212, Y + 34, 96, 28, 'Baseline', 'baseline', ST.connected);
-  pcButton(c, X + 314, Y + 34, 96, 28, 'Start', 'measure', ST.connected); pcButton(c, X + 416, Y + 34, 96, 28, 'Scan', 'scan', ST.connected);
-  pcButton(c, X + 560, Y + 34, 110, 28, (ST.pcTab === 'foto' ? '■ ' : '') + 'Fotometri', 'tabfoto'); pcButton(c, X + 676, Y + 34, 110, 28, (ST.pcTab === 'scan' ? '■ ' : '') + 'Spektrum', 'tabscan');
-  // status bar
-  c.fillStyle = '#e5e7eb'; c.fillRect(X, Y + HH - 24, WW, 24); c.fillStyle = '#374151'; c.font = '500 12px "JetBrains Mono",monospace'; c.textAlign = 'left';
-  const zs = ST.zero ? (ST.zero.type === 'az' ? 'AZ @' + fx(ST.zero.lam, 1) + ' nm' : 'Baseline ' + ST.zero.lo + '–' + ST.zero.hi + ' nm') : 'belum auto zero';
-  c.fillText((ST.connected ? '● Terhubung' : '○ Tidak terhubung') + '   |   λ ' + fx(ST.lam, 1) + ' nm   |   ' + (ST.lam < 340.8 ? 'D2' : 'WI') + '   |   ' + zs + '   |   ' + (ST.lid > 0.5 ? 'KOMPARTEMEN TERBUKA' : 'kompartemen tertutup'), X + 10, Y + HH - 8);
-  if (!ST.connected) { c.fillStyle = '#6b7280'; c.font = '500 16px Inter,Arial'; c.textAlign = 'center'; c.fillText(ST.inst === 'off' ? 'Instrumen belum dinyalakan.' : 'Tekan Connect untuk menghubungkan perangkat lunak dengan UV-1700.', X + WW / 2, Y + HH / 2); return; }
-  const top = Y + 78, bot = Y + HH - 32;
-  if (ST.pcTab === 'foto') {
-    // tabel
-    const tx = X + 10, tw = 470; c.fillStyle = '#eef2ff'; c.fillRect(tx, top, tw, 24); c.fillStyle = '#1e1b4b'; c.font = '600 12px Inter,Arial'; c.textAlign = 'left';
-    [['No', 8], ['Larutan', 40], ['C (' + INIT.unit + ')', 220], ['λ (nm)', 310], ['Abs', 380], ['%T', 430]].forEach(([s, x]) => c.fillText(s, tx + x, top + 16));
-    const rows = ST.readings.slice(-14); c.font = '12px "JetBrains Mono",monospace';
-    rows.forEach((r, i) => { const yy = top + 24 + i * 21; if (i % 2) { c.fillStyle = '#f9fafb'; c.fillRect(tx, yy, tw, 21); }
-      c.fillStyle = r.flag ? '#b91c1c' : '#111827'; c.fillText(String(r.no), tx + 8, yy + 15); c.fillText(r.label.slice(0, 24), tx + 40, yy + 15);
-      c.fillText(r.std ? fx(r.c, 2) : (r.sample ? '?' : '0'), tx + 220, yy + 15); c.fillText(fx(r.lam, 1), tx + 310, yy + 15); c.fillText(fx(r.A, 4), tx + 380, yy + 15); c.fillText(fx(100 * Math.pow(10, -r.A), 1), tx + 430, yy + 15); });
-    if (!rows.length) { c.fillStyle = '#9ca3af'; c.font = '500 13px Inter,Arial'; c.fillText('Belum ada data. Tekan Start untuk mengukur.', tx + 10, top + 50); }
-    // grafik kalibrasi
-    const gx = X + 500, gy = top, gw = WW - 520, gh = bot - top - 70; chartFrame(c, gx, gy, gw, gh, 'Kurva kalibrasi', 'C (' + INIT.unit + ')', 'Abs');
-    const cd = calData();
-    if (cd && cd.xs.length) {
-      const xmax = Math.max(...cd.xs, 0.01) * 1.15, ymax = Math.max(...cd.ys, ...(cd.smp.length ? cd.smp : [0]), 0.05) * 1.2;
-      const PX = x => gx + 40 + (gw - 52) * x / xmax, PY = y => gy + gh - 28 - (gh - 52) * y / ymax;
-      if (cd.reg) { c.strokeStyle = '#7c3aed'; c.lineWidth = 2; c.beginPath(); c.moveTo(PX(0), PY(cd.reg.b)); c.lineTo(PX(xmax), PY(cd.reg.a * xmax + cd.reg.b)); c.stroke(); }
-      c.fillStyle = '#4f46e5'; cd.xs.forEach((x, i) => { c.beginPath(); c.arc(PX(x), PY(cd.ys[i]), 5, 0, 7); c.fill(); });
-      const ax = cd.smp.length ? cd.smp.reduce((a, b) => a + b) / cd.smp.length : null;
-      if (cd.reg && ax != null) { const cx = (ax - cd.reg.b) / cd.reg.a; c.fillStyle = '#e11d48'; c.beginPath(); c.moveTo(PX(cx), PY(ax) - 7); c.lineTo(PX(cx) + 7, PY(ax)); c.lineTo(PX(cx), PY(ax) + 7); c.lineTo(PX(cx) - 7, PY(ax)); c.fill(); }
-      c.fillStyle = '#111827'; c.font = '500 13px "JetBrains Mono",monospace'; c.textAlign = 'left';
-      const ly = gy + gh + 18;
-      c.fillText('λ = ' + fx(cd.lam, 1) + ' nm   ·   ' + cd.xs.length + ' standar', gx, ly);
-      if (cd.reg) { c.fillText('y = ' + fx(cd.reg.a, 4) + 'x ' + (cd.reg.b < 0 ? '− ' : '+ ') + fx(Math.abs(cd.reg.b), 4) + '    R² = ' + fx(cd.reg.r2, 4), gx, ly + 20);
-        if (ax != null) c.fillText('Sampel X: Ā = ' + fx(ax, 4) + ' (n=' + cd.smp.length + ')  →  C = ' + fx((ax - cd.reg.b) / cd.reg.a, 3) + ' ' + INIT.unit, gx, ly + 40); }
-    } else { c.fillStyle = '#9ca3af'; c.font = '500 13px Inter,Arial'; c.textAlign = 'center'; c.fillText('Ukur larutan standar untuk membentuk kurva', gx + gw / 2, gy + gh / 2); }
-  } else {
-    const gx = X + 10, gy = top, gw = WW - 20, gh = bot - top - 10; chartFrame(c, gx, gy, gw, gh, 'Spektrum absorbansi', 'λ (nm)', 'Abs');
-    const sp = ST.spectrum;
-    if (sp && sp.l.length > 1) {
-      const lo = sp.lo, hi = sp.hi, ymax = Math.max(0.1, ...sp.a) * 1.15, ymin = Math.min(0, ...sp.a);
-      const PX = l => gx + 46 + (gw - 60) * (l - lo) / (hi - lo), PY = a => gy + gh - 28 - (gh - 52) * (a - ymin) / (ymax - ymin);
-      for (let l = Math.max(380, lo); l < Math.min(780, hi); l += 5) { c.fillStyle = lamColor(l + 2.5); c.fillRect(PX(l), gy + gh - 30, Math.max(1, PX(l + 5) - PX(l)), 4); }
-      c.strokeStyle = '#4f46e5'; c.lineWidth = 2; c.beginPath(); sp.l.forEach((l, i) => { const X1 = PX(l), Y1 = PY(sp.a[i]); i ? c.lineTo(X1, Y1) : c.moveTo(X1, Y1); }); c.stroke();
-      c.fillStyle = '#374151'; c.font = '11px Inter,Arial'; c.textAlign = 'center';
-      for (let l = Math.ceil(lo / 50) * 50; l <= hi; l += 50) c.fillText(String(l), PX(l), gy + gh - 12);
-      if (sp.done) { let im = 0; sp.a.forEach((a, i) => { if (a > sp.a[im]) im = i; }); c.strokeStyle = '#0d9488'; c.setLineDash([5, 4]); c.beginPath(); c.moveTo(PX(sp.l[im]), gy + 30); c.lineTo(PX(sp.l[im]), gy + gh - 30); c.stroke(); c.setLineDash([]);
-        c.fillStyle = '#0d9488'; c.font = '600 13px "JetBrains Mono",monospace'; c.fillText('λmaks ' + fx(sp.l[im], 1) + ' nm · A = ' + fx(sp.a[im], 4), PX(sp.l[im]), gy + 26); sp.lmax = sp.l[im]; }
-      if (!sp.zeroed) { c.fillStyle = '#b91c1c'; c.font = '500 12px Inter,Arial'; c.textAlign = 'right'; c.fillText('Tanpa koreksi baseline', gx + gw - 10, gy + 18); }
-    } else { c.fillStyle = '#9ca3af'; c.font = '500 13px Inter,Arial'; c.textAlign = 'center'; c.fillText('Tekan Scan untuk memindai spektrum ' + scanRange().join('–') + ' nm', gx + gw / 2, gy + gh / 2); }
-  }
+  // jendela UVProbe
+  const X = 0, Y = 0, WW = Wp, HH = TB; c.fillStyle = '#ffffff'; c.fillRect(X, Y, WW, HH);
+  c.fillStyle = '#ffffff'; c.fillRect(0, 0, WW, 26); c.fillStyle = '#111'; c.font = F(400, 12); c.textAlign = 'left';
+  c.fillText('UVProbe - [' + (ST.win === 'photometric' ? 'Photometric' : ST.win === 'spectrum' ? 'Spectrum' : 'Report') + ']', 30, 17);
+  c.fillStyle = '#2563eb'; c.fillRect(8, 6, 14, 14); c.fillStyle = '#111'; c.textAlign = 'right'; c.fillText('—    ☐    ✕', WW - 12, 17);
+  const MENUS = ['File', 'Edit', 'View', 'Operations', 'Graph', 'Instrument', 'Tools', 'Window', 'Help']; let mx = 8; const mpos = {};
+  c.font = F(400, 12); c.textAlign = 'left';
+  MENUS.forEach(m => { const w = c.measureText(m).width + 16; mpos[m] = mx; if (ST.menu && ST.menu.name === m) { c.fillStyle = '#cce4f7'; c.fillRect(mx, 26, w, 20); } c.fillStyle = '#111'; c.fillText(m, mx + 8, 40); mx += w; });
+  c.fillStyle = '#f5f5f5'; c.fillRect(0, 46, WW, 26); c.strokeStyle = '#e5e7eb'; c.beginPath(); c.moveTo(0, 72.5); c.lineTo(WW, 72.5); c.stroke();
+  for (let i = 0; i < 22; i++) { c.fillStyle = i % 5 === 4 ? '#f5f5f5' : ['#94a3b8', '#60a5fa', '#a3a3a3', '#f59e0b'][i % 4]; c.fillRect(8 + i * 22, 51, 16, 16); }
+  const mainTop = 74, barTop = HH - 64;
+  if (!ST.win) { c.fillStyle = '#6b7280'; c.font = F(400, 15); c.textAlign = 'center'; c.fillText('Pilih Window → Spectrum atau Window → Photometric', WW / 2, (mainTop + barTop) / 2); }
+  else if (ST.win === 'spectrum') drawSpectrumWin(c, mainTop, barTop, WW);
+  else drawPhotoWin(c, mainTop, barTop, WW);
+  // bilah instrumen bawah
+  c.fillStyle = '#f3f3f3'; c.fillRect(0, barTop, WW, 64); c.strokeStyle = '#d4d4d4'; c.beginPath(); c.moveTo(0, barTop + 0.5); c.lineTo(WW, barTop + 0.5); c.stroke();
+  c.fillStyle = '#111'; c.font = F(600, 14); c.textAlign = 'left'; c.fillText(fx(ST.lam, 1) + ' nm', 14, barTop + 22); c.fillText((ST.connected ? fx(ST.lastA, 3) : '-----') + ' Abs', 130, barTop + 22);
+  c.font = F(400, 11); c.fillStyle = '#4b5563'; const z = ST.zero ? (ST.zero.type === 'az' ? 'Auto zero ' + fx(ST.zero.lam, 1) + ' nm' : 'Baseline ' + ST.zero.lo + '–' + ST.zero.hi + ' nm') : 'Belum baseline/auto zero';
+  c.fillText(z + (ST.lid > 0.5 ? '   ·   KOMPARTEMEN TERBUKA' : ''), 260, barTop + 22);
+  const by = barTop + 32, bh = 26; let bx = 10; const hiA = ST.hiBtn;
+  const B = (lab, act, en) => { const w = Math.max(84, c.measureText(lab).width + 26); btn3(c, bx, by, w, bh, lab, act, en, hiA === act); bx += w + 6; };
+  B('Auto Zero', 'autozero', ST.connected); B(ST.connected ? 'Disconnect' : 'Connect', ST.connected ? 'disconnect' : 'connect', true);
+  B('Go To WL', 'goto', ST.connected); if (ST.win === 'spectrum') { B('Baseline', 'baseline', ST.connected); B('Start', 'scan', ST.connected); }
+  if (ST.win === 'photometric') { B('Read Std', 'readstd', ST.connected && ST.ptab === 'std'); B('Read Unk', 'readunk', ST.connected && ST.ptab === 'unk'); }
+  if (ST.menu) drawMenu(c, mpos[ST.menu.name]);
+  drawDlg(c, Wp, Hp);
 }
-function chartFrame(c, x, y, w, h, title, xl, yl) {
-  c.strokeStyle = '#d1d5db'; c.lineWidth = 1; c.strokeRect(x + 0.5, y + 0.5, w, h); c.fillStyle = '#111827'; c.font = '600 13px Inter,Arial'; c.textAlign = 'left'; c.fillText(title, x + 10, y + 18);
-  c.strokeStyle = '#9ca3af'; c.beginPath(); c.moveTo(x + 40, y + 24); c.lineTo(x + 40, y + h - 28); c.lineTo(x + w - 10, y + h - 28); c.stroke();
-  c.fillStyle = '#6b7280'; c.font = '11px Inter,Arial'; c.textAlign = 'right'; c.fillText(xl, x + w - 12, y + h - 4); c.save(); c.translate(x + 12, y + h / 2); c.rotate(-Math.PI / 2); c.textAlign = 'center'; c.fillText(yl, 0, 0); c.restore();
+function drawMenu(c, x) {
+  const m = ST.menu, w = 210, ih = 22; c.fillStyle = '#ffffff'; c.fillRect(x, 46, w, m.items.length * ih + 6); c.strokeStyle = '#a3a3a3'; c.strokeRect(x + 0.5, 46.5, w, m.items.length * ih + 6);
+  m.items.forEach((it, i) => { if (i === m.hi) { c.fillStyle = '#cce4f7'; c.fillRect(x + 2, 49 + i * ih, w - 4, ih); } c.fillStyle = '#111'; c.font = F(400, 12); c.textAlign = 'left'; c.fillText(it, x + 24, 64 + i * ih); });
+}
+function drawSpectrumWin(c, top, bot, WW) {
+  const lw = 380;
+  c.fillStyle = '#fafafa'; c.fillRect(0, top, lw, bot - top); c.strokeStyle = '#d4d4d4'; c.strokeRect(0.5, top + 0.5, lw, bot - top - 1);
+  c.fillStyle = '#e8eef7'; c.fillRect(1, top + 1, lw - 1, 22); c.fillStyle = '#111'; c.font = F(600, 12); c.textAlign = 'left'; c.fillText('Peak Pick', 10, top + 16);
+  const cols = [['No.', 10], ['P/V', 50], ['Wavelength', 100], ['Abs.', 210], ['Description', 280]];
+  c.fillStyle = '#f0f0f0'; c.fillRect(1, top + 23, lw - 1, 20); c.fillStyle = '#374151'; c.font = F(600, 11); cols.forEach(([s, x]) => c.fillText(s, x, top + 37));
+  (ST.peaks || []).slice(0, 10).forEach((p, i) => { const yy = top + 43 + i * 20; if (ST.peakSel && i === 0) { c.fillStyle = '#cce4f7'; c.fillRect(1, yy, lw - 1, 20); } c.fillStyle = '#111'; c.font = F(400, 12);
+    c.fillText(String(i + 1), 10, yy + 14); c.fillText(p.v ? 'V' : 'P', 50, yy + 14); c.fillText(fx(p.l, 2), 100, yy + 14); c.fillText(fx(p.a, 4), 210, yy + 14); c.fillText(i === 0 ? 'λmaks' : '', 280, yy + 14); });
+  if (ST.smethod) { c.fillStyle = '#6b7280'; c.font = F(400, 11); const m = ST.smethod; const y = bot - 70;
+    ['Metode spektrum:', 'Rentang ' + m.hi + ' – ' + m.lo + ' nm', 'Kecepatan ' + m.speed + ' · interval ' + fx(m.step, 1) + ' nm', 'Mode: Absorbance · celah 1,0 nm'].forEach((s, i) => c.fillText(s, 10, y + i * 15)); }
+  graphFrame(c, lw + 10, top + 6, WW - lw - 20, bot - top - 12, 'nm', 'Abs.');
+  const sp = ST.spectrum, gx = lw + 10, gy = top + 6, gw = WW - lw - 20, gh = bot - top - 12;
+  const [lo, hi] = ST.smethod ? [ST.smethod.lo, ST.smethod.hi] : scanRange();
+  if (sp && sp.l.length > 1) {
+    const ymax = Math.max(0.1, ...sp.a) * 1.15, ymin = Math.min(0, ...sp.a);
+    const PX = l => gx + 50 + (gw - 64) * (l - lo) / (hi - lo), PY = a => gy + gh - 30 - (gh - 50) * (a - ymin) / (ymax - ymin);
+    c.fillStyle = '#374151'; c.font = F(400, 10); c.textAlign = 'right'; for (let i = 0; i <= 4; i++) { const a = ymin + (ymax - ymin) * i / 4; c.fillText(fx(a, 3), gx + 46, PY(a) + 3); }
+    c.textAlign = 'center'; for (let l = Math.ceil(lo / 50) * 50; l <= hi; l += 50) c.fillText(fx(l, 2), PX(l), gy + gh - 14);
+    c.strokeStyle = '#d00000'; c.lineWidth = 1.4; c.beginPath(); sp.l.forEach((l, i) => { const X1 = PX(l), Y1 = PY(sp.a[i]); i ? c.lineTo(X1, Y1) : c.moveTo(X1, Y1); }); c.stroke();
+    if (ST.peaks) ST.peaks.slice(0, 3).forEach((p, i) => { c.fillStyle = '#111'; c.font = F(400, 10); c.textAlign = 'center'; c.fillText(fx(p.l, 2), PX(p.l), PY(p.a) - 8); c.beginPath(); c.moveTo(PX(p.l), PY(p.a) - 4); c.lineTo(PX(p.l) - 3, PY(p.a) - 1); c.lineTo(PX(p.l) + 3, PY(p.a) - 1); c.fill(); });
+  } else { c.fillStyle = '#9ca3af'; c.font = F(400, 13); c.textAlign = 'center'; c.fillText(ST.smethod ? 'Lakukan Baseline, lalu Start' : 'Atur metode: Edit → Method', gx + gw / 2, gy + gh / 2); }
+}
+function graphFrame(c, x, y, w, h, xl, yl) {
+  c.fillStyle = '#fff'; c.fillRect(x, y, w, h); c.strokeStyle = '#9ca3af'; c.lineWidth = 1; c.strokeRect(x + 50.5, y + 10.5, w - 64, h - 40);
+  c.fillStyle = '#374151'; c.font = F(400, 11); c.textAlign = 'center'; c.fillText(xl, x + w / 2, y + h - 2); c.save(); c.translate(x + 12, y + h / 2); c.rotate(-Math.PI / 2); c.fillText(yl, 0, 0); c.restore();
+}
+function drawPhotoWin(c, top, bot, WW) {
+  const lw = 560;
+  // tab tabel
+  const tabY = bot - 24; c.fillStyle = '#ffffff'; c.fillRect(0, top, lw, tabY - top); c.strokeStyle = '#d4d4d4'; c.strokeRect(0.5, top + 0.5, lw, tabY - top);
+  const pm = ST.pmethod, L = pm ? pm.lam : null;
+  const head = ['', 'Sample ID', 'Type', 'Ex', 'Conc', L ? 'WL' + fx(L, 1) : 'WL', 'Comments'], xs = [4, 30, 170, 250, 290, 370, 460];
+  c.fillStyle = '#f0f0f0'; c.fillRect(1, top + 1, lw - 1, 22); c.fillStyle = '#111'; c.font = F(600, 11); c.textAlign = 'left'; head.forEach((h, i) => c.fillText(h, xs[i], top + 16));
+  const rows = ST.ptab === 'std' ? ST.stdTable : ST.unkTable;
+  for (let i = 0; i < Math.max(10, rows.length); i++) {
+    const yy = top + 23 + i * 21; if (yy > tabY - 21) break; c.strokeStyle = '#eceff3'; c.beginPath(); c.moveTo(0, yy + 21.5); c.lineTo(lw, yy + 21.5); c.stroke();
+    c.fillStyle = '#6b7280'; c.font = F(400, 11); c.fillText(String(i + 1), xs[0], yy + 15);
+    const r = rows[i]; if (!r) continue;
+    if (ST.rowHi === i && ST.ptab === (ST.rowHiTab || ST.ptab)) { c.fillStyle = '#fef9c3'; c.fillRect(24, yy, lw - 25, 21); }
+    c.fillStyle = '#111'; c.font = F(400, 12);
+    c.fillText(r.id || '', xs[1], yy + 15); c.fillText(ST.ptab === 'std' ? 'Standard' : 'Unknown', xs[2], yy + 15); c.fillText('', xs[3], yy + 15);
+    c.fillText(r.conc != null && isFinite(r.conc) ? fx(r.conc, 4) : '', xs[4], yy + 15); c.fillText(r.A != null ? fx(r.A, 4) : '', xs[5], yy + 15);
+  }
+  // tab di bawah tabel
+  [['Standard Table', 'std'], ['Sample Table', 'unk']].forEach(([s, k], i) => { const x = 4 + i * 128; c.fillStyle = ST.ptab === k ? '#ffffff' : '#e5e7eb'; c.fillRect(x, tabY, 124, 22); c.strokeStyle = '#c7c7c7'; c.strokeRect(x + 0.5, tabY + 0.5, 124, 22);
+    c.fillStyle = '#111'; c.font = F(ST.ptab === k ? 600 : 400, 12); c.textAlign = 'center'; c.fillText(s, x + 62, tabY + 15); pcBtns.push({ x, y: tabY, w: 124, h: 22, act: 'tab' + k }); });
+  // grafik kurva standar
+  const gx = lw + 10, gy = top + 6, gw = WW - lw - 20, gh = bot - top - 76; graphFrame(c, gx, gy, gw, gh, 'Conc (' + (pm ? pm.unit : INIT.unit) + ')', 'Abs.');
+  c.fillStyle = '#111'; c.font = F(600, 12); c.textAlign = 'left'; c.fillText('Standard Curve', gx + 56, gy + 24);
+  const reg = regress(), pts = ST.stdTable.filter(r => r.A != null), unk = ST.unkTable.filter(r => r.A != null);
+  if (pts.length) {
+    const xmax = Math.max(...ST.stdTable.map(r => r.conc), 0.01) * 1.1, ymax = Math.max(...pts.map(r => r.A), ...unk.map(r => r.A), 0.05) * 1.15;
+    const PX = x => gx + 50 + (gw - 64) * x / xmax, PY = y => gy + gh - 30 - (gh - 40) * y / ymax;
+    c.fillStyle = '#374151'; c.font = F(400, 10); c.textAlign = 'right'; for (let i = 0; i <= 4; i++) c.fillText(fx(ymax * i / 4, 3), gx + 46, PY(ymax * i / 4) + 3);
+    c.textAlign = 'center'; for (let i = 0; i <= 4; i++) c.fillText(fx(xmax * i / 4, 2), PX(xmax * i / 4), gy + gh - 18);
+    if (reg) { c.strokeStyle = '#d00000'; c.lineWidth = 1.4; c.beginPath(); c.moveTo(PX(0), PY(reg.b)); c.lineTo(PX(xmax), PY(reg.a * xmax + reg.b)); c.stroke(); }
+    c.fillStyle = '#1d4ed8'; pts.forEach(r => { c.fillRect(PX(r.conc) - 3.5, PY(r.A) - 3.5, 7, 7); });
+    c.fillStyle = '#16a34a'; unk.forEach(r => { if (isFinite(r.conc)) { c.beginPath(); c.arc(PX(r.conc), PY(r.A), 4.5, 0, 7); c.fill(); } });
+  } else { c.fillStyle = '#9ca3af'; c.font = F(400, 13); c.textAlign = 'center'; c.fillText(pm ? 'Read Std untuk membentuk kurva' : 'Atur metode: Edit → Method', gx + gw / 2, gy + gh / 2); }
+  c.fillStyle = '#111'; c.font = F(400, 12); c.textAlign = 'left'; const ly = gy + gh + 18;
+  if (reg) { c.fillText('Abs = ' + fx(reg.a, 5) + ' * Conc' + (reg.zero ? '' : (reg.b < 0 ? ' − ' : ' + ') + fx(Math.abs(reg.b), 5)), gx + 6, ly); c.fillText('r² = ' + fx(reg.r2, 5) + '    (' + reg.n + ' standar' + (reg.zero ? ', zero interception' : '') + ')', gx + 6, ly + 18); }
+  if (pm) c.fillText('Metode: ' + pm.type + ' · ' + fx(pm.lam, 1) + ' nm · ' + pm.unit + '   File: ' + (pm.file || '-'), gx + 6, ly + 36);
+}
+function drawDlg(c, Wp, Hp) {
+  const d = ST.dlg; if (!d) return;
+  const w = d.w || 520, h = d.h || 330, x = (Wp - w) / 2, y = (Hp - 32 - h) / 2;
+  c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(x + 6, y + 6, w, h); c.fillStyle = '#ffffff'; c.fillRect(x, y, w, h); c.strokeStyle = '#0078d4'; c.lineWidth = 1; c.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  c.fillStyle = '#111'; c.font = F(400, 12); c.textAlign = 'left'; c.fillText(d.title, x + 12, y + 19); c.textAlign = 'right'; c.fillText('✕', x + w - 12, y + 19);
+  c.strokeStyle = '#e5e7eb'; c.beginPath(); c.moveTo(x, y + 28.5); c.lineTo(x + w, y + 28.5); c.stroke();
+  if (d.sub) { c.fillStyle = '#1e3a8a'; c.font = F(600, 14); c.textAlign = 'left'; c.fillText(d.sub, x + 16, y + 52); }
+  let yy = y + (d.sub ? 80 : 56);
+  (d.fields || []).forEach(f => {
+    c.fillStyle = '#111'; c.font = F(400, 12); c.textAlign = 'left'; c.fillText(f[0], x + 18, yy + 4);
+    const fxw = f[2] || 200, fxx = x + w - fxw - 24;
+    if (f[3] === 'check') { c.strokeStyle = '#555'; c.strokeRect(fxx + 0.5, yy - 9.5, 13, 13); if (f[1]) { c.strokeStyle = '#0078d4'; c.lineWidth = 2; c.beginPath(); c.moveTo(fxx + 3, yy - 3); c.lineTo(fxx + 6, yy + 1); c.lineTo(fxx + 11, yy - 7); c.stroke(); c.lineWidth = 1; } }
+    else { c.fillStyle = d.hi === f[0] ? '#fffbe6' : '#fff'; c.fillRect(fxx, yy - 12, fxw, 22); c.strokeStyle = d.hi === f[0] ? '#0078d4' : '#9ca3af'; c.strokeRect(fxx + 0.5, yy - 11.5, fxw, 22);
+      c.fillStyle = '#111'; c.fillText(String(f[1]) + (d.hi === f[0] && (performance.now() / 400 | 0) % 2 ? '|' : ''), fxx + 6, yy + 4); }
+    yy += 32;
+  });
+  (d.buttons || []).forEach((b, i) => { const bw = 86; btn3(c, x + w - (d.buttons.length - i) * (bw + 8) - 8, y + h - 38, bw, 26, b, null, true, d.btnHi === b); });
+  if (d.progress != null) { c.fillStyle = '#e5e7eb'; c.fillRect(x + 20, y + h - 70, w - 40, 12); c.fillStyle = '#06b025'; c.fillRect(x + 20, y + h - 70, (w - 40) * d.progress, 12); }
 }
 
-/* ---------------- animasi & utilitas ---------------- */
+/* ================= animasi & utilitas ================= */
 const tweens = [];
 function tween(dur, fn) { return new Promise(res => tweens.push({ t0: performance.now(), dur: dur * 1000, fn, res })); }
 const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
@@ -1930,226 +2169,422 @@ const wait = s => tween(s, () => { });
 let audio = null;
 function beep(f, d) { if (!ST.sound) return; try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = f || 880; g.gain.value = 0.05; o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + (d || 0.12)); } catch (e) { } }
 let toastT = 0;
-function toast(msg, kind) { const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (kind || 'info'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3600); }
+function toast(msg, kind) { const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (kind || 'info'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3800); }
 function log(msg, kind) { const el = $('#log'); const d = document.createElement('div'); if (kind) d.className = kind; d.textContent = mmss((performance.now() - ST.t0) / 1000) + '  ' + msg; el.insertBefore(d, el.firstChild); }
-function mistake(code, msg) { if (!ST.errs.has(code)) { ST.errs.add(code); ST.score = Math.max(0, ST.score - 5); log('Kesalahan prosedur (−5): ' + msg, 'e'); } toast(msg, 'err'); beep(220, 0.25); sync(); }
+function mistake(code, msg) { if (!ST.errs.has(code)) { ST.errs.add(code); ST.score = Math.max(0, ST.score - 5); log('Kesalahan prosedur (−5): ' + msg, 'e'); } toast(msg, 'err'); beep(220, 0.25); }
 function ok(msg) { toast(msg, 'ok'); log(msg, 'o'); }
 const ready = () => ST.inst === 'warm' || ST.inst === 'ready';
-const sel = () => ($$('input[name=cv]').find(i => i.checked) || {}).value || 'S';
-function moveCuv(k, pts, durEach) { const c = ST.cuv[k]; let chain = Promise.resolve(); for (let i = 0; i < pts.length; i++) { chain = chain.then(() => { const from = c.pos.slice(), to = pts[i]; return tween(durEach, t => { c.pos = lerp3(from, to, ease(t)); }); }); } return chain; }
-function scanRange() { const lo = AN.lam_ref < 320 ? 200 : Math.max(190, Math.round((AN.lam_ref - 150) / 10) * 10); return [lo, Math.min(1100, lo + 320)]; }
+const selCuv = () => ($$('input[name=cv]').find(i => i.checked) || {}).value || 'S';
+function moveCuv(k, pts, d) { const c = ST.cuv[k]; let ch = Promise.resolve(); pts.forEach(to => { ch = ch.then(() => { const from = c.pos.slice(); return tween(d, t => { c.pos = lerp3(from, to, ease(t)); }); }); }); return ch; }
+async function menuPick(name, items, idx) { if (ST.pc < 3) return; ST.menu = { name, items, hi: -1 }; await wait(0.35); for (let i = 0; i <= idx; i++) { ST.menu.hi = i; await wait(0.12); } await wait(0.3); ST.menu = null; }
+async function typeInto(obj, key, text, dlgField) { const s = String(text); if (ST.dlg) ST.dlg.hi = dlgField; for (let i = 1; i <= s.length; i++) { obj[key] = s.slice(0, i); if (ST.dlg && dlgField) setField(dlgField, s.slice(0, i)); await wait(0.05); } }
+function setField(name, val) { const f = (ST.dlg.fields || []).find(f => f[0] === name); if (f) f[1] = val; }
+async function pressBtn(act) { ST.hiBtn = act; await wait(0.35); ST.hiBtn = null; }
+async function dlgBtn(b) { if (ST.dlg) { ST.dlg.btnHi = b; await wait(0.35); } }
+const MENU = { File: ['New', 'Open...', 'Save', 'Save As...', 'Print...', 'Exit'], Edit: ['Undo', 'Copy', 'Paste', 'Method...'], Window: ['Spectrum', 'Photometric', 'Kinetics', 'Report Generator'],
+  Operations: ['Peak Pick', 'Point Pick', 'Arithmetic', 'Smoothing'], Windows: ['Shutdown'] };
 
-/* ---------------- pengukuran ---------------- */
+/* ================= fisika pengukuran ================= */
 function cellA(k, l) { const c = ST.cuv[k]; if (c.where !== 'sel') return 0; let a = 0.045 + c.smudge; if (!c.content) return a + 0.035; return a + 0.003 + SOL[c.content].c * absorptivity(l); }
 function rawA(l, noisy) {
-  let A = cellA('S', l) - cellA('R', l) + instOff(l);
-  const t = (performance.now() - ST.t0) / 1000;
+  let A = cellA('S', l) - cellA('R', l) + instOff(l); const t = (performance.now() - ST.t0) / 1000;
   if (ST.lid > 0.5) A -= 0.05 + 0.06 * rnd();
+  if (ST.silica === 'comp') A += 0.35 + 0.05 * rnd();
   A += ST.warmSkipped ? 0.006 * Math.sin(t / 7) + 0.002 * gauss() : 0.0004 * Math.sin(t / 30);
   if (noisy !== false) { const T = Math.pow(10, -A); A += gauss() * 0.4343 * 1.5e-4 / Math.max(T * lampE(l), 1e-4); }
   const s = l < 230 ? 4e-4 : 1e-4; const T = (Math.pow(10, -A) + s) / (1 + s); return Math.min(4, Math.max(-0.5, -Math.log10(T)));
 }
 function zeroOff(l) { const z = ST.zero; if (!z) return null; if (z.type === 'az' && Math.abs(z.lam - l) < 0.05) return z.off; if (z.type === 'bl' && l >= z.lo && l <= z.hi) return z.offs[Math.round(l) - z.lo]; return null; }
-function readAt(l) { const r = rawA(l); const z = zeroOff(l); return { A: z == null ? r : r - z, zeroed: z != null }; }
-function checksBeforeRead() {
-  if (!ready()) { toast(ST.inst === 'off' ? 'Instrumen belum dinyalakan.' : 'Tunggu inisialisasi selesai.', 'warn'); return false; }
-  if (ST.lid > 0.5) mistake('lidopen', 'Kompartemen masih terbuka: cahaya ruangan masuk ke detektor. Tutup sebelum mengukur.');
-  if (ST.inst === 'warm' && !ST.warmSkipped) mistake('nowarm', 'Lampu belum stabil (pemanasan belum selesai); pembacaan dapat bergeser.');
+function readAt(l) { const r = rawA(l); const z = zeroOff(l); return z == null ? r : r - z; }
+function checks() {
+  if (!ready()) { toast(ST.inst === 'off' ? 'UV-1700 belum dinyalakan.' : 'Tunggu inisialisasi selesai.', 'warn'); return false; }
+  if (!ST.connected) { toast('Hubungkan UVProbe ke UV-1700 (Connect) terlebih dahulu.', 'warn'); return false; }
+  if (ST.lid > 0.5) mistake('lidopen', 'Kompartemen masih terbuka: cahaya ruangan masuk ke detektor.');
+  if (ST.silica === 'comp') mistake('silicain', 'Silica gel masih di dalam kompartemen dan menghalangi berkas.');
+  if (ST.inst === 'warm' && !ST.warmSkipped) mistake('nowarm', 'Lampu belum stabil (pemanasan belum selesai).');
   return true;
 }
+async function beamPulse(s) { ST.xrayT = ST.autoX ? 1 : ST.xrayT; await tween(s, t => { ST.beam = Math.sin(Math.PI * t); }); ST.beam = 0; if (!ST.xrayUser) ST.xrayT = 0; }
+function findPeaks(l, a) { const out = []; for (let i = 3; i < a.length - 3; i++) { const v = a[i]; if (v > a[i - 1] && v >= a[i + 1] && v > a[i - 3] && v > a[i + 3]) { let L = Math.min(...a.slice(Math.max(0, i - 25), i)), R = Math.min(...a.slice(i + 1, i + 26)); if (v - Math.max(L, R) > 0.01 && v > 0.03) out.push({ l: l[i], a: v }); } } return out.sort((p, q) => q.a - p.a); }
 
-/* ---------------- aksi ---------------- */
+/* ================= animasi botol semprot & labu takar ================= */
+function wpt(p, part) { return xf(p, part); }
+async function washBottle(c) {
+  const p = c.pos, T = [p[0] - 0.2, 11.2, p[2]], th = -72, base = WASHTIP.slice();
+  const tipRel = rotZ(WASHTIP, WASH0, th * D2R).map((v, i) => v - WASH0[i]);
+  const F = [T[0] - tipRel[0], T[1] - tipRel[1], T[2] - tipRel[2]], d = [F[0] - WASH0[0], F[1] - WASH0[1], F[2] - WASH0[2]];
+  await tween(0.7, t => { const e = ease(t); ST.wash = { ang: th * e, d: [d[0] * e, d[1] * e + 6 * Math.sin(Math.PI * e), d[2] * e] }; });
+  ST.wash = { ang: th, d };
+  await tween(1.0, t => { const tip = xf(WASHTIP, { grp: 'wash' }); ST.stream = { a: tip, b: [p[0], 5.2 + 0.4 * Math.sin(t * 40), p[2]], col: '#a8d8ff', w: 0.3 }; c.level = Math.max(c.level, 0.3 * Math.sin(Math.PI * t)); });
+  ST.stream = null; beep(500, 0.05);
+  await tween(0.6, t => { const e = 1 - ease(t); ST.wash = { ang: th * e, d: [d[0] * e, d[1] * e, d[2] * e] }; });
+  ST.wash = null; if (!c.content) c.level = 0;
+}
+async function pourFlask(sid, c, rinse) {
+  const f = FL[sid], th = -104, mouth = [f.x, FLY + 16.2 * FS, f.z], pv = [f.x, FLY, f.z], p = c.pos;
+  const T = [p[0] - 0.6, 10.6, p[2]], rel = rotZ(mouth, pv, th * D2R).map((v, i) => v - pv[i]);
+  const F = [T[0] - rel[0], T[1] - rel[1], T[2] - rel[2]], d = [F[0] - pv[0], F[1] - pv[1], F[2] - pv[2]];
+  const dur = rinse ? 0.5 : 1.0;
+  await tween(0.8, t => { const e = ease(t); ST.pour = { k: sid, ang: th * Math.min(1, e * 1.2), d: [d[0] * e, d[1] * e + 10 * Math.sin(Math.PI * e), d[2] * e] }; });
+  ST.pour = { k: sid, ang: th, d }; c.content = sid;
+  await tween(dur, t => { ST.stream = { a: xf(mouth, { grp: 'fl_' + sid }), b: [p[0], 4.6 + (rinse ? 0 : 2.2 * t), p[2]], col: SOL[sid].col, w: 0.35 }; c.level = rinse ? 0.3 * t : 0.85 * ease(t); });
+  ST.stream = null;
+  await tween(0.7, t => { const e = 1 - ease(t); ST.pour = { k: sid, ang: th * e, d: [d[0] * e, d[1] * e + 8 * Math.sin(Math.PI * e), d[2] * e] }; });
+  ST.pour = null; beep(700, 0.04);
+}
+
+/* ================= aksi dasar (dipakai mode panduan & manual) ================= */
 const ACT = {
   async cables() {
     if (ST.cabled) return toast('Semua kabel sudah tersambung.');
-    setView('belakang'); log('Menyambungkan kabel daya dan data…');
-    for (let i = 0; i < CABLES.length; i++) { await tween(0.7, t => { ST.cab[i] = t; }); beep(600, 0.05); log('Tersambung: ' + CABLES[i].nm); }
-    ST.cabled = true; ok('Kabel daya (UPS → stop kontak; alat, CPU, monitor → UPS), kabel video, dan kabel data RS-232C tersambung.');
-    await wait(0.6); setView('meja');
+    setView('belakang'); log('Memeriksa dan menyambungkan kabel…');
+    for (let i = 0; i < CABLES.length; i++) { if (ST.cab[i] >= 1) continue; await tween(0.55, t => { ST.cab[i] = t; }); beep(600, 0.05); log('Tersambung: ' + CABLES[i].nm); }
+    ST.cabled = true; ok('Semua kabel daya dan data tersambung.'); await wait(0.4); setView('meja');
   },
   async ups() {
-    if (!ST.cab[0]) return mistake('upsnocable', 'UPS belum tersambung ke stop kontak. Sambungkan kabel terlebih dahulu.');
-    if (ST.ups) return toast('UPS sudah menyala.');
-    setView('ups'); await wait(0.6); ST.ups = true; beep(1200, 0.15); await wait(0.25); beep(1200, 0.15); ok('UPS menyala: tegangan keluaran stabil 220 V.'); await wait(0.6); setView('meja');
+    if (ST.ups) { if (ST.inst !== 'off' || ST.pc) return mistake('upsoffearly', 'UPS dimatikan terakhir, setelah UV-1700 dan komputer mati (IK C.8).'); setView('ups'); await wait(0.5); ST.ups = false; beep(500, 0.2); log('UPS dimatikan (tombol OFF).'); return; }
+    if (ST.cab[0] < 1 || ST.cab[1] < 1) return mistake('upsnocable', 'UPS belum mendapat listrik: sambungkan kabel perpanjangan ke stop kontak dan UPS ke perpanjangan.');
+    setView('ups'); await wait(0.6); ST.ups = true; beep(1200, 0.15); await wait(0.25); beep(1200, 0.15); ok('UPS menyala; indikator hijau aktif.'); await wait(0.5);
   },
-  async pc() {
-    if (!ST.ups || !ST.cab[2]) return mistake('pcnoups', 'Komputer harus mendapat daya dari UPS yang sudah menyala dan kabelnya tersambung.');
-    if (ST.pc) return toast('Komputer sudah menyala.');
-    setView('komputer'); ST.pc = 1; ST.pcBoot = 0; log('Komputer dinyalakan; sistem memulai.');
-    await tween(2.5, t => { ST.pcBoot = t; }); ST.pc = 2; ok('Komputer siap. Buka perangkat lunak instrumen.');
+  async silica() {
+    const out = ST.silica === 'comp';
+    if (ST.lid < 0.5) await ACT.lid();
+    setView('kompartemen'); const from = ST.silicaPos.slice(), to = out ? [-30, -1.4, -6] : [-8.5, 6, 8];
+    await tween(0.6, t => { ST.silicaPos = lerp3(from, [from[0], 22, from[2]], ease(t)); }); await tween(0.8, t => { ST.silicaPos = lerp3([from[0], 22, from[2]], [to[0], 22, to[2]], ease(t)); }); await tween(0.6, t => { ST.silicaPos = lerp3([to[0], 22, to[2]], to, ease(t)); });
+    ST.silica = out ? 'meja' : 'comp'; log(out ? 'Silica gel dikeluarkan dari kompartemen.' : 'Silica gel dimasukkan kembali ke kompartemen.');
   },
   async inst() {
-    if (ST.inst !== 'off') return toast('Instrumen sudah menyala.');
-    if (!ST.ups || !ST.cab[1]) return mistake('instnoups', 'UV-1700 belum mendapat daya: sambungkan kabel dan nyalakan UPS terlebih dahulu.');
-    if (ST.cuv.R.where === 'sel' || ST.cuv.S.where === 'sel') mistake('initcuv', 'Kompartemen harus kosong saat inisialisasi (pemeriksaan energi berkas).');
-    setView('alat'); ST.inst = 'init'; ST.initLines = []; beep(900, 0.1); log('UV-1700 dinyalakan; inisialisasi berjalan.');
-    const L = ['UV-1700 INITIALIZE', 'LSI INITIALIZE    OK', 'ROM CHECK         OK', 'RAM CHECK         OK', 'FILTER INIT       OK', 'SLIT INIT         OK', 'D2 LAMP ON        OK', 'WI LAMP ON        OK', 'WL ORIGIN 656.1   OK', 'ENERGY CHECK      OK'];
-    for (const s of L) { ST.initLines.push(s); dirty = true; await wait(0.45); }
-    beep(1400, 0.2); ST.inst = 'warm'; ST.warmLeft = 15 * 60; ST.lam = AN.lam_ref; ST.lastA = 0;
-    ok('Inisialisasi selesai. Lampu dipanaskan 15 menit (dipercepat) agar intensitas stabil.');
+    if (ST.inst !== 'off') {
+      if (ST.pcctrl) return mistake('offpcctrl', 'Tekan MODE pada UV-1700 untuk keluar dari PC CONTROL sebelum mematikan alat (IK C.6).');
+      setView('alat'); await wait(0.4); ST.inst = 'off'; ST.lastA = 0; ST.zero = null; beep(400, 0.2); log('Tombol power di bagian kiri UV-1700 ditekan: alat mati.');
+      await tween(0.8, t => { ST.lcdFold = t; }); log('Monitor (LCD) UV-1700 ditutup.'); return;
+    }
+    if (!ST.ups || ST.cab[2] < 1) return mistake('instnoups', 'UV-1700 belum mendapat daya: sambungkan kabel dan nyalakan UPS.');
+    if (ST.silica === 'comp') mistake('initsilica', 'Silica gel harus dikeluarkan sebelum inisialisasi; kompartemen harus kosong agar pemeriksaan energi berhasil.');
+    if (ST.cuv.R.where === 'sel' || ST.cuv.S.where === 'sel') mistake('initcuv', 'Kompartemen harus kosong saat inisialisasi.');
+    if (ST.lid > 0.5) await ACT.lid();
+    setView('alat'); if (ST.lcdFold > 0) await tween(0.6, t => { ST.lcdFold = 1 - t; });
+    ST.inst = 'init'; ST.initLines = []; beep(900, 0.1); log('Tombol power di bagian kiri UV-1700 ditekan; inisialisasi berjalan.');
+    const L = ['UV-1700 INITIALIZE', 'LSI INITIALIZE    OK', 'ROM CHECK         OK', 'RAM CHECK         OK', 'FILTER INIT       OK', 'SLIT INIT         OK', 'D2 LAMP ON        OK', 'WI LAMP ON        OK', 'WL ORIGIN 656.1   OK', 'ENERGY CHECK      ' + (ST.silica === 'comp' ? 'NG' : 'OK')];
+    for (const s of L) { ST.initLines.push(s); dirty = true; await wait(0.4); }
+    beep(1400, 0.2); ST.inst = 'warm'; ST.warmLeft = 15 * 60; ST.lam = AN.lam_ref; ST.lastA = 0; ok('Inisialisasi selesai; lampu mulai pemanasan.');
   },
-  skipwarm() {
-    if (ST.inst !== 'warm') return toast(ST.inst === 'ready' ? 'Pemanasan sudah selesai.' : 'Nyalakan instrumen terlebih dahulu.', 'warn');
-    ST.warmSkipped = true; ST.inst = 'ready'; ST.warmLeft = 0; mistake('skipwarm', 'Pemanasan dilewati: drift baseline meningkat selama pengukuran.');
+  async pc() {
+    if (ST.pc) return toast('Komputer sudah menyala.');
+    if (!ST.ups || ST.cab[3] < 1 || ST.cab[4] < 1) return mistake('pcnoups', 'Komputer dan monitor mendapat daya dari UPS: sambungkan kabel dan nyalakan UPS dahulu.');
+    setView('komputer'); ST.pc = 1; log('CPU dan monitor dinyalakan; Windows memulai.'); await wait(2.6); ST.pc = 2;
+    if (ST.cab[5] >= 1) { ST.printer = true; log('Printer dinyalakan.'); } ok('Komputer siap.');
   },
-  software() { if (ST.pc < 2) return toast('Nyalakan komputer terlebih dahulu.', 'warn'); if (ST.pc === 3) return toast('Perangkat lunak sudah terbuka.'); ST.pc = 3; ok('Perangkat lunak instrumen dibuka.'); setView('komputer'); },
+  async pcctrl() {
+    if (!ready()) return toast('Tunggu inisialisasi UV-1700 selesai.', 'warn');
+    setView('alat'); ST.keyFlash = 1; await wait(0.4); ST.keyFlash = 0;
+    if (ST.pcctrl) { if (ST.connected) return mistake('modeconn', 'Klik Disconnect di UVProbe sebelum menekan MODE.'); ST.pcctrl = false; log('Tombol MODE ditekan: UV-1700 keluar dari PC CONTROL.'); return; }
+    ST.pcctrl = true; beep(900, 0.08); log('MODE → PC CONTROL: UV-1700 menunggu perintah komputer.');
+  },
+  async software() {
+    if (ST.pc < 2) return toast('Nyalakan komputer terlebih dahulu.', 'warn'); if (ST.sw) return toast('UVProbe sudah terbuka.');
+    setView('komputer'); ST.pc = 3; ST.dlg = { title: 'UVProbe', sub: 'Memuat UVProbe…', w: 360, h: 140, progress: 0 }; await tween(1.4, t => { ST.dlg.progress = t; });
+    ST.dlg = null; ST.sw = true; ok('UVProbe terbuka.');
+  },
   async connect() {
-    if (ST.pc < 3) return toast('Buka perangkat lunak di komputer terlebih dahulu.', 'warn');
-    if (ST.connected) return toast('Sudah terhubung.');
-    if (!ST.cab[5]) return mistake('nodata', 'Kabel data RS-232C belum tersambung.');
-    if (!ready()) return mistake('connearly', 'Hubungkan setelah inisialisasi UV-1700 selesai.');
-    log('Menghubungkan perangkat lunak ke UV-1700…'); await wait(1.4); ST.connected = true; beep(1000, 0.1); ok('Komunikasi PC–UV-1700 terhubung. Hasil pengukuran akan tampil di layar komputer.');
+    if (!ST.sw) return toast('Buka UVProbe terlebih dahulu.', 'warn'); if (ST.connected) return toast('Sudah terhubung.');
+    if (ST.cab[7] < 1) return mistake('nodata', 'Kabel data RS-232C belum tersambung.');
+    if (!ready()) return mistake('connearly', 'Klik Connect setelah inisialisasi UV-1700 selesai.');
+    if (!ST.pcctrl) return mistake('nopcctrl', 'Aktifkan PC CONTROL pada UV-1700 (tekan MODE) sebelum Connect.');
+    setView('komputer'); await pressBtn('connect');
+    const items = ['Communication', 'ROM version', 'Lamp status', 'Wavelength accuracy', 'Baseline flatness'];
+    ST.dlg = { title: 'Instrument Initialization', sub: 'Menghubungkan ke UV-1700…', w: 440, h: 270, fields: items.map(s => [s, '…', 120]), progress: 0 };
+    for (let i = 0; i < items.length; i++) { await wait(0.35); ST.dlg.fields[i][1] = 'Pass'; ST.dlg.progress = (i + 1) / items.length; }
+    await wait(0.3); ST.dlg = null; ST.connected = true; beep(1000, 0.1); ok('UVProbe terhubung dengan UV-1700.');
   },
-  async fill() {
-    const k = sel(), c = ST.cuv[k], sid = $('#sol').value;
-    if (c.where !== 'rak') return toast('Keluarkan kuvet dari alat dahulu sebelum mengisi.', 'warn');
-    setView('kerja'); const prev = c.content;
-    if (prev) await tween(0.6, t => { c.level = 1 - t; });
-    log('Kuvet ' + (k === 'R' ? 'referensi' : 'sampel') + ' dibilas akuades lalu dibilas dan diisi ' + SOL[sid].label + '.');
-    c.content = sid; await tween(1.1, t => { c.level = 0.85 * ease(t); }); c.dirty = true; c.smudge = 0;
-    if (k === 'R' && sid !== 'blank') toast('Perhatian: kuvet referensi biasanya diisi blanko.', 'warn'); else toast('Kuvet terisi. Lap dinding beningnya dengan tisu sebelum dimasukkan.', 'info');
+  async disconnect() { if (!ST.connected) return toast('Belum terhubung.'); setView('komputer'); await pressBtn('disconnect'); ST.connected = false; log('Disconnect: komunikasi UVProbe–UV-1700 diputus.'); },
+  skipwarm() { if (ST.inst !== 'warm') return toast(ST.inst === 'ready' ? 'Pemanasan sudah selesai.' : 'Nyalakan UV-1700 terlebih dahulu.', 'warn'); ST.warmSkipped = true; ST.inst = 'ready'; ST.warmLeft = 0; mistake('skipwarm', 'Pemanasan dilewati: drift baseline meningkat.'); },
+  async lid() { const to = ST.lid > 0.5 ? 0 : 1; if (viewName !== 'kompartemen') setView('kompartemen'); await tween(0.6, t => { ST.lid = to ? t : 1 - t; }); ST.lid = to; log(to ? 'Tutup kompartemen dibuka.' : 'Tutup kompartemen ditutup.'); },
+  async fill(k, sid) {
+    k = k || selCuv(); sid = sid || $('#sol').value; const c = ST.cuv[k];
+    if (c.where !== 'rak') return toast('Keluarkan kuvet dari alat dahulu.', 'warn');
+    setView('isi'); if (c.content) await tween(0.5, t => { c.level = 0.85 * (1 - t); });
+    await washBottle(c);
+    log('Kuvet ' + (k === 'R' ? 'referensi' : 'sampel') + ' dibilas akuades dari botol semprot, dibilas dengan ' + SOL[sid].short + ', lalu diisi ±¾ volume.');
+    await pourFlask(sid, c, true); await tween(0.4, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0;
+    await pourFlask(sid, c, false); c.dirty = true; c.smudge = 0; c.wet = false;
   },
-  async empty() { const k = sel(), c = ST.cuv[k]; if (c.where !== 'rak') return toast('Keluarkan kuvet dahulu.', 'warn'); if (!c.content) return toast('Kuvet sudah kosong.'); setView('kerja'); await tween(0.6, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0; log('Isi kuvet dibuang ke gelas buangan.'); },
-  async wipe() {
-    const k = sel(), c = ST.cuv[k];
-    if (c.where !== 'rak') return toast('Kuvet harus di luar alat untuk dilap.', 'warn');
-    setView('kerja'); const p = c.pos; ST.tissue = { pos: [-35, 9, 23], rot: 0 };
-    const near = [p[0] + 1.6, p[1] + 5, p[2]];
-    await tween(0.7, t => { ST.tissue.pos = lerp3([-35, 9, 23], near, ease(t)); ST.tissue.rot = 90 * t; });
-    await tween(1.6, t => { ST.tissue.pos = [near[0], p[1] + 4 + 2.8 * Math.sin(t * Math.PI * 6), near[2]]; });
-    await tween(0.6, t => { ST.tissue.pos = lerp3(ST.tissue.pos, [-58, 7, 26], ease(t)); });
-    ST.tissue = null; c.dirty = false; ok('Kuvet ' + (k === 'R' ? 'referensi' : 'sampel') + ' dilap dengan tisu: dinding bening bebas tetesan dan sidik jari.');
+  async empty() { const k = selCuv(), c = ST.cuv[k]; if (c.where !== 'rak') return toast('Keluarkan kuvet dahulu.', 'warn'); if (!c.content) return; setView('kerja'); await tween(0.5, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0; log('Isi kuvet dibuang ke gelas buangan.'); },
+  async wipe(k) {
+    k = k || selCuv(); const c = ST.cuv[k]; if (c.where !== 'rak') return toast('Kuvet harus di luar alat untuk dilap.', 'warn');
+    setView('kerja'); const p = c.pos; const start = [-31.5, 9, 23]; ST.tissue = { pos: start, rot: 0 }; const near = [p[0] + 1.6, p[1] + 5, p[2]];
+    await tween(0.6, t => { ST.tissue.pos = lerp3(start, near, ease(t)); ST.tissue.rot = 90 * t; });
+    await tween(1.4, t => { ST.tissue.pos = [near[0], p[1] + 4 + 2.8 * Math.sin(t * Math.PI * 6), near[2]]; });
+    const cur = ST.tissue.pos.slice(); await tween(0.6, t => { ST.tissue.pos = lerp3(cur, start, ease(t)); });
+    ST.tissue = null; c.dirty = false; log('Kuvet ' + (k === 'R' ? 'referensi' : 'sampel') + ' dilap dengan tisu (sisi bening bebas tetesan dan sidik jari).');
   },
-  async lid() { const to = ST.lid > 0.5 ? 0 : 1; if (to && viewName === 'meja') setView('kompartemen'); await tween(0.7, t => { ST.lid = to ? t : 1 - t; }); ST.lid = to; log(to ? 'Tutup kompartemen dibuka.' : 'Tutup kompartemen ditutup.'); },
-  async insert() {
-    const k = sel(), c = ST.cuv[k];
-    if (c.where === 'sel') return toast('Kuvet ini sudah di dalam alat.');
+  async insert(k) {
+    k = k || selCuv(); const c = ST.cuv[k];
+    if (c.where === 'sel') return toast('Kuvet sudah di dalam alat.');
     if (ST.lid < 0.5) return mistake('lidclosed', 'Buka tutup kompartemen sebelum memasukkan kuvet.');
-    if (!c.content) toast('Kuvet masih kosong (berisi udara).', 'warn');
-    if (c.dirty) { mistake('dirty' + k, 'Kuvet dimasukkan tanpa dilap: tetesan/sidik jari menghamburkan cahaya dan menaikkan absorbansi.'); c.smudge = 0.012 + 0.02 * rnd(); }
-    setView('kompartemen'); const r = RACK[k], d = CELL[k];
-    await moveCuv(k, [[r[0], r[1] + 22, r[2]], [d[0], d[1] + 18, d[2]], d], 0.75); c.where = 'sel'; beep(700, 0.05);
-    log('Kuvet ' + (k === 'R' ? 'referensi → sel referensi (belakang)' : 'sampel → sel sampel (depan)') + '; sisi bening menghadap berkas.');
+    if (c.dirty) { mistake('dirty' + k, 'Kuvet dimasukkan tanpa dilap: tetesan/sidik jari menaikkan absorbansi.'); c.smudge = 0.012 + 0.02 * rnd(); }
+    setView('kompartemen'); const r = c.pos.slice(), d = CELL[k];
+    await moveCuv(k, [[r[0], 22, r[2]], [d[0], 24.6, d[2]], d], 0.6); c.where = 'sel'; beep(700, 0.05);
+    log('Kuvet ' + (k === 'R' ? 'referensi → sel referensi (belakang)' : 'sampel → sel sampel (depan)') + '.');
   },
-  async remove() {
-    const k = sel(), c = ST.cuv[k];
-    if (c.where !== 'sel') return toast('Kuvet ini tidak sedang di dalam alat.');
+  async remove(k) {
+    k = k || selCuv(); const c = ST.cuv[k]; if (c.where !== 'sel') return toast('Kuvet ini tidak di dalam alat.');
     if (ST.lid < 0.5) return mistake('lidclosed2', 'Buka tutup kompartemen untuk mengeluarkan kuvet.');
-    setView('kompartemen'); const r = RACK[k], d = CELL[k];
-    await moveCuv(k, [[d[0], d[1] + 18, d[2]], [r[0], r[1] + 22, r[2]], r], 0.75); c.where = 'rak'; c.smudge = 0; log('Kuvet dikeluarkan ke rak.');
+    setView('kompartemen'); const d = CELL[k], r = RACK[k];
+    await moveCuv(k, [[d[0], 24.6, d[2]], [r[0], 22, r[2]], r], 0.6); c.where = 'rak'; c.smudge = 0; log('Kuvet dikeluarkan ke rak.');
   },
-  goto() { const v = parseFloat(String($('#lam').value).replace(',', '.')); if (!(v >= 190 && v <= 1100)) return toast('λ harus 190–1100 nm.', 'warn'); if (ST.inst === 'off') return toast('Instrumen mati.', 'warn');
-    ST.lam = Math.round(v * 10) / 10; ST.lastA = ready() ? readAt(ST.lam).A : 0; beep(800, 0.05); log('GOTO WL ' + fx(ST.lam, 1) + ' nm.'); },
-  async autozero() {
-    if (!checksBeforeRead()) return;
-    const R = ST.cuv.R, S = ST.cuv.S;
-    if (R.where !== 'sel') mistake('azref', 'Sel referensi kosong: masukkan kuvet blanko sebelum auto zero.');
-    if (S.where === 'sel' && S.content && S.content !== 'blank') mistake('aznonblank', 'Auto zero harus dilakukan dengan blanko di sel sampel, bukan larutan standar/sampel.');
-    setView('alat'); await beamPulse(0.9);
-    ST.zero = { type: 'az', lam: ST.lam, off: rawA(ST.lam, false) }; ST.lastA = 0; beep(1100, 0.1); ok('AUTO ZERO pada ' + fx(ST.lam, 1) + ' nm: absorbansi blanko = 0,000.');
+  async goto(lam) {
+    const v = lam || parseFloat(String($('#lam').value).replace(',', '.')); if (!(v >= 190 && v <= 1100)) return toast('λ harus 190–1100 nm.', 'warn');
+    if (!checks()) return; await pressBtn('goto'); ST.lam = Math.round(v * 10) / 10; $('#lam').value = ST.lam; ST.lastA = readAt(ST.lam); beep(800, 0.05); log('Go To WL ' + fx(ST.lam, 1) + ' nm.');
   },
   async baseline() {
-    if (!checksBeforeRead()) return;
-    const R = ST.cuv.R, S = ST.cuv.S;
-    if (R.where !== 'sel' || S.where !== 'sel' || R.content !== 'blank' || S.content !== 'blank') mistake('blnotblank', 'Koreksi baseline memerlukan blanko di kedua sel.');
-    const [lo, hi] = scanRange(); setView('alat'); ST.xrayT = ST.autoX ? 1 : ST.xrayT; log('Koreksi baseline ' + lo + '–' + hi + ' nm…');
+    if (!checks()) return; const R = ST.cuv.R, S = ST.cuv.S;
+    if (R.where !== 'sel' || S.where !== 'sel' || R.content !== 'blank' || S.content !== 'blank') mistake('blnotblank', 'Baseline memerlukan blanko di sel referensi dan sel sampel.');
+    const [lo, hi] = ST.smethod ? [ST.smethod.lo, ST.smethod.hi] : scanRange(); setView('alat'); await pressBtn('baseline');
+    ST.dlg = { title: 'Baseline', sub: 'Koreksi baseline ' + hi + ' → ' + lo + ' nm', w: 400, h: 150, progress: 0 };
     const offs = []; for (let l = lo; l <= hi; l++) offs.push(rawA(l, false));
-    await tween(2.4, t => { ST.lam = hi - (hi - lo) * t; ST.beam = 1; }); ST.beam = 0; ST.lam = AN.lam_ref; if (!ST.xrayUser) ST.xrayT = 0;
-    ST.zero = { type: 'bl', lo, hi, offs }; ST.lastA = 0; beep(1100, 0.1); ok('Baseline ' + lo + '–' + hi + ' nm tersimpan.');
+    ST.xrayT = ST.autoX ? 1 : ST.xrayT; await tween(2.4, t => { ST.lam = hi - (hi - lo) * t; ST.beam = 1; ST.dlg.progress = t; }); ST.beam = 0; if (!ST.xrayUser) ST.xrayT = 0;
+    ST.dlg = null; ST.zero = { type: 'bl', lo, hi, offs }; ST.lam = AN.lam_ref; ST.lastA = 0; beep(1100, 0.1); ok('Baseline ' + lo + '–' + hi + ' nm selesai.');
   },
-  async measure() {
-    if (!checksBeforeRead()) return;
-    const S = ST.cuv.S; if (S.where !== 'sel') return mistake('nosample', 'Sel sampel kosong: masukkan kuvet sampel.');
-    if (zeroOff(ST.lam) == null) mistake('nozero', 'Belum auto zero/baseline pada λ ini: pembacaan masih mengandung offset instrumen dan blanko.');
-    setView('alat'); await beamPulse(1.0);
-    let s = 0; for (let i = 0; i < 5; i++) s += readAt(ST.lam).A; const A = s / 5; ST.lastA = A; beep(1300, 0.08);
-    const sol = S.content ? SOL[S.content] : { label: 'Kuvet kosong', c: 0 };
-    if (ST.connected) {
-      ST.readings.push({ no: ST.readings.length + 1, label: sol.label.replace(/ · .*/, ''), c: sol.c, std: !!sol.std, sample: !!sol.sample, lam: ST.lam, A, flag: S.smudge > 0 || ST.lid > 0.5 || zeroOff(ST.lam) == null });
-      ST.pcTab = 'foto'; updateOut(); ok(sol.label + ': A = ' + fx(A, 4) + ' pada ' + fx(ST.lam, 1) + ' nm (tercatat di komputer).');
-    } else { toast('A = ' + fx(A, 4) + ' (hanya di LCD; hubungkan PC agar tercatat).', 'warn'); log('Pembacaan ' + fx(A, 4) + ' tidak tercatat di komputer.', 'w'); }
+  async autozero() {
+    if (!checks()) return; const R = ST.cuv.R, S = ST.cuv.S;
+    if (R.where !== 'sel') mistake('azref', 'Sel referensi kosong: masukkan kuvet blanko.');
+    if (S.where === 'sel' && S.content && S.content !== 'blank') mistake('aznonblank', 'Auto Zero harus dengan blanko di sel sampel (IK B.11).');
+    await pressBtn('autozero'); setView('alat'); await beamPulse(0.9);
+    ST.zero = { type: 'az', lam: ST.lam, off: rawA(ST.lam, false) }; ST.lastA = 0; beep(1100, 0.1); ok('Auto Zero pada ' + fx(ST.lam, 1) + ' nm: blanko = 0,000 Abs.');
   },
   async scan() {
-    if (!ST.connected) return toast('Pemindaian spektrum dijalankan dari komputer: hubungkan PC terlebih dahulu.', 'warn');
-    if (!checksBeforeRead()) return;
-    const S = ST.cuv.S; if (S.where !== 'sel') return mistake('nosample', 'Sel sampel kosong: masukkan kuvet sampel.');
-    const [lo, hi] = scanRange(); const zeroed = ST.zero && ST.zero.type === 'bl' && ST.zero.lo <= lo && ST.zero.hi >= hi;
-    if (!zeroed) mistake('noblscan', 'Pemindaian tanpa koreksi baseline: spektrum mengandung serapan blanko dan offset instrumen.');
-    ST.pcTab = 'scan'; ST.spectrum = { lo, hi, l: [], a: [], done: false, zeroed, name: S.content ? SOL[S.content].label : 'kosong' }; setView('alat');
+    if (!checks()) return; if (!ST.smethod) return toast('Atur metode spektrum dahulu (Edit → Method).', 'warn');
+    const S = ST.cuv.S; if (S.where !== 'sel') return mistake('nosample', 'Sel sampel kosong.');
+    const { lo, hi } = ST.smethod; const zeroed = ST.zero && ST.zero.type === 'bl' && ST.zero.lo <= lo && ST.zero.hi >= hi;
+    if (!zeroed) mistake('noblscan', 'Scan tanpa Baseline: spektrum mengandung serapan blanko dan offset instrumen.');
+    await pressBtn('scan'); ST.win = 'spectrum'; ST.peaks = null; ST.spectrum = { l: [], a: [], name: S.content ? SOL[S.content].label : 'kosong' }; setView('alat');
     ST.xrayT = ST.autoX ? 1 : ST.xrayT; let li = hi;
-    await tween(4.0, t => { const target = hi - (hi - lo) * t; while (li >= target) { const r = readAt(li); ST.spectrum.l.unshift(li); ST.spectrum.a.unshift(r.A); li -= 1; } ST.lam = Math.max(lo, target); ST.lastA = ST.spectrum.a[0] || 0; ST.beam = 1; });
-    ST.beam = 0; if (!ST.xrayUser) ST.xrayT = 0; ST.spectrum.done = true; drawPC();
-    const lm = ST.spectrum.lmax; ST.lam = lm || AN.lam_ref; $('#lam').value = ST.lam; ST.lastA = readAt(ST.lam).A; beep(1300, 0.1);
-    ok('Scan selesai: λmaks ≈ ' + fx(lm, 1) + ' nm. Gunakan GOTO WL ke λmaks untuk pengukuran kuantitatif.');
+    await tween(4.0, t => { const tg = hi - (hi - lo) * t; while (li >= tg) { ST.spectrum.l.unshift(li); ST.spectrum.a.unshift(readAt(li)); li -= ST.smethod.step; } ST.lam = Math.max(lo, tg); ST.lastA = ST.spectrum.a[0] || 0; ST.beam = 1; });
+    ST.beam = 0; if (!ST.xrayUser) ST.xrayT = 0; ST.spectrum.done = true; beep(1300, 0.1); ok('Scan selesai.');
   },
-  tabfoto() { ST.pcTab = 'foto'; }, tabscan() { ST.pcTab = 'scan'; },
-  async shutdown() {
-    if (ST.cuv.R.where === 'sel' || ST.cuv.S.where === 'sel') toast('Keluarkan dan bersihkan kuvet setelah praktikum.', 'warn');
-    ST.connected = false; ST.pc = 0; ST.inst = 'off'; ST.beam = 0; ST.zero = null; await wait(0.4); ST.ups = false; log('Perangkat lunak ditutup, UV-1700 dan komputer dimatikan, lalu UPS.'); ok('Semua perangkat dimatikan dengan urutan benar.');
+  async peakpick() {
+    if (!ST.spectrum || !ST.spectrum.done) return toast('Lakukan scan terlebih dahulu.', 'warn');
+    setView('komputer'); await menuPick('Operations', MENU.Operations, 0); ST.peaks = findPeaks(ST.spectrum.l, ST.spectrum.a);
+    const pk = ST.peaks[0]; if (pk) { ST.lmax = pk.l; $('#lam').value = pk.l; } ok('Peak pick: λmaks = ' + fx(pk ? pk.l : NaN, 1) + ' nm.');
+  },
+  async readstd() {
+    if (!checks()) return; if (!ST.pmethod) return toast('Atur metode fotometri dahulu.', 'warn');
+    const S = ST.cuv.S; if (S.where !== 'sel') return mistake('nosample', 'Sel sampel kosong.');
+    if (zeroOff(ST.pmethod.lam) == null) mistake('nozero', 'Belum Auto Zero dengan blanko pada λ metode (IK B.11).');
+    const i = ST.stdTable.findIndex(r => r.A == null); if (i < 0) return toast('Semua standar sudah dibaca.');
+    const want = 's' + i; if (S.content !== want) mistake('stdwrong' + i, 'Isi kuvet tidak sesuai baris standar ' + (i + 1) + ' (' + ST.stdTable[i].id + ').');
+    ST.ptab = 'std'; await pressBtn('readstd'); ST.lam = ST.pmethod.lam; setView('alat'); await beamPulse(1.0);
+    let s = 0; for (let j = 0; j < 3; j++) s += readAt(ST.lam); const A = s / 3; ST.lastA = A; ST.stdTable[i].A = A; ST.rowHi = i; beep(1300, 0.08);
+    updateOut(); ok('Read Std ' + ST.stdTable[i].id + ': ' + fx(A, 4) + ' Abs.');
+  },
+  async readunk() {
+    if (!checks()) return; if (!ST.pmethod) return toast('Atur metode fotometri dahulu.', 'warn');
+    const S = ST.cuv.S; if (S.where !== 'sel') return mistake('nosample', 'Sel sampel kosong.');
+    if (!ST.stdTable.some(r => r.A != null)) return mistake('nostd', 'Baca standar terlebih dahulu sebelum sampel.');
+    let i = ST.unkTable.findIndex(r => r.A == null); if (i < 0) { ST.unkTable.push({ id: 'Sampel X-' + (ST.unkTable.length + 1), A: null }); i = ST.unkTable.length - 1; }
+    ST.ptab = 'unk'; await pressBtn('readunk'); ST.lam = ST.pmethod.lam; setView('alat'); await beamPulse(1.0);
+    let s = 0; for (let j = 0; j < 3; j++) s += readAt(ST.lam); const A = s / 3; ST.lastA = A; const reg = regress();
+    ST.unkTable[i].A = A; ST.unkTable[i].conc = reg ? (A - reg.b) / reg.a : NaN; ST.rowHi = i; beep(1300, 0.08);
+    updateOut(); ok('Read Unk ' + ST.unkTable[i].id + ': ' + fx(A, 4) + ' Abs → ' + fx(ST.unkTable[i].conc, 4) + ' ' + ST.pmethod.unit + '.');
+  },
+  async dry(k) {
+    const ks = k ? [k] : ['R', 'S'];
+    for (const kk of ks) { const c = ST.cuv[kk]; if (c.where === 'sel') return toast('Keluarkan kuvet dari alat terlebih dahulu.', 'warn'); }
+    if (ST.inst !== 'off') mistake('dryon', 'Kuvet dikeringkan setelah praktik selesai dan alat dalam keadaan mati (IK D.1).');
+    setView('kerja');
+    for (const kk of ks) { const c = ST.cuv[kk];
+      if (c.content) { await tween(0.4, t => { c.level = 0.85 * (1 - t); }); c.content = null; }
+      for (const [nm, col] of [['etanol', '#f4efe6'], ['aseton', '#e9f2f3']]) { SOL['_' + nm] = { label: nm, c: 0, col }; c.content = '_' + nm; await tween(0.5, t => { c.level = 0.6 * t; }); await tween(0.4, t => { c.level = 0.6 * (1 - t); }); log('Kuvet ' + (kk === 'R' ? 'referensi' : 'sampel') + ' dibilas ' + nm + '.'); }
+      c.content = null; c.level = 0; }
+    setView('kering');
+    for (const kk of ks) { const c = ST.cuv[kk]; const from = c.pos.slice(), to = DRY[kk];
+      await tween(0.6, t => { c.pos = lerp3(from, [from[0], 20, from[2]], ease(t)); }); await tween(0.5, t => { c.flip = t; });
+      await tween(0.7, t => { c.pos = lerp3([from[0], 20, from[2]], [to[0], 20, to[2]], ease(t)); }); await tween(0.5, t => { c.pos = lerp3([to[0], 20, to[2]], to, ease(t)); });
+      c.where = 'kering'; }
+    ok('Kuvet dibilas etanol lalu aseton, dibalik di atas tisu, dan dibiarkan hingga kering sempurna.');
   },
   copy() { const t = $('#out'); t.removeAttribute('readonly'); t.select(); let okc = false; try { okc = document.execCommand('copy'); } catch (e) { } t.setAttribute('readonly', '');
-    if (navigator.clipboard) navigator.clipboard.writeText(t.value).then(() => toast('Data disalin.', 'ok'), () => toast(okc ? 'Data disalin.' : 'Pilih teks lalu tekan Ctrl+C.', okc ? 'ok' : 'warn')); else toast(okc ? 'Data disalin.' : 'Pilih teks lalu tekan Ctrl+C.', okc ? 'ok' : 'warn'); },
-  csv() { const rows = ['No;Larutan;C (' + INIT.unit + ');Lambda (nm);Abs;%T'].concat(ST.readings.map(r => [r.no, r.label, r.std ? fx(r.c, 3) : (r.sample ? '' : '0'), fx(r.lam, 1), fx(r.A, 4), fx(100 * Math.pow(10, -r.A), 2)].join(';')));
+    const done = () => toast(okc ? 'Data disalin.' : 'Pilih teks lalu tekan Ctrl+C.', okc ? 'ok' : 'warn');
+    if (navigator.clipboard) navigator.clipboard.writeText(t.value).then(() => toast('Data disalin.', 'ok'), done); else done(); },
+  csv() { const rows = ['Tabel;Sample ID;Conc (' + INIT.unit + ');Lambda (nm);Abs'];
+    const L = ST.pmethod ? fx(ST.pmethod.lam, 1) : '';
+    ST.stdTable.forEach(r => rows.push(['Standard', r.id, fx(r.conc, 4), L, r.A != null ? fx(r.A, 4) : ''].join(';')));
+    ST.unkTable.forEach(r => rows.push(['Unknown', r.id, fx(r.conc, 4), L, r.A != null ? fx(r.A, 4) : ''].join(';')));
     if (ST.spectrum && ST.spectrum.done) { rows.push(''); rows.push('Spektrum ' + ST.spectrum.name); rows.push('Lambda (nm);Abs'); ST.spectrum.l.forEach((l, i) => rows.push(fx(l, 1) + ';' + fx(ST.spectrum.a[i], 4))); }
-    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' })); a.download = 'praktikum-uvvis.csv'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Unduhan diblokir browser; gunakan Salin data.', 'warn'); } }
+    download(new Blob([rows.join('\n')], { type: 'text/csv' }), fname() + '.csv'); },
+  tabstd() { ST.ptab = 'std'; }, tabunk() { ST.ptab = 'unk'; }
 };
-async function beamPulse(s) { ST.xrayT = ST.autoX ? 1 : ST.xrayT; await tween(s, t => { ST.beam = Math.sin(Math.PI * t); }); ST.beam = 0; if (!ST.xrayUser) ST.xrayT = 0; }
+function download(blob, name) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Unduhan diblokir browser; gunakan Salin data.', 'warn'); } }
 function updateOut() {
-  const cd = calData(); let s = '#LAMBDA ' + fx(cd ? cd.lam : ST.lam, 1) + '\n#STANDAR\n';
-  if (cd) cd.xs.forEach((x, i) => { s += fx(x, 3) + ';' + fx(cd.ys[i], 4) + '\n'; });
-  s += '#SAMPEL\n' + (cd && cd.smp.length ? cd.smp.map(a => fx(a, 4)).join('; ') : '') + '\n'; $('#out').value = s;
+  const L = ST.pmethod ? ST.pmethod.lam : ST.lam; let s = '#LAMBDA ' + fx(L, 1) + '\n#STANDAR\n';
+  ST.stdTable.filter(r => r.A != null).forEach(r => { s += fx(r.conc, 4) + ';' + fx(r.A, 4) + '\n'; });
+  s += '#SAMPEL\n' + ST.unkTable.filter(r => r.A != null).map(r => fx(r.A, 4)).join('; ') + '\n'; $('#out').value = s;
 }
 
-/* ---------------- panduan langkah ---------------- */
-function nextStep() {
-  const R = ST.cuv.R, S = ST.cuv.S;
-  if (!ST.cabled) return ['cables', 'Sambungkan kabel daya ke UPS dan stop kontak, kabel video, serta kabel data RS-232C.'];
-  if (!ST.ups) return ['ups', 'Nyalakan UPS terlebih dahulu.'];
-  if (!ST.pc) return ['pc', 'Nyalakan komputer.'];
-  if (ST.inst === 'off') return ['inst', 'Nyalakan UV-1700 (kompartemen kosong saat inisialisasi).'];
-  if (ST.inst === 'init') return [null, 'Tunggu inisialisasi selesai…'];
-  if (ST.pc === 2) return ['software', 'Buka perangkat lunak instrumen di komputer.'];
-  if (!ST.connected) return ['connect', 'Hubungkan perangkat lunak dengan UV-1700.'];
-  if (R.content !== 'blank') return ['fill', 'Pilih Kuvet referensi, pilih Blanko, lalu Bilas & isi.'];
-  if (R.where === 'rak' && R.dirty) return ['wipe', 'Lap kuvet referensi dengan tisu.'];
-  if (!S.content && S.where === 'rak') return ['fill', 'Pilih Kuvet sampel dan isi dengan Blanko untuk auto zero/baseline.'];
-  if (S.where === 'rak' && S.dirty) return ['wipe', 'Lap kuvet sampel dengan tisu.'];
-  if ((R.where === 'rak' || S.where === 'rak') && ST.lid < 0.5) return ['lid', 'Buka tutup kompartemen.'];
-  if (R.where === 'rak') return ['insert', 'Pilih Kuvet referensi lalu Masukkan ke alat.'];
-  if (S.where === 'rak') return ['insert', 'Pilih Kuvet sampel lalu Masukkan ke alat.'];
-  if (ST.lid > 0.5) return ['lid', 'Tutup kompartemen sebelum mengukur.'];
-  if (ST.inst === 'warm') return [null, 'Lampu masih pemanasan (' + mmss(ST.warmLeft) + '). Tunggu, atau lewati (mengurangi skor).'];
-  if (!ST.zero && S.content === 'blank') return ['baseline', 'Lakukan koreksi baseline (untuk scan) atau GOTO λ lalu auto zero.'];
-  if (!ST.spectrum && ST.zero && ST.zero.type === 'bl' && S.content === 'blank') return ['remove', 'Keluarkan kuvet sampel, isi dengan standar tengah, lap, masukkan, lalu Scan untuk mencari λmaks.'];
-  if (zeroOff(ST.lam) == null && S.content === 'blank') return ['autozero', 'Auto zero pada λ kerja dengan blanko.'];
-  const done = new Set(ST.readings.filter(r => r.std).map(r => r.c)); const left = AN.std.filter(c => !done.has(c));
-  if (left.length) return ['measure', 'Ukur deret standar berurutan (sisa ' + left.length + '): keluarkan kuvet sampel, ganti isi, lap, masukkan, tutup, Ukur.'];
-  if (!ST.readings.some(r => r.sample)) return ['measure', 'Ukur Sampel X tiga kali (triplo).'];
-  return ['copy', 'Data lengkap. Salin data dan kirim ke Kurva Kalibrasi; matikan alat setelah selesai.'];
+/* ================= aksi UVProbe berbasis menu ================= */
+async function printDoc(kind) {
+  if (!ST.printer) return toast('Printer belum menyala atau kabelnya belum tersambung.', 'warn');
+  setView('komputer'); ST.dlg = { title: 'Print', sub: 'Mencetak ke printer…', w: 360, h: 140, progress: 0 }; await tween(0.8, t => { ST.dlg.progress = t; }); ST.dlg = null;
+  setView('printer'); await tween(2.0, t => { ST.paper = t; }); beep(700, 0.05);
+  const cvp = document.createElement('canvas'); cvp.width = 595; cvp.height = 842; const c = cvp.getContext ? cvp.getContext('2d') : null;
+  if (c) {
+    c.fillStyle = '#fff'; c.fillRect(0, 0, 595, 842); c.fillStyle = '#111'; c.font = '700 16px Arial'; c.textAlign = 'left';
+    const title = kind === 'peak' ? 'Peak Pick — Spektrum' : kind === 'std' ? 'Standard Table & Standard Curve' : 'Sample Table';
+    c.fillText('UVProbe · ' + title, 40, 50); c.font = '12px Arial'; c.fillText('File: ' + fname() + (kind === 'peak' ? '.spc' : '.pho') + '    Tanggal: ' + dstr + '    Operator: ' + (ID.nama || '-'), 40, 72);
+    c.fillText('Instrumen: Shimadzu UV-1700 PharmaSpec    Analit: ' + AN.nama, 40, 90); c.strokeStyle = '#111'; c.beginPath(); c.moveTo(40, 100); c.lineTo(555, 100); c.stroke();
+    let y = 126; c.font = '700 12px Arial';
+    if (kind === 'peak') { c.fillText('No.   P/V   Wavelength (nm)   Abs.', 40, y); c.font = '12px Arial'; (ST.peaks || []).slice(0, 12).forEach((p, i) => { y += 20; c.fillText((i + 1) + '      P      ' + fx(p.l, 2) + '                 ' + fx(p.a, 4), 40, y); });
+      if (ST.spectrum) { const gx = 40, gy = y + 30, gw = 515, gh = 260; c.strokeRect(gx, gy, gw, gh); const sp = ST.spectrum, lo = sp.l[0], hi = sp.l[sp.l.length - 1], ymax = Math.max(...sp.a) * 1.1;
+        c.strokeStyle = '#c00'; c.beginPath(); sp.l.forEach((l, i) => { const X1 = gx + gw * (l - lo) / (hi - lo), Y1 = gy + gh - gh * Math.max(0, sp.a[i]) / ymax; i ? c.lineTo(X1, Y1) : c.moveTo(X1, Y1); }); c.stroke(); } }
+    else { const rows = kind === 'std' ? ST.stdTable : ST.unkTable; c.fillText('Sample ID              Type           Conc (' + INIT.unit + ')        Abs', 40, y); c.font = '12px Arial';
+      rows.forEach(r => { y += 20; c.fillText((r.id || '').padEnd(22, ' ') + (kind === 'std' ? 'Standard' : 'Unknown').padEnd(16, ' ') + fx(r.conc, 4).padEnd(18, ' ') + (r.A != null ? fx(r.A, 4) : ''), 40, y); });
+      const reg = regress(); if (reg) { y += 30; c.font = '700 12px Arial'; c.fillText('Abs = ' + fx(reg.a, 5) + ' * Conc' + (reg.zero ? '' : ' + ' + fx(reg.b, 5)) + '     r² = ' + fx(reg.r2, 5), 40, y); } }
+    c.font = '10px Arial'; c.fillStyle = '#555'; c.fillText('Dicetak dari praktikum virtual SPECTRA LAB (simulasi pendidikan)', 40, 820);
+    let url = ''; try { url = cvp.toDataURL('image/png'); } catch (e) { }
+    ST.prints.push({ title, url }); renderPrints();
+  } else ST.prints.push({ title: kind === 'peak' ? 'Peak Pick' : kind === 'std' ? 'Standard Table' : 'Sample Table', url: '' });
+  await wait(0.4); ST.paper = 0; ok('Tercetak: ' + (kind === 'peak' ? 'data peak pick' : kind === 'std' ? 'kurva kalibrasi standar' : 'data sampel') + '.');
 }
+function renderPrints() { const el = $('#prints'); el.innerHTML = ''; ST.prints.forEach((p, i) => { const a = document.createElement('a'); a.href = p.url || '#'; a.download = fname() + '_cetak' + (i + 1) + '.png'; a.innerHTML = (p.url ? '<img src="' + p.url + '">' : '') + p.title; el.appendChild(a); }); }
+async function saveAs(ext) {
+  setView('komputer'); await menuPick('File', MENU.File, ext === 'spc' ? 3 : 2);
+  ST.dlg = { title: ext === 'spc' ? 'Save As' : 'Save', sub: 'Simpan file', w: 520, h: 210, fields: [['File name:', ''], ['Save as type:', ext === 'spc' ? 'Spectrum Files (*.spc)' : 'Photometric Files (*.pho)']], buttons: ['Save', 'Cancel'] };
+  const o = {}; await typeInto(o, 'f', fname() + '.' + ext, 'File name:'); await dlgBtn('Save'); ST.dlg = null; ST.files.push(fname() + '.' + ext); beep(900, 0.05); ok('File tersimpan: ' + fname() + '.' + ext);
+}
+
+/* ================= langkah Instruksi Kerja ================= */
+const STD_MID = 's' + Math.floor(AN.std.length / 2);
+async function ensureLid(open) { if ((ST.lid > 0.5) !== !!open) await ACT.lid(); }
+async function putSample(sid) {
+  const S = ST.cuv.S; await ensureLid(1);
+  if (S.where === 'sel') await ACT.remove('S');
+  if (S.where === 'kering') { S.where = 'rak'; S.flip = 0; S.pos = RACK.S.slice(); }
+  await ACT.fill('S', sid); await ACT.wipe('S'); await ACT.insert('S'); await ensureLid(0);
+}
+async function setupRef() {
+  const R = ST.cuv.R; if (R.where === 'sel' && R.content === 'blank') return; await ensureLid(1);
+  if (R.where === 'sel') await ACT.remove('R'); await ACT.fill('R', 'blank'); await ACT.wipe('R'); await ACT.insert('R');
+}
+function smethodDlg() { const m = ST.smethod_tmp; return { title: 'Spectrum Method', sub: 'Measurement', w: 560, h: 330, fields: [['Wavelength Range (nm)  Start:', m.hi, 120], ['End:', m.lo, 120], ['Scan Speed:', m.speed, 160], ['Sampling Interval:', fx(m.step, 1), 120], ['Scan Mode:', 'Single', 160], ['Measuring Mode:', 'Absorbance', 160]], buttons: ['OK', 'Cancel'] }; }
+function pDlg(page) {
+  const m = ST.pm_tmp; const pages = [
+    { sub: 'Wavelength', fields: [['Wavelength Type:', 'Point', 160], ['Wavelength (nm):', m.wlText || '', 120], ['Daftar WL:', m.lam ? fx(m.lam, 1) + ' nm' : '-', 160]], buttons: ['Add', '< Back', 'Next >'] },
+    { sub: 'Calibration', fields: [['Type:', m.type || '', 180], ['Unit:', m.unit || '', 120], ['WL1:', m.wl1 || '', 160], ['Formula Type:', 'Fixed Wave Length', 180], ['Zero Interception', !!m.zero, 0, 'check']], buttons: ['< Back', 'Next >'] },
+    { sub: 'Measurement Parameters (Standard)', fields: [['Repetitions:', '1', 80], ['Averaging:', 'Average', 120]], buttons: ['< Back', 'Next >'] },
+    { sub: 'Measurement Parameters (Sample)', fields: [['Repetitions:', '1', 80], ['Averaging:', 'Average', 120]], buttons: ['< Back', 'Next >'] },
+    { sub: 'File Properties', fields: [['File name:', m.file || '', 300], ['Folder:', 'D:\\Data Praktikum\\', 300]], buttons: ['...', '< Back', 'Finish'] }];
+  const p = pages[page]; return Object.assign({ title: 'Photometric Method Wizard', w: 600, h: 330 }, p);
+}
+async function wiz(page) { ST.dlg = pDlg(page); ST.wizPage = page; await wait(0.3); }
+const STEPS = [
+  // A — rekonstruksi
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Periksa dan sambungkan kabel: stop kontak → kabel perpanjangan → UPS; UV-1700, CPU, dan monitor ke UPS; printer ke perpanjangan; kabel VGA, USB, dan RS-232C.', done: () => ST.cabled, run: () => ACT.cables() },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Tekan tombol ON pada UPS dan tunggu indikator hijau menyala.', done: () => ST.ups, run: () => ACT.ups() },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Buka tutup kompartemen, keluarkan silica gel, lalu tutup kembali.', done: () => ST.silica === 'meja', run: async () => { await ACT.silica(); await ensureLid(0); } },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Tekan tombol power di bagian kiri UV-1700; tunggu inisialisasi sampai semua pemeriksaan OK.', done: () => ST.inst !== 'off' && ST.inst !== 'init', run: () => ACT.inst() },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Nyalakan CPU, monitor, dan printer.', done: () => ST.pc >= 2, run: () => ACT.pc() },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Pada UV-1700 tekan MODE lalu pilih PC CONTROL.', done: () => ST.pcctrl, run: () => ACT.pcctrl() },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Klik dua kali ikon UVProbe, lalu klik Connect; tunggu pemeriksaan instrumen selesai (Pass).', done: () => ST.connected, run: async () => { await ACT.software(); await ACT.connect(); } },
+  { sec: 'A. Menyalakan Alat', rk: 1, t: 'Biarkan lampu pemanasan ±15–30 menit agar intensitas stabil (waktu dipercepat).', done: () => ST.inst === 'ready', run: async () => { setView('alat'); toast('Menunggu pemanasan lampu…'); while (ST.inst === 'warm') await wait(0.25); } },
+  // B — spektrum (1–5 rekonstruksi; 6 sesuai IK)
+  { sec: 'B. Pengukuran Spektrum', rk: 1, t: 'Klik Window → Spectrum.', done: () => ST.done.has('b1'), run: async () => { setView('komputer'); await menuPick('Window', MENU.Window, 0); ST.win = 'spectrum'; ST.done.add('b1'); } },
+  { sec: 'B. Pengukuran Spektrum', rk: 1, t: 'Klik Edit → Method; atur rentang panjang gelombang, kecepatan scan, dan interval sampling → OK.', done: () => !!ST.smethod, run: async () => {
+      setView('komputer'); await menuPick('Edit', MENU.Edit, 3); const [lo, hi] = scanRange(); ST.smethod_tmp = { lo: '', hi: '', speed: 'Medium', step: 1 }; ST.dlg = smethodDlg(); const o = {};
+      await typeInto(o, 'v', String(hi), 'Wavelength Range (nm)  Start:'); await typeInto(o, 'v', String(lo), 'End:'); await dlgBtn('OK'); ST.dlg = null; ST.smethod = { lo, hi, speed: 'Medium', step: 1 }; ok('Metode spektrum: ' + hi + '–' + lo + ' nm, Medium, 1,0 nm.'); } },
+  { sec: 'B. Pengukuran Spektrum', rk: 1, t: 'Isi kuvet referensi dan kuvet sampel dengan blanko, lap dengan tisu, masukkan ke sel, tutup kompartemen → klik Baseline.', done: () => ST.zero && ST.zero.type === 'bl' || ST.done.has('b3'),
+    run: async () => { await setupRef(); await putSample('blank'); await ACT.baseline(); ST.done.add('b3'); } },
+  { sec: 'B. Pengukuran Spektrum', rk: 1, t: 'Ganti kuvet sampel dengan larutan standar (konsentrasi tengah) → klik Start.', done: () => !!(ST.spectrum && ST.spectrum.done), run: async () => { await putSample(STD_MID); await ACT.scan(); } },
+  { sec: 'B. Pengukuran Spektrum', rk: 1, t: 'Klik Operations → Peak Pick untuk menampilkan tabel puncak; catat λmaks.', done: () => !!ST.peaks, run: () => ACT.peakpick() },
+  { sec: 'B. Pengukuran Spektrum', no: 6, t: 'Klik File → Save As → beri nama spektrum dengan format Tanggal_Kelas_Kelompok → Save.', done: () => ST.files.some(f => f.endsWith('.spc')), run: () => saveAs('spc') },
+  { sec: 'B. Print Data', no: 1, t: 'Klik 1× pada tabel peak pick, klik kanan → Print.', done: () => ST.prints.some(p => p.title.startsWith('Peak')), run: async () => { setView('komputer'); ST.peakSel = true; await wait(0.5); await printDoc('peak'); ST.peakSel = false; } },
+  // B — analisa sampel (sesuai IK)
+  { sec: 'B. Analisa Sampel', no: 1, t: 'Klik Window → Photometric.', done: () => ST.done.has('p1'), run: async () => { setView('komputer'); await menuPick('Window', MENU.Window, 1); ST.win = 'photometric'; ST.done.add('p1'); } },
+  { sec: 'B. Analisa Sampel', no: 2, t: 'Klik Edit → Method.', done: () => ST.done.has('p2'), run: async () => { setView('komputer'); await menuPick('Edit', MENU.Edit, 3); ST.pm_tmp = {}; await wiz(0); ST.done.add('p2'); } },
+  { sec: 'B. Analisa Sampel', no: 3, t: 'Pada kolom Wavelength (nm) ketik panjang gelombang yang diinginkan (λmaks) → Add.', done: () => ST.done.has('p3'), run: async () => {
+      const L = ST.lmax || AN.lam_ref; if (!ST.dlg) await wiz(0); await typeInto(ST.pm_tmp, 'wlText', fx(L, 1), 'Wavelength (nm):'); await dlgBtn('Add'); ST.pm_tmp.lam = L; ST.dlg = pDlg(0); ST.done.add('p3'); } },
+  { sec: 'B. Analisa Sampel', no: 4, t: 'Klik Next.', done: () => ST.done.has('p4'), run: async () => { await dlgBtn('Next >'); await wiz(1); ST.done.add('p4'); } },
+  { sec: 'B. Analisa Sampel', no: 5, t: 'Pada kolom Type pilih metode: Multi Point (standar lebih dari satu konsentrasi).', done: () => ST.done.has('p5'), run: async () => { if (ST.wizPage !== 1) await wiz(1); await typeInto(ST.pm_tmp, 'type', 'Multi Point', 'Type:'); ST.dlg = pDlg(1); ST.done.add('p5'); } },
+  { sec: 'B. Analisa Sampel', no: 6, t: 'Pada kolom Unit ketik satuan yang diinginkan.', done: () => ST.done.has('p6'), run: async () => { if (ST.wizPage !== 1) await wiz(1); await typeInto(ST.pm_tmp, 'unit', INIT.unit, 'Unit:'); ST.dlg = pDlg(1); ST.done.add('p6'); } },
+  { sec: 'B. Analisa Sampel', no: 7, t: 'Pada kolom WL1 pilih panjang gelombang yang diinginkan.', done: () => ST.done.has('p7'), run: async () => { if (ST.wizPage !== 1) await wiz(1); await typeInto(ST.pm_tmp, 'wl1', 'WL' + fx(ST.pm_tmp.lam || ST.lmax || AN.lam_ref, 1), 'WL1:'); ST.dlg = pDlg(1); ST.done.add('p7'); } },
+  { sec: 'B. Analisa Sampel', no: 8, t: 'Klik Zero Interception → klik Next 3×.', done: () => ST.done.has('p8'), run: async () => { if (ST.wizPage !== 1) await wiz(1); ST.pm_tmp.zero = true; ST.dlg = pDlg(1); await wait(0.5);
+      for (let i = 0; i < 3; i++) { await dlgBtn('Next >'); await wiz(2 + i); } ST.done.add('p8'); } },
+  { sec: 'B. Analisa Sampel', no: 9, t: 'Pada kolom File name klik (...) → pilih folder → beri nama Tanggal_Kelas_Kelompok → Open → Finish.', done: () => !!ST.pmethod, run: async () => {
+      if (ST.wizPage !== 4) await wiz(4); await dlgBtn('...'); await typeInto(ST.pm_tmp, 'file', fname() + '.pho', 'File name:'); ST.dlg = pDlg(4); await dlgBtn('Finish'); ST.dlg = null;
+      const t = ST.pm_tmp; ST.pmethod = { lam: t.lam || ST.lmax || AN.lam_ref, type: t.type || 'Multi Point', unit: t.unit || INIT.unit, zero: t.zero !== false, file: t.file || fname() + '.pho' };
+      ST.lam = ST.pmethod.lam; $('#lam').value = ST.lam; ok('Metode fotometri tersimpan: ' + fx(ST.pmethod.lam, 1) + ' nm, Multi Point, zero interception.'); } },
+  { sec: 'B. Analisa Sampel', no: 10, t: 'Pada Standard Table ketik nama standar pada kolom Sample ID dan konsentrasinya pada kolom Conc.', done: () => ST.stdTable.length === AN.std.length, run: async () => {
+      setView('komputer'); ST.ptab = 'std'; ST.stdTable = [];
+      for (let i = 0; i < AN.std.length; i++) { const r = { id: '', conc: null, A: null }; ST.stdTable.push(r); ST.rowHi = i; await typeInto(r, 'id', 'Std ' + (i + 1)); r.conc = AN.std[i]; await wait(0.15); } ST.rowHi = null; ok('Standard Table terisi ' + AN.std.length + ' standar.'); } },
+  { sec: 'B. Analisa Sampel', no: 11, t: 'Ganti isi kuvet di sample compartment dengan blanko → klik Auto Zero.', done: () => ST.zero && ST.zero.type === 'az' && ST.pmethod && Math.abs(ST.zero.lam - ST.pmethod.lam) < 0.05,
+    run: async () => { await setupRef(); await putSample('blank'); ST.lam = ST.pmethod.lam; await ACT.autozero(); } },
+  { sec: 'B. Analisa Sampel', no: 12, t: 'Ganti dengan standar → klik Read Std (ulangi untuk semua deret standar).', multi: true,
+    done: () => ST.stdTable.length > 0 && ST.stdTable.every(r => r.A != null), prog: () => ST.stdTable.filter(r => r.A != null).length + '/' + AN.std.length,
+    run: async () => { const i = ST.stdTable.findIndex(r => r.A == null); await putSample('s' + i); await ACT.readstd(); } },
+  { sec: 'B. Analisa Sampel', no: 13, t: 'Klik Sample Table → beri nama sampel pada kolom Sample ID.', done: () => ST.unkTable.length >= 3, run: async () => {
+      setView('komputer'); ST.ptab = 'unk'; for (let i = ST.unkTable.length; i < 3; i++) { const r = { id: '', A: null }; ST.unkTable.push(r); ST.rowHi = i; await typeInto(r, 'id', 'Sampel X-' + (i + 1)); } ST.rowHi = null; } },
+  { sec: 'B. Analisa Sampel', no: 14, t: 'Ganti dengan sampel → klik Read Unk (ulangi untuk semua sampel; di sini triplo).', multi: true,
+    done: () => ST.unkTable.length >= 3 && ST.unkTable.every(r => r.A != null), prog: () => ST.unkTable.filter(r => r.A != null).length + '/' + Math.max(3, ST.unkTable.length),
+    run: async () => { if (ST.cuv.S.content !== 'X' || ST.cuv.S.where !== 'sel') await putSample('X'); await ACT.readunk(); } },
+  { sec: 'B. Analisa Sampel', no: 15, t: 'Setelah semua pengukuran selesai klik File → Save.', done: () => ST.files.some(f => f.endsWith('.pho')), run: () => saveAs('pho') },
+  { sec: 'B. Print Kurva Kalibrasi Standar', no: 1, t: 'Klik kanan pada Standard Table → Print.', done: () => ST.prints.some(p => p.title.startsWith('Standard')), run: async () => { ST.ptab = 'std'; await printDoc('std'); } },
+  { sec: 'B. Print Data Sampel', no: 1, t: 'Klik kanan pada Sample Table → Print.', done: () => ST.prints.some(p => p.title.startsWith('Sample')), run: async () => { ST.ptab = 'unk'; await printDoc('unk'); } },
+  // C — mematikan alat (sesuai IK)
+  { sec: 'C. Mematikan Alat', no: 1, t: 'Catat semua kejadian pada Log Book Alat dan tanda tangani dengan nama jelas.', done: () => !!ST.logbook, run: () => openLog() },
+  { sec: 'C. Mematikan Alat', no: 2, t: 'Klik Disconnect.', done: () => ST.done.has('c2'), run: async () => { if (ST.connected) await ACT.disconnect(); ST.done.add('c2'); } },
+  { sec: 'C. Mematikan Alat', no: 3, t: 'Klik File → Exit.', done: () => ST.done.has('c3'), run: async () => { if (ST.connected) await ACT.disconnect(); setView('komputer'); await menuPick('File', MENU.File, 5); ST.sw = false; ST.win = null; ST.pc = 2; ST.done.add('c3'); log('UVProbe ditutup (File → Exit).'); } },
+  { sec: 'C. Mematikan Alat', no: 4, t: 'Klik menu Windows → tekan tombol Shut down.', done: () => ST.done.has('c4'), run: async () => { setView('komputer'); ST.sw = false; ST.pc = 4; await wait(2.2); ST.pc = 0; ST.done.add('c4'); log('Komputer di-shutdown.'); } },
+  { sec: 'C. Mematikan Alat', no: 5, t: 'Tekan tombol power monitor komputer dan printer.', done: () => ST.done.has('c5'), run: async () => { ST.printer = false; await wait(0.3); ST.done.add('c5'); log('Monitor dan printer dimatikan.'); } },
+  { sec: 'C. Mematikan Alat', no: 6, t: 'Tekan MODE pada UV-1700 (keluar dari PC CONTROL).', done: () => ST.done.has('c6'), run: async () => { if (ST.connected) await ACT.disconnect(); if (ST.pcctrl) await ACT.pcctrl(); ST.done.add('c6'); } },
+  { sec: 'C. Mematikan Alat', no: 7, t: 'Tekan tombol power di bagian kiri UV-1700, tutup monitor UV-1700, dan masukkan kembali silica gel ke dalam compartment.', done: () => ST.inst === 'off' && ST.done.has('c6') && ST.silica === 'comp' && ST.lcdFold > 0.9,
+    run: async () => { await ensureLid(1); if (ST.cuv.S.where === 'sel') await ACT.remove('S'); if (ST.cuv.R.where === 'sel') await ACT.remove('R'); await ensureLid(0); if (ST.inst !== 'off') await ACT.inst(); if (ST.silica !== 'comp') await ACT.silica(); await ensureLid(0); } },
+  { sec: 'C. Mematikan Alat', no: 8, t: 'Tekan tombol OFF pada UPS.', done: () => ST.done.has('c6') && !ST.ups, run: () => ACT.ups() },
+  { sec: 'C. Mematikan Alat', no: 9, t: 'Cabut kabel dari kabel perpanjangan, kecuali kabel UPS.', done: () => ST.done.has('c9'), run: async () => { setView('belakang'); await tween(0.8, t => { ST.cab[5] = 1 - t; }); ST.cabled = false; ST.done.add('c9'); log('Kabel printer dicabut dari kabel perpanjangan; kabel UPS tetap terpasang.'); } },
+  { sec: 'C. Mematikan Alat', no: 10, t: 'Rapikan area kerja di sekitar instrumen dan komputer dari sampel dan standar.', done: () => ST.tidy, run: async () => { setView('isi'); await wait(0.6); ST.tidy = true; log('Labu sampel dan standar dikembalikan; area kerja rapi.'); await wait(0.4); } },
+  { sec: 'C. Mematikan Alat', no: 11, t: 'Rapikan kursi pada area kerja ke tempat aman.', done: () => ST.done.has('c11'), run: async () => { setView('kursi'); const z0 = ST.chairZ; await tween(1.2, t => { ST.chairZ = z0 + (24 - z0) * ease(t); }); ST.done.add('c11'); log('Kursi dirapikan ke tempat aman (didorong ke bawah meja).'); } },
+  // D — mengeringkan kuvet
+  { sec: 'D. Mengeringkan Kuvet', no: 1, t: 'Setelah alat mati, keringkan kuvet dengan membilas etanol lalu aseton; balik kuvet (posisi aman) dan tunggu hingga kering sempurna.', done: () => ST.cuv.R.where === 'kering' && ST.cuv.S.where === 'kering', run: () => ACT.dry() }
+];
+function isDone(s) { if (!s._d && s.done()) s._d = true; return !!s._d; }
+function curStep() { return STEPS.findIndex(s => !isDone(s)); }
+function openLog() { return new Promise(res => { const m = $('#logm'); $('#lg_t').value = dstr; $('#lg_n').value = ID.nama; $('#lg_k').value = 'Alat berfungsi normal. Pengukuran ' + AN.nama + ' pada ' + fx(ST.pmethod ? ST.pmethod.lam : AN.lam_ref, 1) + ' nm; ' + ST.stdTable.filter(r => r.A != null).length + ' standar, ' + ST.unkTable.filter(r => r.A != null).length + ' sampel. Tidak ada kendala.';
+  $('#lg_s').value = ID.nama; m.classList.add('show'); setView('log'); logResolve = res; }); }
+let logResolve = null;
+
+/* ================= panel ================= */
 function sync() {
   const R = ST.cuv.R, S = ST.cuv.S, ch = [];
   const chip = (t, s) => ch.push('<span class="chip ' + (s === 2 ? 'on' : s === 1 ? 'mid' : '') + '">' + t + '</span>');
-  chip('Kabel', ST.cabled ? 2 : (ST.cab.some(x => x > 0) ? 1 : 0)); chip('UPS', ST.ups ? 2 : 0); chip('PC', ST.pc === 3 ? 2 : ST.pc ? 1 : 0);
-  chip('UV-1700 ' + (ST.inst === 'warm' ? mmss(ST.warmLeft) : ST.inst.toUpperCase()), ST.inst === 'ready' ? 2 : ST.inst === 'off' ? 0 : 1); chip('Link PC', ST.connected ? 2 : 0);
+  chip('Kabel', ST.cabled ? 2 : (ST.cab.some(x => x > 0) ? 1 : 0)); chip('UPS', ST.ups ? 2 : 0); chip('Silica ' + (ST.silica === 'comp' ? 'di alat' : 'keluar'), ST.silica === 'comp' ? 1 : 2);
+  chip('UV-1700 ' + (ST.inst === 'warm' ? 'pemanasan ' + mmss(ST.warmLeft) : ST.inst.toUpperCase()), ST.inst === 'ready' ? 2 : ST.inst === 'off' ? 0 : 1);
+  chip('PC ' + (ST.pc >= 2 ? 'ON' : ST.pc ? '…' : 'OFF'), ST.pc >= 2 ? 2 : ST.pc ? 1 : 0); chip(ST.pcctrl ? 'PC CTRL' : 'Mode lokal', ST.pcctrl ? 2 : 0); chip(ST.connected ? 'Terhubung' : 'Tidak terhubung', ST.connected ? 2 : 0);
   chip('Tutup ' + (ST.lid > 0.5 ? 'terbuka' : 'tertutup'), ST.lid > 0.5 ? 1 : 2);
-  chip('Ref: ' + (R.content ? SOL[R.content].label.replace(/ ·.*| \(.*/, '') : 'kosong') + ' · ' + (R.where === 'sel' ? 'di alat' : 'rak') + (R.dirty ? ' · belum dilap' : ''), R.where === 'sel' ? 2 : 1);
-  chip('Sampel: ' + (S.content ? SOL[S.content].label.replace(/ \(.*/, '') : 'kosong') + ' · ' + (S.where === 'sel' ? 'di alat' : 'rak') + (S.dirty ? ' · belum dilap' : ''), S.where === 'sel' ? 2 : 1);
-  chip(ST.zero ? (ST.zero.type === 'az' ? 'AZ ' + fx(ST.zero.lam, 1) : 'Baseline') : 'Belum zero', ST.zero ? 2 : 0);
+  chip('Ref: ' + (R.content ? SOL[R.content].short || R.content : 'kosong') + ' · ' + R.where + (R.dirty ? ' · belum dilap' : ''), R.where === 'sel' ? 2 : 1);
+  chip('Sampel: ' + (S.content ? SOL[S.content].short || S.content : 'kosong') + ' · ' + S.where + (S.dirty ? ' · belum dilap' : ''), S.where === 'sel' ? 2 : 1);
   $('#chips').innerHTML = ch.join('');
-  const [act, txt] = nextStep(); $('#next').innerHTML = '<b>' + txt + '</b>';
-  $$('button.a').forEach(b => { b.classList.toggle('hl', b.dataset.act === act); b.disabled = ST.busy && !['copy', 'csv'].includes(b.dataset.act); });
-  $('#score').textContent = ST.score; const [lo, hi] = scanRange(); $('#scaninfo').textContent = 'Rentang scan/baseline: ' + lo + '–' + hi + ' nm · λ referensi metode ' + AN.lam_ref + ' nm.';
+  const ci = curStep(); const st = STEPS[ci];
+  if (st) { $('#nowsec').textContent = st.sec.toUpperCase() + ' · ' + (st.no ? 'LANGKAH ' + st.no : 'LANGKAH') + (st.rk ? ' (REK)' : '') + (st.prog ? ' · ' + st.prog() : '');
+    $('#nowtx').textContent = st.t; $('#nowwhy').textContent = ST.busy ? (ST.busyMsg || 'Sedang dikerjakan… perhatikan animasi 3D dan layar komputer.') : 'Tekan tombol di bawah; atau coba sendiri lewat Kontrol manual.';
+    $('#gobtn').textContent = st.multi ? 'Kerjakan (' + st.prog() + ')' : 'Kerjakan langkah ini'; $('#prog2').style.width = (100 * ci / STEPS.length) + '%'; }
+  else { $('#nowsec').textContent = 'SELESAI'; $('#nowtx').textContent = 'Seluruh langkah Instruksi Kerja selesai. Skor akhir: ' + ST.score + '/100.'; $('#nowwhy').textContent = 'Salin data ke Kurva Kalibrasi untuk mengolah hasil.'; $('#gobtn').textContent = 'Selesai'; }
+  $('#gobtn').disabled = ST.busy || !st;
+  let html = '', last = '';
+  STEPS.forEach((s, i) => { if (s.sec !== last) { html += '<div class="grp">' + s.sec + '</div>'; last = s.sec; }
+    const d = isDone(s); html += '<div class="it ' + (d ? 'done' : (i === ci ? 'cur' : '')) + '" data-i="' + i + '"><span class="d">' + (d ? '✓' : (s.no || '•')) + '</span><span>' + s.t + (s.rk ? '<span class="rk">REK</span>' : '') + (s.multi && !d ? ' <b>(' + s.prog() + ')</b>' : '') + '</span></div>'; });
+  $('#iklist').innerHTML = html; const nd = STEPS.filter(isDone).length; $('#ikn').textContent = nd + '/' + STEPS.length; $('#prog').style.width = (100 * nd / STEPS.length) + '%';
+  $$('button.a').forEach(b => { b.disabled = ST.busy && !['copy', 'csv'].includes(b.dataset.act); });
+  $('#score').textContent = ST.score; $('#ident').textContent = (ID.nama || 'Praktikan') + ' · ' + ID.kelas + ' · Kel. ' + ID.kel;
+  const [lo, hi] = scanRange(); $('#scaninfo').textContent = 'Rentang scan: ' + lo + '–' + hi + ' nm · λ referensi metode ' + AN.lam_ref + ' nm.';
+  if (ci >= 0) { const el = $('#iklist .cur'); if (el && el.scrollIntoView && ST.autoScroll) el.scrollIntoView({ block: 'nearest' }); }
   dirty = true;
 }
-async function run(name) {
-  const f = ACT[name]; if (!f || ST.busy) return;
-  ST.busy = true; sync();
-  try { await f(); } catch (e) { console.error(e); toast('Galat: ' + e.message, 'err'); }
-  ST.busy = false; sync(); drawPC();
+async function run(fn, label) {
+  if (ST.busy) return; ST.busy = true; ST.busyMsg = label || null; sync();
+  try { await fn(); } catch (e) { console.error(e); toast('Galat: ' + e.message, 'err'); }
+  ST.busy = false; ST.busyMsg = null; sync(); drawPC();
 }
 
-/* ---------------- loop ---------------- */
+/* ================= loop ================= */
 let last = performance.now(), lastPC = 0;
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
@@ -2158,14 +2593,13 @@ function loop(now) {
   const nx = e(ST.xray, ST.xrayT, 5); if (nx !== ST.xray) { ST.xray = nx; dirty = true; }
   if (camAnim) { const a = camAnim; a.t = Math.min(1, a.t + dt * 1.6); const k = ease(a.t); let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
     CAM.yaw = a.from[0] + dy * k; CAM.pitch = a.from[1] + (a.to[1] - a.from[1]) * k; CAM.dist = a.from[2] + (a.to[2] - a.from[2]) * k; CAM.target = lerp3(a.from[3], a.to[3], k); if (a.t >= 1) camAnim = null; dirty = true; }
-  if (ST.inst === 'warm' && !ST.warmSkipped) { ST.warmLeft -= dt * 90; if (ST.warmLeft <= 0) { ST.warmLeft = 0; ST.inst = 'ready'; beep(1400, 0.2); ok('Pemanasan selesai: lampu stabil, instrumen READY.'); sync(); } dirty = true; }
-  if (now - lastPC > 250) { lastPC = now; $('#clock').textContent = mmss((now - ST.t0) / 1000); if (ST.inst === 'warm') sync(); drawPC(); dirty = true; }
+  if (ST.inst === 'warm' && !ST.warmSkipped) { ST.warmLeft -= dt * 90; if (ST.warmLeft <= 0) { ST.warmLeft = 0; ST.inst = 'ready'; beep(1400, 0.2); ok('Pemanasan selesai: lampu stabil.'); sync(); } dirty = true; }
+  if (now - lastPC > 200) { lastPC = now; $('#clock').textContent = mmss((now - ST.t0) / 1000); if (ST.inst === 'warm') sync(); drawPC(); dirty = true; }
   if (dirty) { dirty = false; draw(); }
   requestAnimationFrame(loop);
 }
 
-/* ---------------- input ---------------- */
-let selId = null;
+/* ================= input ================= */
 function pickAt(x, y) {
   const inPoly = (p, px, py) => { let c = false; for (let i = 0, j = 3; i < 4; j = i++) { if (((p[i][1] > py) !== (p[j][1] > py)) && (px < (p[j][0] - p[i][0]) * (py - p[i][1]) / (p[j][1] - p[i][1]) + p[i][0])) c = !c; } return c; };
   for (let i = drawn.length - 1; i >= 0; i--) if (inPoly(drawn[i].p, x, y)) return drawn[i].id; return null;
@@ -2173,30 +2607,33 @@ function pickAt(x, y) {
 (function bind() {
   let pts = new Map(), start = null, pinch = null;
   cv.addEventListener('pointerdown', e => { try { cv.setPointerCapture(e.pointerId); } catch (_) { } pts.set(e.pointerId, [e.clientX, e.clientY]); start = { x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch, moved: false }; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: CAM.dist }; } });
-  cv.addEventListener('pointermove', e => {
-    if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; CAM.dist = Math.max(40, Math.min(420, pinch.dist * pinch.d / Math.max(10, Math.hypot(a[0] - b[0], a[1] - b[1])))); start.moved = true; dirty = true; return; }
+  cv.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; CAM.dist = Math.max(40, Math.min(460, pinch.dist * pinch.d / Math.max(10, Math.hypot(a[0] - b[0], a[1] - b[1])))); start.moved = true; dirty = true; return; }
     if (!start) return; const dx = e.clientX - start.x, dy = e.clientY - start.y; if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
-    CAM.yaw = start.yaw - dx * 0.4; CAM.pitch = Math.max(-5, Math.min(89, start.pitch + dy * 0.3)); camAnim = null; dirty = true;
-  });
+    CAM.yaw = start.yaw - dx * 0.4; CAM.pitch = Math.max(-5, Math.min(89, start.pitch + dy * 0.3)); camAnim = null; dirty = true; });
   const up = e => { if (!pts.has(e.pointerId)) return; pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
     if (pts.size === 0) { if (start && !start.moved) { const r = cv.getBoundingClientRect(); const id = pickAt(e.clientX - r.left, e.clientY - r.top); selId = id; const inf = id && INFO[id];
-      $('#ti').textContent = inf ? inf[0] : 'Info komponen'; $('#info').textContent = inf ? (inf[1] || 'Komponen bangku optik.') : 'Klik objek untuk penjelasan.'; dirty = true; } start = null; } };
+      $('#ti').textContent = inf ? inf[0] : 'Info objek'; $('#info').textContent = inf ? (inf[1] || 'Komponen bangku optik UV-1700.') : 'Klik objek pada meja untuk penjelasan.'; dirty = true; } start = null; } };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
-  cv.addEventListener('wheel', e => { e.preventDefault(); CAM.dist = Math.max(40, Math.min(420, CAM.dist * (e.deltaY > 0 ? 1.08 : 1 / 1.08))); camAnim = null; dirty = true; }, { passive: false });
+  cv.addEventListener('wheel', e => { e.preventDefault(); CAM.dist = Math.max(40, Math.min(460, CAM.dist * (e.deltaY > 0 ? 1.08 : 1 / 1.08))); camAnim = null; dirty = true; }, { passive: false });
   pcc.addEventListener('click', e => { const r = pcc.getBoundingClientRect(); const x = (e.clientX - r.left) * pcc.width / r.width, y = (e.clientY - r.top) * pcc.height / r.height;
-    const b = pcBtns.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h); if (b) { if (b.act.startsWith('tab')) { ACT[b.act](); drawPC(); } else run(b.act); } });
+    const b = pcBtns.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h); if (!b) return;
+    if (b.act.startsWith('tab')) { ACT[b.act](); drawPC(); } else if (ACT[b.act]) run(() => ACT[b.act]()); });
   document.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.act) run(b.dataset.act);
-    if (b.dataset.v) setView(b.dataset.v);
-    if (b.dataset.t) { const k = b.dataset.t, on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on));
-      if (k === 'xray') { ST.xrayUser = on; ST.xrayT = on ? 1 : 0; } if (k === 'autox') ST.autoX = on; if (k === 'sound') ST.sound = on; } });
+    if (b.id === 'gobtn') { const i = curStep(); if (i >= 0) { ST.autoScroll = true; run(() => STEPS[i].run(), 'Mengerjakan: ' + STEPS[i].t); } return; }
+    if (b.id === 'startbtn') { ID.nama = $('#nm').value.trim(); ID.kelas = $('#kl').value.trim() || 'Kelas'; ID.kel = $('#kp').value.trim() || 'Kelompok'; $('#welcome').classList.remove('show'); log('Praktikum dimulai oleh ' + (ID.nama || 'praktikan') + ' (' + ID.kelas + ', kelompok ' + ID.kel + ').'); sync(); return; }
+    if (b.id === 'lg_ok') { ST.logbook = { t: dstr, n: $('#lg_n').value, k: $('#lg_k').value, s: $('#lg_s').value }; $('#logm').classList.remove('show'); ok('Log Book tercatat dan ditandatangani oleh ' + (ST.logbook.s || '-') + '.'); if (logResolve) { logResolve(); logResolve = null; } sync(); return; }
+    if (b.dataset.act) { const a = b.dataset.act; if (ACT[a]) run(() => ACT[a]()); return; }
+    if (b.dataset.v) { setView(b.dataset.v); return; }
+    if (b.dataset.t) { const k = b.dataset.t; if (k === 'help') { $('#welcome').classList.add('show'); return; }
+      if (k === 'pip') { $('#pip').classList.remove('hide'); return; } if (k === 'pipx') { $('#pip').classList.add('hide'); return; } if (k === 'pipbig') { const bg = $('#pip').classList.toggle('big'); b.textContent = bg ? 'Kecilkan' : 'Perbesar'; return; } const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on));
+      if (k === 'xray') { ST.xrayUser = on; ST.xrayT = on ? 1 : 0; } if (k === 'sound') ST.sound = on; } });
   const s = $('#sol'); SOL_KEYS.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = SOL[k].label; s.appendChild(o); });
   $('#lam').value = AN.lam_ref;
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { dirty = true; }).observe(cv.parentElement);
 })();
-window.LAB = { ST, ACT, run, nextStep, readAt };
-log('Praktikum dimulai: ' + AN.nama + ' (' + AN.rumus + '). Ikuti kotak "Langkah berikutnya".');
+window.LAB = { ST, ACT, STEPS, run, curStep, readAt, ID, finishLog: () => { ST.logbook = { t: dstr, n: ID.nama, k: 'uji', s: ID.nama }; if (logResolve) { logResolve(); logResolve = null; } } };
+log('Praktikum virtual: ' + AN.nama + '. Ikuti kotak "Langkah sekarang".');
 updateOut(); sync(); drawPC(); requestAnimationFrame(loop);
 })();
 </script></body></html>
@@ -2237,7 +2674,7 @@ st.markdown("""
 html, body, .stApp, .stMarkdown, p, li, label { font-family:'Inter', system-ui, sans-serif; }
 h1, h2, h3, h4 { font-family:'Space Grotesk','Inter',sans-serif !important; letter-spacing:-.01em; color:var(--ink); }
 .stApp { background: radial-gradient(1100px 480px at 100% -8%, #ede8ff 0%, rgba(237,232,255,0) 60%), radial-gradient(900px 420px at -8% 0%, #e3f4ff 0%, rgba(227,244,255,0) 55%), #f7f8fc; }
-.block-container { padding-top: 1.6rem; max-width: 1400px; }
+.block-container { padding-top: 1.1rem; max-width: 1400px; }
 section[data-testid="stSidebar"] { background: linear-gradient(180deg,#14123a 0%,#1e1a5c 55%,#2d2172 100%); }
 section[data-testid="stSidebar"] * { color:#e6e4ff !important; }
 section[data-testid="stSidebar"] [data-baseweb="select"] * { color:#14123a !important; }
@@ -2290,6 +2727,9 @@ div[data-testid="stVerticalBlockBorderWrapper"] { border-radius: 16px; backgroun
 .feat .ic { font: 600 .72rem 'JetBrains Mono', monospace; color: var(--vio); letter-spacing:.1em; }
 .feat .h { font: 600 1rem 'Space Grotesk', sans-serif; color: var(--ink); margin: 4px 0; }
 .feat .b { color: var(--muted); font-size: .85rem; }
+.homeimg { max-width: 1000px; margin: 8px auto 6px; border-radius: 24px; overflow: hidden; background:#fff; border:1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(37,29,107,.45); }
+.homeimg img { display:block; width:100%; height:auto; }
+.homeimg .cap { text-align:center; padding: 16px 12px 18px; font: 700 1.7rem 'Space Grotesk', sans-serif; color: var(--ink); letter-spacing:-.01em; }
 .verdict { border-radius: 14px; padding: 10px 14px; font-weight: 500; margin: 6px 0; }
 .verdict.ok { background:#e3f8f2; color:#0b6b60; border:1px solid #bfece0; } .verdict.bad { background:#ffe9ed; color:#a8123a; border:1px solid #fecdd6; }
 </style>
@@ -2524,10 +2964,10 @@ def add_rainbow(fig, lo, hi):
                       fillcolor=lam_color(l0 + 2.5), line_width=0, layer="below", opacity=0.9)
 
 
-def model3d(height=560, lid=False, xray=True, compact=False, auto=False):
+def model3d(height=560, lid=False, xray=True, compact=False, auto=False, tour=False):
     init = {"lam": float(I["lam"]), "abs": float(I["last_A"]) if I["power"] == "ready" else 0.0,
             "status": "READY" if I["power"] == "ready" else "OFF", "solColor": "#d9f3f7" if I["solution"] == "blanko" else an()["warna"],
-            "lampSwitch": float(I["lamp_switch"]), "xray": xray, "lid": lid, "compact": compact, "auto": auto}
+            "lampSwitch": float(I["lamp_switch"]), "xray": xray, "lid": lid, "compact": compact, "auto": auto, "tour": tour}
     components.html(MODEL3D_HTML.replace("/*__INIT__*/null", json.dumps(init)), height=height, scrolling=False)
 
 
@@ -2539,48 +2979,29 @@ def csv_bytes(df):
 # ---------------------------------------------------------------------------
 # Halaman: Beranda
 # ---------------------------------------------------------------------------
+HOME_IMG = "data:image/jpeg;base64,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"
+
+
 def page_home():
-    reg = cal_reg()
-    c1, c2 = st.columns([1.1, 1], gap="large")
-    with c1:
-        html("""<div class="hero"><div class="eb">Politeknik AKA Bogor · Analisis Spektrofotometri</div>
-<h1>SPECTRA LAB 2.0</h1>
-<p>Ruang kerja analitik UV-Vis: simulasi instrumen double-beam bergaya UV-1700 PharmaSpec, analisis spektrum, kalibrasi Lambert–Beer dengan uji Mandel, adisi standar, analisis multikomponen, kualifikasi kinerja alat, dan laporan PDF otomatis.</p>
-<span class="pill sim"><span class="d"></span>MODE SIMULASI</span> <span class="pill"><span class="d"></span>190–1100 nm</span> <span class="pill"><span class="d"></span>Double-beam</span>
-<svg width="300" height="90" viewBox="0 0 300 90"><defs><linearGradient id="rb" x1="0" x2="1"><stop offset="0" stop-color="#7b3fe4"/><stop offset=".3" stop-color="#2f5bff"/><stop offset=".5" stop-color="#22c55e"/><stop offset=".7" stop-color="#facc15"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs>
-<path d="M0 80 C 40 78, 60 70, 80 50 S 110 8, 130 10 S 150 40, 165 38 S 185 16, 200 20 S 230 70, 300 78" fill="none" stroke="url(#rb)" stroke-width="3"/></svg></div>""")
-        kpis([("Spektrum", str(len(S["spectra"])), "tersimpan di pustaka", "indigo"),
-              ("Titik kalibrasi", str(len(cal_points())), S["cal_name"] or "belum ada", "violet"),
-              ("R²", fmt(reg.r2, 4) if reg and reg.ok else "—", "linearitas kurva", "teal" if reg and reg.ok and reg.r2 >= CR["r2_min"] else "amber"),
-              ("λ kerja", f"{fmt(S['cal_lambda'], 1)} nm" if S["cal_lambda"] else "—", "pengukuran kuantitatif", "amber")])
-        f1, f2, f3 = st.columns(3)
-        for col, (ic, h, b) in zip((f1, f2, f3), [("01 · INSTRUMEN", "Simulasi UV-1700", "Inisialisasi, baseline, auto zero, pemindaian, dan fotometri dengan derau dan sinar sesat realistis."),
-                                                 ("02 · ANALISIS", "Kalibrasi & matriks", "Regresi dengan SK 95 %, uji Mandel, adisi standar, dan multikomponen Vierordt/CLS."),
-                                                 ("03 · MUTU", "Validasi & PQ", "Presisi, Grubbs, Horwitz, recovery, serta kualifikasi kinerja Ph. Eur. 2.2.25.")]):
-            col.markdown(f'<div class="feat"><div class="ic">{ic}</div><div class="h">{h}</div><div class="b">{b}</div></div>', unsafe_allow_html=True)
-    with c2:
-        model3d(height=430, xray=False, compact=True, auto=True)
-        st.caption("Model 3D skematis mengikuti tata letak unit UV-1700 PharmaSpec di laboratorium; bukan gambar resmi pabrikan.")
-    if S["spectra"]:
-        sp = next((s for s in S["spectra"] if s["id"] == S["last_scan"]), S["spectra"][-1])
-        fig = fig_base("Panjang gelombang (nm)", "Absorbansi", 300)
-        fig.add_trace(go.Scatter(x=sp["lam"], y=sp["A"], mode="lines", name=sp["name"], line=dict(color=PAL[0], width=2.2), fill="tozeroy", fillcolor="rgba(79,70,229,.08)"))
-        add_rainbow(fig, min(sp["lam"]), max(sp["lam"]))
-        st.subheader("Spektrum terakhir"); show(fig)
-    else:
-        html('<div class="banner info">Coba <b>Praktikum Virtual 3D</b> untuk merasakan praktik langsung di meja laboratorium. Mulai dari <b>Panduan Praktikum</b> untuk alur langkah demi langkah, atau buka <b>Simulasi Instrumen</b> untuk menyalakan alat virtual.</div>')
+    html(f'''<div class="homeimg"><img src="{HOME_IMG}" alt="Spektrofotometer UV-Vis Shimadzu UV-1700 PharmaSpec">
+<div class="cap">Spektrofotometer UV-Vis Shimadzu UV-1700 PharmaSpec</div></div>''')
+    _, mid, _ = st.columns([1.2, 1, 1.2])
+    if mid.button("Mulai praktikum", type="primary", icon=":material/play_arrow:", key="home_go"):
+        st.switch_page(PG_LAB)
 
 
 # ---------------------------------------------------------------------------
 # Halaman: Model 3D
 # ---------------------------------------------------------------------------
 def page_model3d():
-    header("Instrumen", "Model 3D UV-1700", "Seret untuk memutar, roda/cubit untuk zoom, klik komponen untuk penjelasan. Gunakan Buka tutup, Tembus pandang, Terurai, dan Jalur cahaya. Warna berkas mengikuti λ instrumen virtual; kisi ventilasi kanan berpendar oranye saat lampu WI aktif.")
-    model3d(height=640, xray=True)
-    st.subheader("Fungsi komponen utama")
-    cols = st.columns(2)
-    for i, (k, v) in enumerate(COMPONENTS.items()):
-        cols[i % 2].markdown(f'<div class="feat" style="margin-bottom:10px"><div class="h">{k}</div><div class="b">{v}</div></div>', unsafe_allow_html=True)
+    header("Instrumen", "Bagian dalam alat dan prinsip kerja",
+           "Ikuti tur 9 langkah: lampu → pemilih sumber → monokromator → pembagi berkas → kuvet → detektor → pengolah sinyal → layar. "
+           "Geser λ dan konsentrasi untuk melihat lampu berganti, kisi berputar, dan intensitas berkas menurun menurut hukum Lambert–Beer.")
+    model3d(height=720, xray=True, tour=True)
+    with st.expander("Fungsi komponen utama"):
+        cols = st.columns(2)
+        for i, (k, v) in enumerate(COMPONENTS.items()):
+            cols[i % 2].markdown(f'<div class="feat" style="margin-bottom:10px"><div class="h">{k}</div><div class="b">{v}</div></div>', unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
@@ -2777,21 +3198,21 @@ def parse_lab_result(txt: str) -> dict:
 
 
 def page_lab():
-    header("Instrumen", "Praktikum Virtual 3D",
-           "Simulasi praktik langsung di meja laboratorium: sambungkan kabel daya ke UPS dan stop kontak, nyalakan UPS, komputer (CPU dan monitor), "
-           "dan UV-1700; bilas, isi, dan lap kuvet dengan tisu; masukkan kuvet ke kompartemen; lakukan baseline, auto zero, scan, dan pengukuran. "
-           "Hasil tampil di layar komputer, dan setiap kesalahan prosedur mengurangi skor.")
     keys = list(ANALYTES)
-    akey = st.selectbox("Percobaan (analit)", keys, index=keys.index(S.get("lab_an", "fephen")), format_func=lambda k: f"{ANALYTES[k]['nama']} · λref {ANALYTES[k]['lam_ref']} nm", key="lab_an_sel")
+    c1, c2 = st.columns([1.5, 1], vertical_alignment="bottom")
+    with c1:
+        html('<div class="ph" style="margin:0"><div class="eb">Praktikum · IK/LAB.INST/6</div><h1 style="font-size:1.6rem">Praktikum Virtual UV-1700</h1></div>')
+    with c2:
+        akey = st.selectbox("Percobaan", keys, index=keys.index(S.get("lab_an", "fephen")), format_func=lambda k: f"{ANALYTES[k]['nama']} · {ANALYTES[k]['lam_ref']} nm", key="lab_an_sel")
     if akey != S.get("lab_an"):
         S["lab_an"] = akey
     a = ANALYTES[akey]
-    html('<div class="banner info">Mengganti analit atau memuat ulang halaman akan mengulang praktikum dari awal. '
-         'Salin data dari panel <b>Data untuk Kurva Kalibrasi</b> sebelum berpindah. Kotak <b>Langkah berikutnya</b> menuntun urutan kerja yang benar.</div>')
     init = {"seed": int(S["seed"]) % 2147483647, "hidden": hidden_conc(akey, S["seed"]), "dec": S["settings"]["dec"], "unit": "mg/L",
             "analyte": {"nama": a["nama"], "rumus": a["rumus"], "pelarut": a["pelarut"], "lam_ref": a["lam_ref"], "k": float(a["k"]), "warna": a["warna"],
                         "bands": [list(b) for b in a["bands"]], "std": [float(x) for x in a["std"]]}}
-    components.html(LAB_HTML.replace("/*__LAB__*/null", json.dumps(init)), height=1320, scrolling=True)
+    components.html(LAB_HTML.replace("/*__LAB__*/null", json.dumps(init)), height=900, scrolling=True)
+    st.caption("Mengganti percobaan atau memuat ulang halaman mengulang praktikum dari awal; salin data dari panel di bawah 3D sebelum berpindah. "
+               "Tanda REK = langkah disusun dari prosedur baku UVProbe karena halaman 1 IK belum tersedia.")
     with st.container(border=True):
         st.markdown("**Impor hasil praktikum ke Kurva Kalibrasi**")
         txt = st.text_area("Tempel teks dari tombol Salin data", key="lab_paste", height=150,
@@ -3753,41 +4174,49 @@ def page_history():
 # ---------------------------------------------------------------------------
 # Navigasi & bilah samping
 # ---------------------------------------------------------------------------
-PAGES = {
-    "Ruang kerja": [st.Page(page_home, title="Beranda", icon=":material/space_dashboard:", url_path="beranda", default=True)],
-    "Instrumen": [st.Page(page_lab, title="Praktikum Virtual 3D", icon=":material/science:", url_path="praktikum-3d"),
-                  st.Page(page_model3d, title="Model 3D UV-1700", icon=":material/view_in_ar:", url_path="model-3d"),
-                  st.Page(page_instrument, title="Simulasi Instrumen", icon=":material/settings_input_component:", url_path="instrumen"),
-                  st.Page(page_photometric, title="Fotometri", icon=":material/light_mode:", url_path="fotometri"),
-                  st.Page(page_kinetics, title="Kinetika", icon=":material/timeline:", url_path="kinetika")],
-    "Analisis": [st.Page(page_spectrum, title="Analisis Spektrum", icon=":material/ssid_chart:", url_path="spektrum"),
-                 st.Page(page_calibration, title="Kurva Kalibrasi", icon=":material/show_chart:", url_path="kalibrasi"),
-                 st.Page(page_stdadd, title="Adisi Standar", icon=":material/add_chart:", url_path="adisi-standar"),
-                 st.Page(page_multi, title="Multikomponen", icon=":material/stacked_line_chart:", url_path="multikomponen")],
-    "Mutu": [st.Page(page_validation, title="Validasi Data", icon=":material/fact_check:", url_path="validasi"),
-             st.Page(page_pq, title="Kualifikasi Kinerja", icon=":material/verified:", url_path="kualifikasi")],
-    "Belajar": [st.Page(page_learn, title="Pembelajaran & Kuis", icon=":material/school:", url_path="belajar"),
-                st.Page(page_guide, title="Panduan Praktikum", icon=":material/checklist:", url_path="panduan")],
-    "Dokumen": [st.Page(page_report, title="Laporan", icon=":material/picture_as_pdf:", url_path="laporan"),
-                st.Page(page_history, title="Riwayat", icon=":material/history:", url_path="riwayat")],
-}
+ADV = bool(st.session_state.get("adv_menu", False))
+PG_HOME = st.Page(page_home, title="Beranda", icon=":material/home:", url_path="beranda", default=True)
+PG_LAB = st.Page(page_lab, title="Praktikum (sesuai IK)", icon=":material/science:", url_path="praktikum")
+PG_INNER = st.Page(page_model3d, title="Bagian dalam & prinsip", icon=":material/view_in_ar:", url_path="bagian-dalam")
+PG_CAL = st.Page(page_calibration, title="Olah data (kurva kalibrasi)", icon=":material/show_chart:", url_path="kalibrasi")
+PG_REP = st.Page(page_report, title="Laporan", icon=":material/picture_as_pdf:", url_path="laporan")
+if ADV:
+    PAGES = {
+        "Utama": [PG_HOME, PG_LAB, PG_INNER],
+        "Instrumen": [st.Page(page_instrument, title="Simulasi instrumen", icon=":material/settings_input_component:", url_path="instrumen"),
+                      st.Page(page_photometric, title="Fotometri", icon=":material/light_mode:", url_path="fotometri"),
+                      st.Page(page_kinetics, title="Kinetika", icon=":material/timeline:", url_path="kinetika")],
+        "Analisis": [st.Page(page_spectrum, title="Analisis spektrum", icon=":material/ssid_chart:", url_path="spektrum"), PG_CAL,
+                     st.Page(page_stdadd, title="Adisi standar", icon=":material/add_chart:", url_path="adisi-standar"),
+                     st.Page(page_multi, title="Multikomponen", icon=":material/stacked_line_chart:", url_path="multikomponen")],
+        "Mutu": [st.Page(page_validation, title="Validasi data", icon=":material/fact_check:", url_path="validasi"),
+                 st.Page(page_pq, title="Kualifikasi kinerja", icon=":material/verified:", url_path="kualifikasi")],
+        "Belajar": [st.Page(page_learn, title="Pembelajaran & kuis", icon=":material/school:", url_path="belajar"),
+                    st.Page(page_guide, title="Panduan praktikum", icon=":material/checklist:", url_path="panduan")],
+        "Dokumen": [PG_REP, st.Page(page_history, title="Riwayat", icon=":material/history:", url_path="riwayat")],
+    }
+else:
+    PAGES = [PG_HOME, PG_LAB, PG_INNER, PG_CAL, PG_REP]
 nav = st.navigation(PAGES)
 
 with st.sidebar:
     html("<div style='padding:4px 0 2px'><div style='font:700 1.25rem Space Grotesk,sans-serif;letter-spacing:.04em'>SPECTRA LAB 2.0</div>"
-         "<div style='font:500 .7rem JetBrains Mono,monospace;letter-spacing:.12em;opacity:.7'>UV-VIS ANALYTICAL WORKBENCH</div>"
+         "<div style='font:500 .7rem JetBrains Mono,monospace;letter-spacing:.12em;opacity:.7'>PRAKTIKUM UV-VIS · KELOMPOK 2</div>"
          "<div style='height:4px;margin-top:8px;border-radius:4px;background:linear-gradient(90deg,#7b3fe4,#2f5bff,#00b3d6,#22c55e,#facc15,#f97316,#ef4444)'></div></div>")
-    S["settings"]["mode"] = st.radio("Mode kerja", ["latihan", "analisis"], index=0 if S["settings"]["mode"] == "latihan" else 1,
-                                     format_func=lambda m: "Latihan (data contoh)" if m == "latihan" else "Analisis (data saya)")
-    S["settings"]["dec"] = st.radio("Pemisah desimal", ["koma", "titik"], index=0 if S["settings"]["dec"] == "koma" else 1,
-                                    format_func=lambda d: "Koma (0,512)" if d == "koma" else "Titik (0.512)", horizontal=True)
-    st.caption("Politeknik AKA Bogor · Analisis Kimia. Instrumen acuan: Shimadzu UV-1700 PharmaSpec. Aplikasi ini simulator edukatif dan tidak terhubung ke alat.")
+    st.toggle("Tampilkan semua menu", key="adv_menu", help="Menu analisis lanjutan: spektrum, adisi standar, multikomponen, validasi, kualifikasi, kuis, dll.")
+    with st.expander("Pengaturan"):
+        S["settings"]["mode"] = st.radio("Mode kerja", ["latihan", "analisis"], index=0 if S["settings"]["mode"] == "latihan" else 1,
+                                         format_func=lambda m: "Latihan (data contoh)" if m == "latihan" else "Analisis (data saya)")
+        S["settings"]["dec"] = st.radio("Pemisah desimal", ["koma", "titik"], index=0 if S["settings"]["dec"] == "koma" else 1,
+                                        format_func=lambda d: "Koma (0,512)" if d == "koma" else "Titik (0.512)", horizontal=True)
+    st.caption("Politeknik AKA Bogor · Analisis Kimia. Instrumen acuan: Shimadzu UV-1700 PharmaSpec. Simulator edukatif; tidak terhubung ke alat.")
 
-_bl = I["baseline"]
-html('<div class="topbar">' + pill("SIMULASI", "sim") +
-     pill("Instrumen siap" if I["power"] == "ready" else "Instrumen mati", "ok" if I["power"] == "ready" else "bad") +
-     pill(f"Baseline {int(_bl['start'])}–{int(_bl['end'])} nm" if _bl else "Baseline belum", "ok" if _bl else "sim") +
-     pill(f"λ {fmt(I['lam'], 1)} nm · {'D2' if I['lam'] < I['lamp_switch'] else 'WI'}") +
-     pill(f"{ANALYTES[I['analyte']]['rumus']} · {CUVETTES[I['cuvette']]['nama']}") + "</div>")
+if ADV:
+    _bl = I["baseline"]
+    html('<div class="topbar">' + pill("SIMULASI", "sim") +
+         pill("Instrumen siap" if I["power"] == "ready" else "Instrumen mati", "ok" if I["power"] == "ready" else "bad") +
+         pill(f"Baseline {int(_bl['start'])}–{int(_bl['end'])} nm" if _bl else "Baseline belum", "ok" if _bl else "sim") +
+         pill(f"λ {fmt(I['lam'], 1)} nm · {'D2' if I['lam'] < I['lamp_switch'] else 'WI'}") +
+         pill(f"{ANALYTES[I['analyte']]['rumus']} · {CUVETTES[I['cuvette']]['nama']}") + "</div>")
 
 nav.run()
