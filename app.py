@@ -1785,10 +1785,10 @@ const WASH0 = [-47, -1.4, 30.5];
 const WASHTIP = [WASH0[0] + 4.9, WASH0[1] + 19.4 + 4.11, WASH0[2]];
 // gelas piala berisi Sampel X (di samping botol akuades)
 const BKX = -40.5, BKZ = 33.5;
-cyl('beaker', 'fl_X', BKX, BKZ, 3.2, -1.4, 6.5, '#dfeff5', { alpha: 0.4, open: true }, 16); cyl('beaker', 'fl_X', BKX, BKZ, 3.0, -1.3, 1.6, '#c7dce6', { alpha: 0.55 }, 16);
-cyl('beaker', 'fl_X', BKX, BKZ, 2.95, -1.2, 4.6, '#cfe6ee', { alpha: 0.5, topCol: '#e9f6fa' }, 16);
-box('beaker', 'fl_X', BKX + 2.8, BKX + 4.0, 5.6, 6.5, BKZ - 0.6, BKZ + 0.6, '#dfeff5', { alpha: 0.5, cell: 99 });
-box('beaker', 'fl_X', BKX - 1.6, BKX + 1.6, 0.4, 3.6, BKZ + 3.18, BKZ + 3.3, '#ffffff', { bias: -3, cell: 99, text: { face: 'f', w: 90, h: 72, lines: [['SAMPEL', 45, 30, 'center', '700 20px Arial', '#111827'], ['X', 45, 58, 'center', '700 26px Arial', '#111827']] } });
+cyl('beaker', 'beakerW', BKX, BKZ, 3.2, -1.4, 6.5, '#dfeff5', { alpha: 0.4, open: true }, 16); cyl('beaker', 'beakerW', BKX, BKZ, 3.0, -1.3, 1.6, '#c7dce6', { alpha: 0.55 }, 16);
+cyl('beaker', 'beakerW', BKX, BKZ, 2.95, -1.2, 4.6, '#cfe6ee', { alpha: 0.5, topCol: '#e9f6fa' }, 16);
+box('beaker', 'beakerW', BKX + 2.8, BKX + 4.0, 5.6, 6.5, BKZ - 0.6, BKZ + 0.6, '#dfeff5', { alpha: 0.5, cell: 99 });
+box('beaker', 'beakerW', BKX - 1.6, BKX + 1.6, 0.4, 3.6, BKZ + 3.18, BKZ + 3.3, '#ffffff', { bias: -3, cell: 99, text: { face: 'f', w: 90, h: 72, lines: [['LIMBAH', 45, 40, 'center', '700 19px Arial', '#111827']] } });
 box('logbook', 'room', -104, -88, -1.4, -0.4, 20, 33, '#1e3a8a', { cell: 99, faceCol: { t: '#22409a' }, text: { face: 't', w: 120, h: 100, lines: [['LOG BOOK', 60, 40, 'center', '700 15px Arial', '#e0e7ff'], ['UV-1700', 60, 60, 'center', '600 12px Arial', '#c7d2fe']] } });
 box('logbook', 'room', -86, -85.4, -0.6, -0.1, 21, 31, '#111', {});
 box('drymat', 'room', -20, -7, -1.4, -1.25, 26, 34, '#ffffff', { cell: 99 });
@@ -1796,7 +1796,7 @@ box('drymat', 'room', -20, -7, -1.4, -1.25, 26, 34, '#ffffff', { cell: 99 });
 const FLY = -1.4, FS = 0.74;
 const FPROF = [[0, 0], [2.5, 0], [3.4, 0.5], [4.0, 1.6], [4.25, 3.1], [4.0, 4.7], [3.2, 6.1], [2.0, 7.3], [1.1, 8.3], [0.78, 9.4], [0.74, 15.2], [0.9, 15.7], [0.98, 16.2]].map(([r, y]) => [r * FS, FLY + y * FS]);
 const FMARK = FLY + 12.9 * FS, FTOP = FLY + 16.2 * FS;
-const FL = { X: { x: BKX, z: BKZ, h: 7.9, ox: 3.4 } }; const STDK = SOL_KEYS.filter(k => SOL[k].std); const FLK = ['blank'].concat(STDK); FLK.forEach((k, i) => { FL[k] = { x: -88 + i * 6.6, z: 26 }; });
+const FL = {}; const STDK = SOL_KEYS.filter(k => SOL[k].std); const FLK = STDK.concat(['X']); FLK.forEach((k, i) => { FL[k] = { x: -88 + i * 6.6, z: 26 }; });
 FLK.forEach(k => { const f = FL[k], g = 'fl_' + k;
   lathe('flask', g, f.x, f.z, FPROF, '#e9f4f8', { alpha: 0.34 }, 10);
   lathe('flask', g, f.x, f.z, clipProf(FPROF, FMARK, 0.13), SOL[k].col, { alpha: 0.9, topCol: mix(SOL[k].col, '#ffffff', 0.35) }, 10);
@@ -2302,7 +2302,8 @@ const ACT = {
     setView('isi'); if (c.content) await tween(0.5, t => { c.level = 0.85 * (1 - t); });
     await washBottle(c, false);
     log('Kuvet ' + (k === 'R' ? 'referensi' : 'sampel') + ' dibilas akuades dari botol semprot, dibilas dengan ' + SOL[sid].short + ', lalu diisi ±¾ volume.');
-    { await pourFlask(sid, c, true); await tween(0.4, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0; await pourFlask(sid, c, false); }
+    if (sid === 'blank') { await washBottle(c, true); }
+    else { await pourFlask(sid, c, true); await tween(0.4, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0; await pourFlask(sid, c, false); }
     c.dirty = true; c.smudge = 0; c.wet = false;
   },
   async empty() { const k = selCuv(), c = ST.cuv[k]; if (c.where !== 'rak') return toast('Keluarkan kuvet dahulu.', 'warn'); if (!c.content) return; setView('kerja'); await tween(0.5, t => { c.level = 0.85 * (1 - t); }); c.content = null; c.level = 0; log('Isi kuvet dibuang ke gelas buangan.'); },
@@ -3098,24 +3099,14 @@ def rpd_pct(c1, c2) -> float:
 
 def page_qc():
     st.subheader("Presisi dan akurasi: %RPD dan %Recovery")
-    cs = []
-    reg = cal_reg()
-    for s_ in S["samples"]:
-        r_ = sample_res(s_, reg) if reg else None
-        if r_:
-            cs.append((s_["name"], float(r_["c_final"])))
-    opt = ["(isi manual)"] + [f"{n} · {sig(c)}" for n, c in cs]
     q1, q2 = st.columns(2, gap="large")
     with q1:
         with st.container(border=True):
             st.markdown("**%RPD (duplo)**")
-            i1 = st.selectbox("Hasil duplo 1", opt, index=1 if len(cs) > 0 else 0, key="rpd_s1")
-            i2 = st.selectbox("Hasil duplo 2", opt, index=2 if len(cs) > 1 else 0, key="rpd_s2")
-            d1 = st.text_input("Konsentrasi duplo 1 (manual)", "", key="rpd_m1", disabled=i1 != opt[0])
-            d2 = st.text_input("Konsentrasi duplo 2 (manual)", "", key="rpd_m2", disabled=i2 != opt[0])
+            d1 = st.text_input("Konsentrasi duplo 1", "", key="rpd_m1")
+            d2 = st.text_input("Konsentrasi duplo 2", "", key="rpd_m2")
             lim = st.number_input("Batas %RPD", 0.1, 50.0, 5.0, 0.5, key="rpd_lim")
-            v1 = cs[opt.index(i1) - 1][1] if i1 != opt[0] else num_in(d1)
-            v2 = cs[opt.index(i2) - 1][1] if i2 != opt[0] else num_in(d2)
+            v1, v2 = num_in(d1), num_in(d2)
             if not (math.isnan(v1) or math.isnan(v2)) and (v1 + v2) > 0:
                 rpd = rpd_pct(v1, v2)
                 f4 = lambda x: fmt(x, 4).replace(",", "{,}")
@@ -3123,14 +3114,12 @@ def page_qc():
                 st.latex(r"= \frac{|" + f4(v1) + " - " + f4(v2) + r"|}{(" + f4(v1) + " + " + f4(v2) + r")/2} \times 100 = \frac{" + f4(abs(v1 - v2)) + "}{" + f4((v1 + v2) / 2) + r"} \times 100 = " + fmt(rpd, 2) + r"\ \%")
                 verdict(rpd <= lim, f"%RPD = {fmt(rpd, 2)} % " + (f"≤ {fmt(lim, 1)} % (memenuhi)" if rpd <= lim else f"> {fmt(lim, 1)} % (tidak memenuhi)"))
             else:
-                st.caption("Pilih dua hasil sampel atau isi konsentrasi secara manual.")
+                st.caption("Isi konsentrasi duplo 1 dan duplo 2.")
     with q2:
         with st.container(border=True):
             st.markdown("**%Recovery (spike)**")
-            j1 = st.selectbox("Sampel tanpa spike", opt, index=1 if len(cs) > 0 else 0, key="rec_s1")
-            j2 = st.selectbox("Sampel dengan spike", opt, index=2 if len(cs) > 1 else 0, key="rec_s2")
-            e1 = st.text_input("C sampel (manual)", "", key="rec_m1", disabled=j1 != opt[0])
-            e2 = st.text_input("C sampel + spike (manual)", "", key="rec_m2", disabled=j2 != opt[0])
+            e1 = st.text_input("C sampel (tanpa spike)", "", key="rec_m1")
+            e2 = st.text_input("C sampel + spike", "", key="rec_m2")
             ad_mode = st.radio("C spike yang ditambahkan", ["Hitung dari larutan induk spike", "Isi langsung"], horizontal=True, key="rec_admode")
             if ad_mode.startswith("Hitung"):
                 g1, g2, g3 = st.columns(3)
@@ -3143,8 +3132,7 @@ def page_qc():
                     st.caption("C spike = C larutan spike × V spike / V akhir = " + fmt(cst, 4) + " × " + fmt(vsp, 3) + " / " + fmt(vtt, 3) + " = " + fmt(cad_calc, 4))
             else:
                 ad = st.text_input("C spike yang ditambahkan (setelah pengenceran)", "", key="rec_add")
-            c0 = cs[opt.index(j1) - 1][1] if j1 != opt[0] else num_in(e1)
-            c1_ = cs[opt.index(j2) - 1][1] if j2 != opt[0] else num_in(e2)
+            c0, c1_ = num_in(e1), num_in(e2)
             cad = float(ad) if ad_mode.startswith("Hitung") and ad else num_in(ad)
             if not any(math.isnan(x) for x in (c0, c1_, cad)) and cad > 0:
                 Rv = recovery_spike(c0, c1_, cad)
@@ -3154,7 +3142,7 @@ def page_qc():
                 st.latex(r"= \frac{" + f4(c1_) + " - " + f4(c0) + "}{" + f4(cad) + r"} \times 100 = \frac{" + f4(c1_ - c0) + "}{" + f4(cad) + r"} \times 100 = " + fmt(Rv, 2) + r"\ \%")
                 verdict(ok_, f"%Recovery = {fmt(Rv, 2)} % (kriteria {fmt(CR['rec_min'], 0)}–{fmt(CR['rec_max'], 0)} %): " + ("memenuhi" if ok_ else "tidak memenuhi"))
             else:
-                st.caption("Isi C spike yang ditambahkan dan pilih/isi dua hasil.")
+                st.caption("Isi C sampel, C sampel + spike, dan C spike.")
 
 
 # ---------------------------------------------------------------------------
@@ -3168,7 +3156,7 @@ def page_calibration():
     S["cal_unit"] = c2.selectbox("Satuan", units, index=units.index(S["cal_unit"]))
     lam_txt = c3.text_input("λ ukur (nm)", fmt(S["cal_lambda"], 1) if S["cal_lambda"] else "")
     S["cal_lambda"] = num_in(lam_txt, None) if lam_txt else None
-    S["cal_zero"] = c4.checkbox("Paksa melalui nol", S["cal_zero"], help="Hanya dibenarkan bila intersep tidak berbeda nyata dari nol.")
+    S["cal_zero"] = False
     L, Rr = st.columns([1, 1.6], gap="large")
     with L:
         html("<b>Larutan standar</b> " + src_pill(S["cal_src"]))
