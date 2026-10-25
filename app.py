@@ -980,7 +980,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 <div class="rg"><span>λ = <b id="lv2"></b> nm</span><span id="lamp2" class="hint"></span></div><input type="range" id="lam2" min="190" max="1100" step="1">
 <div class="rg"><span>C = <b id="cv2"></b> mg/L</span><span class="hint">ε·b = 0,20 L mg⁻¹ (b = 1 cm)</span></div><input type="range" id="conc" min="0" max="10" step="0.1" value="2.5">
 <div class="meter" style="margin-top:6px"><span>I₀</span><span class="b"><i id="b0" style="background:#4f46e5;width:100%"></i></span><b id="v0">100</b><span>I</span><span class="b"><i id="b1" style="background:#0d9488"></i></span><b id="v1"></b><span>%T</span><span class="b"><i id="b2" style="background:#d4a017"></i></span><b id="v2"></b><span>A</span><span class="b"><i id="b3" style="background:#e11d48"></i></span><b id="v3"></b></div></div>
-<div class="card tourcard"><h4>Tampilan</h4><div class="tg"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="lid" aria-pressed="false">Buka tutup (masukkan kuvet)</button></div></div>
+<div class="card tourcard"><h4>Tampilan</h4><div class="tg"><button data-t="top" aria-pressed="false">Pisahkan bagian atas</button><button data-t="side" aria-pressed="false">Pisahkan bagian samping</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="lid" aria-pressed="false">Buka tutup (masukkan kuvet)</button></div></div>
 <div class="card plain"><h4>Tampilan</h4><div class="tg">
 <button data-t="lid" aria-pressed="false">Buka tutup</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="expl" aria-pressed="false">Terurai</button><button data-t="beam" aria-pressed="false">Jalur cahaya</button><button data-t="labels" aria-pressed="false">Label</button><button data-t="auto" aria-pressed="false">Putar otomatis</button></div></div>
 <div class="card plain"><h4><span class="sw" id="sw"></span>λ = <span id="lv"></span> nm</h4><input type="range" id="lam" min="190" max="1100" step="1"><div class="hint" id="lamp"></div></div>
@@ -1047,7 +1047,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     constructor(canvas, opt) {
       this.cv = canvas; this.ctx = canvas.getContext('2d'); this.opt = opt || {};
       this.yaw = -32; this.pitch = 24; this.dist = 84; this.target = [0, 9, 0];
-      this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.xray = 0; this.xrayT = 0;
+      this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.topX = 0; this.topT = 0; this.sideX = 0; this.sideT = 0; this.xray = 0; this.xrayT = 0;
       this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false;
       this.lam = 550; this.lampSwitch = 340.8; this.abs = 0; this.status = 'READY'; this.solColor = '#8e2c8f';
       this._build(); this._bind(); this._loop = this._loop.bind(this);
@@ -1160,14 +1160,16 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     toggle(what, on) {
       const flip = (cur) => on == null ? (cur ? 0 : 1) : (on ? 1 : 0);
       if (what === 'lid') this.lidT = flip(this.lidT);
-      if (what === 'expl') this.explT = flip(this.explT);
+      if (what === 'expl') { var nv = flip(this.explT); this.topT = nv; this.sideT = nv; }
+      if (what === 'top') this.topT = flip(this.topT);
+      if (what === 'side') this.sideT = flip(this.sideT);
       if (what === 'xray') this.xrayT = flip(this.xrayT);
       if (what === 'beam') this.beam = on == null ? !this.beam : !!on;
       if (what === 'labels') this.labels = on == null ? !this.labels : !!on;
       if (what === 'auto') this.auto = on == null ? !this.auto : !!on;
       this._kick(); return this.state();
     }
-    state() { return { lid: this.lidT, expl: this.explT, xray: this.xrayT, beam: this.beam, labels: this.labels, auto: this.auto }; }
+    state() { return { lid: this.lidT, expl: this.explT, top: this.topT, side: this.sideT, xray: this.xrayT, beam: this.beam, labels: this.labels, auto: this.auto }; }
     view(name) {
       const V = { depan: [0, 8], samping: [90, 10], atas: [0, 88], belakang: [180, 14], iso: [-32, 24], kompartemen: [-8, 55] };
       const v = V[name] || V.iso; this._anim = { from: [this.yaw, this.pitch], to: v, t: 0 }; this._kick();
@@ -1179,7 +1181,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     _loop(now) {
       const dt = Math.min(0.05, (now - this._last) / 1000); this._last = now;
       const ease = (cur, tgt, sp) => { const d = tgt - cur; return Math.abs(d) < 0.002 ? tgt : cur + d * Math.min(1, dt * sp); };
-      this.lid = ease(this.lid, this.lidT, 5); this.expl = ease(this.expl, this.explT, 4); this.xray = ease(this.xray, this.xrayT, 5);
+      this.lid = ease(this.lid, this.lidT, 5); this.topX = ease(this.topX, this.topT, 4); this.sideX = ease(this.sideX, this.sideT, 4); this.explT = Math.max(this.topT, this.sideT); this.expl = Math.max(this.topX, this.sideX); this.xray = ease(this.xray, this.xrayT, 5);
       if (this._anim) {
         const a = this._anim; a.t = Math.min(1, a.t + dt * 2.2); const k = a.t < 0.5 ? 2 * a.t * a.t : 1 - Math.pow(-2 * a.t + 2, 2) / 2;
         let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
@@ -1190,16 +1192,16 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (this.auto && !this._drag) this.yaw += dt * 18;
       if (this.flow && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
       this._ld = now; this.draw();
-      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam);
+      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam);
       if (busy) requestAnimationFrame(this._loop); else this._running = false;
     }
     _xf(p, part) {
       let q = p;
       if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
-      if (part.grp === 'lid') { q = rotX(q, [0, 15, -2.2], -102 * this.lid * D2R); q = [q[0], q[1] + 16 * this.expl, q[2]]; }
-      if (part.grp === 'cover') q = [q[0], q[1] + 16 * this.expl, q[2]];
+      if (part.grp === 'lid') { q = rotX(q, [0, 15, -2.2], -102 * this.lid * D2R); q = [q[0], q[1] + 16 * this.topX, q[2]]; }
+      if (part.grp === 'cover') q = [q[0], q[1] + 16 * this.topX, q[2]];
       if (part.id === 'cuvR' || part.id === 'cuvS') q = [q[0], q[1] + 9 * this.lid, q[2]];
-      if (part.ex) q = [q[0] + part.ex[0] * this.expl, q[1] + part.ex[1] * this.expl, q[2] + part.ex[2] * this.expl];
+      if (part.ex) q = [q[0] + part.ex[0] * this.sideX, q[1] + part.ex[1] * this.sideX, q[2] + part.ex[2] * this.sideX];
       if (part.id === 'grating') q = rotY(q, [3.5, 0, -21.2], (this.lam - 600) * 0.012 * D2R);
       return q;
     }
@@ -1421,8 +1423,8 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     $('#wrap').classList.add('tour'); $('#badge').textContent = 'BAGIAN DALAM UV-1700 · PRINSIP KERJA'; m.tour = true; m.flow = true;
     var sb = $('#steps'); TOUR.forEach(function (_, k) { var b = document.createElement('button'); b.textContent = k + 1; b.title = TOUR[k].t; b.addEventListener('click', function () { goStep(k); }); sb.appendChild(b); });
     $('#prev').addEventListener('click', function () { goStep(cur - 1); }); $('#next').addEventListener('click', function () { goStep(cur === TOUR.length - 1 ? 0 : cur + 1); });
-    m.toggle('expl', true); $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
-    INIT.xray = false; m.toggle('expl', true);
+    $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
+    INIT.xray = true;
   }
   m.toggle('beam', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
   setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
@@ -3774,44 +3776,22 @@ def page_history():
 # ---------------------------------------------------------------------------
 # Navigasi & bilah samping
 # ---------------------------------------------------------------------------
-ADV = bool(st.session_state.get("adv_menu", False))
 PG_HOME = st.Page(page_home, title="Beranda", icon=":material/home:", url_path="beranda", default=True)
 PG_LAB = st.Page(page_lab, title="3D UV-1700", icon=":material/science:", url_path="praktikum")
 PG_INNER = st.Page(page_model3d, title="Bagian dalam & prinsip", icon=":material/view_in_ar:", url_path="bagian-dalam")
 PG_CAL = st.Page(page_calibration, title="Olah data (kurva kalibrasi)", icon=":material/show_chart:", url_path="kalibrasi")
-PG_REP = st.Page(page_report, title="Laporan", icon=":material/picture_as_pdf:", url_path="laporan")
-if ADV:
-    PAGES = {
-        "Utama": [PG_HOME, PG_LAB, PG_INNER],
-        "Analisis": [PG_CAL],
-        "Mutu": [st.Page(page_validation, title="Validasi data", icon=":material/fact_check:", url_path="validasi"),
-                 st.Page(page_pq, title="Kualifikasi kinerja", icon=":material/verified:", url_path="kualifikasi")],
-        "Belajar": [st.Page(page_learn, title="Pembelajaran & kuis", icon=":material/school:", url_path="belajar"),
-                    st.Page(page_guide, title="Panduan praktikum", icon=":material/checklist:", url_path="panduan")],
-        "Dokumen": [PG_REP, st.Page(page_history, title="Riwayat", icon=":material/history:", url_path="riwayat")],
-    }
-else:
-    PAGES = [PG_HOME, PG_LAB, PG_INNER, PG_CAL, PG_REP]
+PAGES = [PG_HOME, PG_LAB, PG_INNER, PG_CAL]
 nav = st.navigation(PAGES)
 
 with st.sidebar:
     html("<div style='padding:4px 0 2px'><div style='font:700 1.25rem Space Grotesk,sans-serif;letter-spacing:.04em'>SHIMADZU UV-1700</div>"
          "<div style='font:500 .7rem JetBrains Mono,monospace;letter-spacing:.12em;opacity:.7'>PRAKTIKUM UV-VIS · KELOMPOK 2</div>"
          "<div style='height:4px;margin-top:8px;border-radius:4px;background:linear-gradient(90deg,#7b3fe4,#2f5bff,#00b3d6,#22c55e,#facc15,#f97316,#ef4444)'></div></div>")
-    st.toggle("Tampilkan semua menu", key="adv_menu", help="Menu analisis lanjutan: spektrum, adisi standar, multikomponen, validasi, kualifikasi, kuis, dll.")
     with st.expander("Pengaturan"):
         S["settings"]["mode"] = st.radio("Mode kerja", ["latihan", "analisis"], index=0 if S["settings"]["mode"] == "latihan" else 1,
                                          format_func=lambda m: "Latihan (data contoh)" if m == "latihan" else "Analisis (data saya)")
         S["settings"]["dec"] = st.radio("Pemisah desimal", ["koma", "titik"], index=0 if S["settings"]["dec"] == "koma" else 1,
                                         format_func=lambda d: "Koma (0,512)" if d == "koma" else "Titik (0.512)", horizontal=True)
     st.caption("Politeknik AKA Bogor · Analisis Kimia. Instrumen acuan: Shimadzu UV-1700 PharmaSpec. Simulator edukatif; tidak terhubung ke alat.")
-
-if ADV:
-    _bl = I["baseline"]
-    html('<div class="topbar">' + pill("SIMULASI", "sim") +
-         pill("Instrumen siap" if I["power"] == "ready" else "Instrumen mati", "ok" if I["power"] == "ready" else "bad") +
-         pill(f"Baseline {int(_bl['start'])}–{int(_bl['end'])} nm" if _bl else "Baseline belum", "ok" if _bl else "sim") +
-         pill(f"λ {fmt(I['lam'], 1)} nm · {'D2' if I['lam'] < I['lamp_switch'] else 'WI'}") +
-         pill(f"{ANALYTES[I['analyte']]['rumus']} · {CUVETTES[I['cuvette']]['nama']}") + "</div>")
 
 nav.run()
