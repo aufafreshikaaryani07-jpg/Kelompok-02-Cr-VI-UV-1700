@@ -3090,6 +3090,10 @@ def kin_result():
 
 
 
+def rpd_pct(c1, c2) -> float:
+    return abs(c1 - c2) / ((c1 + c2) / 2) * 100
+
+
 def page_qc():
     st.subheader("Presisi dan akurasi: %RPD dan %Recovery")
     cs = []
@@ -3111,8 +3115,10 @@ def page_qc():
             v1 = cs[opt.index(i1) - 1][1] if i1 != opt[0] else num_in(d1)
             v2 = cs[opt.index(i2) - 1][1] if i2 != opt[0] else num_in(d2)
             if not (math.isnan(v1) or math.isnan(v2)) and (v1 + v2) > 0:
-                rpd = abs(v1 - v2) / ((v1 + v2) / 2) * 100
-                st.latex(r"\%RPD = \frac{|C_1 - C_2|}{(C_1 + C_2)/2} \times 100 = " + fmt(rpd, 2).replace(",", "{,}") + r"\ \%")
+                rpd = rpd_pct(v1, v2)
+                f4 = lambda x: fmt(x, 4).replace(",", "{,}")
+                st.latex(r"\%RPD = \frac{|C_1 - C_2|}{(C_1 + C_2)/2} \times 100")
+                st.latex(r"= \frac{|" + f4(v1) + " - " + f4(v2) + r"|}{(" + f4(v1) + " + " + f4(v2) + r")/2} \times 100 = \frac{" + f4(abs(v1 - v2)) + "}{" + f4((v1 + v2) / 2) + r"} \times 100 = " + fmt(rpd, 2) + r"\ \%")
                 verdict(rpd <= lim, f"%RPD = {fmt(rpd, 2)} % " + (f"≤ {fmt(lim, 1)} % (memenuhi)" if rpd <= lim else f"> {fmt(lim, 1)} % (tidak memenuhi)"))
             else:
                 st.caption("Pilih dua hasil sampel atau isi konsentrasi secara manual.")
@@ -3123,15 +3129,28 @@ def page_qc():
             j2 = st.selectbox("Sampel dengan spike", opt, index=2 if len(cs) > 1 else 0, key="rec_s2")
             e1 = st.text_input("C sampel (manual)", "", key="rec_m1", disabled=j1 != opt[0])
             e2 = st.text_input("C sampel + spike (manual)", "", key="rec_m2", disabled=j2 != opt[0])
-            ad = st.text_input("C spike yang ditambahkan (setelah pengenceran)", "", key="rec_add")
+            ad_mode = st.radio("C spike yang ditambahkan", ["Hitung dari larutan induk spike", "Isi langsung"], horizontal=True, key="rec_admode")
+            if ad_mode.startswith("Hitung"):
+                g1, g2, g3 = st.columns(3)
+                cst = num_in(g1.text_input("C larutan spike", "", key="rec_cst"))
+                vsp = num_in(g2.text_input("V spike (mL)", "", key="rec_vsp"))
+                vtt = num_in(g3.text_input("V akhir labu (mL)", "", key="rec_vtt"))
+                cad_calc = cst * vsp / vtt if not any(math.isnan(x) for x in (cst, vsp, vtt)) and vtt > 0 else float("nan")
+                ad = "" if math.isnan(cad_calc) else str(cad_calc)
+                if not math.isnan(cad_calc):
+                    st.caption("C spike = C larutan spike × V spike / V akhir = " + fmt(cst, 4) + " × " + fmt(vsp, 3) + " / " + fmt(vtt, 3) + " = " + fmt(cad_calc, 4))
+            else:
+                ad = st.text_input("C spike yang ditambahkan (setelah pengenceran)", "", key="rec_add")
             c0 = cs[opt.index(j1) - 1][1] if j1 != opt[0] else num_in(e1)
             c1_ = cs[opt.index(j2) - 1][1] if j2 != opt[0] else num_in(e2)
-            cad = num_in(ad)
+            cad = float(ad) if ad_mode.startswith("Hitung") and ad else num_in(ad)
             if not any(math.isnan(x) for x in (c0, c1_, cad)) and cad > 0:
                 Rv = recovery_spike(c0, c1_, cad)
                 ok_ = CR["rec_min"] <= Rv <= CR["rec_max"]
-                st.latex(r"\%Recovery = \frac{C_{spike+sampel} - C_{sampel}}{C_{spike}} \times 100 = " + fmt(Rv, 1).replace(",", "{,}") + r"\ \%")
-                verdict(ok_, f"%Recovery = {fmt(Rv, 1)} % (kriteria {fmt(CR['rec_min'], 0)}–{fmt(CR['rec_max'], 0)} %): " + ("memenuhi" if ok_ else "tidak memenuhi"))
+                f4 = lambda x: fmt(x, 4).replace(",", "{,}")
+                st.latex(r"\%Recovery = \frac{C_{sampel+spike} - C_{sampel}}{C_{spike}} \times 100")
+                st.latex(r"= \frac{" + f4(c1_) + " - " + f4(c0) + "}{" + f4(cad) + r"} \times 100 = \frac{" + f4(c1_ - c0) + "}{" + f4(cad) + r"} \times 100 = " + fmt(Rv, 2) + r"\ \%")
+                verdict(ok_, f"%Recovery = {fmt(Rv, 2)} % (kriteria {fmt(CR['rec_min'], 0)}–{fmt(CR['rec_max'], 0)} %): " + ("memenuhi" if ok_ else "tidak memenuhi"))
             else:
                 st.caption("Isi C spike yang ditambahkan dan pilih/isi dua hasil.")
 
@@ -3350,6 +3369,8 @@ def page_validation():
         CR["std_res_max"] = c[4].number_input("|e/s| maks", 0.5, 5.0, CR["std_res_max"], 0.5)
         CR["a_min"] = c[5].number_input("A min kerja", 0.0, 3.0, CR["a_min"], 0.05)
         CR["a_max"] = c[6].number_input("A maks kerja", 0.0, 3.0, CR["a_max"], 0.05)
+    page_qc()
+    st.divider()
     v = S["valid"]
     p1, p2 = st.columns(2, gap="large")
     with p1:
