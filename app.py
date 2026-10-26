@@ -2825,6 +2825,11 @@ import plotly.io as pio
 import streamlit as st
 import streamlit.components.v1 as components
 
+try:  # paksa tema terang agar teks tidak putih di atas latar terang (mode gelap peramban/Windows)
+    from streamlit import config as _stcfg
+    _stcfg.set_option("theme.base", "light")
+except Exception:
+    pass
 st.set_page_config(page_title="SHIMADZU UV-1700", page_icon=":material/biotech:", layout="wide", initial_sidebar_state="expanded")
 
 
@@ -2850,6 +2855,14 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 :root{--ink:#14123a;--muted:#5b6386;--line:#e1e4f2;--ind:#4f46e5;--vio:#7c3aed;--teal:#0d9488;--amb:#d4a017;--rose:#e11d48}
 html, body, .stApp, .stMarkdown, p, li, label { font-family:'Inter', system-ui, sans-serif; }
+/* teks tetap terbaca di mode gelap: area utama selalu memakai tinta gelap di atas latar terang */
+:root, .stApp { color-scheme: light; }
+.stApp { color: var(--ink); }
+[data-testid="stMain"] :is(p, li, label, h1, h2, h3, h4, h5, h6, small, span, td, th, strong, em, summary, code):not(.pill):not(.pill *):not(.hero *):not(.lcd *):not(.verdict *):not([data-testid="stAlert"] *):not(.kpi *):not(.step *):not(.eq *):not(.banner *):not(.feat *):not(.homeimg *):not(.ph *):not(.stButton *):not(.stDownloadButton *) { color: var(--ink); }
+[data-testid="stMain"] [data-testid="stCaptionContainer"], [data-testid="stMain"] [data-testid="stCaptionContainer"] * { color: var(--muted) !important; }
+[data-testid="stMain"] input, [data-testid="stMain"] textarea, [data-testid="stMain"] [data-baseweb="select"] > div, [data-testid="stMain"] [data-baseweb="input"] { background-color:#ffffff !important; color: var(--ink) !important; }
+[data-testid="stMain"] [data-testid="stExpander"] details { background:#ffffff; border-radius:12px; }
+
 h1, h2, h3, h4 { font-family:'Space Grotesk','Inter',sans-serif !important; letter-spacing:-.01em; color:var(--ink); }
 .stApp { background: radial-gradient(1100px 480px at 100% -8%, #ede8ff 0%, rgba(237,232,255,0) 60%), radial-gradient(900px 420px at -8% 0%, #e3f4ff 0%, rgba(227,244,255,0) 55%), #f7f8fc; }
 .block-container { padding-top: 1.1rem; max-width: 1400px; }
