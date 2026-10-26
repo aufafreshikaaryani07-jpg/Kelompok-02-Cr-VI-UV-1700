@@ -957,6 +957,8 @@ h4{margin:0 0 6px;font-size:13px}.hint{color:var(--muted);font-size:12px}
 input[type=range]{width:100%;accent-color:var(--acc)}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid rgba(0,0,0,.15)}
 .wrap.tour{grid-template-columns:minmax(0,1fr) 330px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}.chips button{font-size:11.5px;padding:3px 8px;border-radius:99px;color:var(--muted)}.chips button.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.cmpi{margin-top:8px}
 .wrap.slave,.wrap.slave.tour{grid-template-columns:1fr!important;padding:0}.wrap.slave .side,.wrap.slave .views,.wrap.slave .tools,.wrap.slave .badge{display:none!important}.wrap.slave .stage{border:0;border-radius:0}
 .tourcard{display:none}.wrap.tour .tourcard{display:block}.wrap.tour .plain{display:none}
 .steps{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
@@ -976,7 +978,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 <div class="badge" id="badge">UV-1700 · MODEL 3D</div>
 <div class="tools"><button data-z="0.85" title="Perbesar">+</button><button data-z="1.18" title="Perkecil">−</button><button id="rs" title="Tampilan awal">⟲</button></div>
 <div class="views"><button data-v="iso" class="on">Isometrik</button><button data-v="depan">Depan</button><button data-v="samping">Kanan</button><button data-v="belakang">Belakang</button><button data-v="atas">Atas</button><button data-v="kompartemen">Kompartemen</button></div></div>
-<div class="side"><div class="card tourcard"><div class="steps" id="steps"></div><div class="tt" id="tt"></div><div class="tx" id="tx"></div><div class="nav2"><button id="prev">◀ Sebelumnya</button><button id="next" class="pri">Berikutnya ▶</button></div></div>
+<div class="side"><div class="card" id="cmp"><h4>Pilih komponen · kamera langsung zoom</h4><div class="chips" id="chips"></div><div class="cmpi" id="cmpi"><div class="hint">Pilih komponen atau klik dua kali pada bagian di model.</div></div></div>
+<div class="card tourcard"><div class="steps" id="steps"></div><div class="tt" id="tt"></div><div class="tx" id="tx"></div><div class="nav2"><button id="prev">◀ Sebelumnya</button><button id="next" class="pri">Berikutnya ▶</button></div></div>
 <div class="card tourcard"><h4>Animasi jalur cahaya</h4><div class="hint" id="lstage" style="min-height:34px;color:#2b2f55;font-size:12.5px">Tekan tombol untuk melihat perjalanan cahaya dari lampu sampai nilai absorbansi (contoh: C = 2,5 mg/L).</div>
 <div class="meter" style="margin:6px 0"><span>I₀</span><span class="b"><i id="lb0" style="background:#4f46e5;width:0"></i></span><b id="lv0">0</b><span>I</span><span class="b"><i id="lb1" style="background:#0d9488;width:0"></i></span><b id="lv1">0</b><span>T</span><span></span><b id="lvT">–</b><span>A</span><span></span><b id="lvA">–</b></div>
 <div class="nav2"><button id="lplay" class="pri">▶ Putar animasi cahaya</button></div></div>
@@ -984,9 +987,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 <div class="rg"><span>λ = <b id="lv2"></b> nm</span><span id="lamp2" class="hint"></span></div><input type="range" id="lam2" min="190" max="1100" step="1">
 <div class="rg"><span>C = <b id="cv2"></b> mg/L</span><span class="hint">ε·b = 0,20 L mg⁻¹ (b = 1 cm)</span></div><input type="range" id="conc" min="0" max="10" step="0.1" value="2.5">
 <div class="meter" style="margin-top:6px"><span>I₀</span><span class="b"><i id="b0" style="background:#4f46e5;width:100%"></i></span><b id="v0">100</b><span>I</span><span class="b"><i id="b1" style="background:#0d9488"></i></span><b id="v1"></b><span>%T</span><span class="b"><i id="b2" style="background:#d4a017"></i></span><b id="v2"></b><span>A</span><span class="b"><i id="b3" style="background:#e11d48"></i></span><b id="v3"></b></div></div>
-<div class="card tourcard"><h4>Tampilan</h4><div class="tg"><button data-t="top" aria-pressed="false">Pisahkan bagian atas</button><button data-t="side" aria-pressed="false">Pisahkan bagian samping</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="lid" aria-pressed="false">Buka tutup (masukkan kuvet)</button></div></div>
+<div class="card tourcard"><h4>Tampilan</h4><div class="tg"><button data-t="top" aria-pressed="false">Pisahkan bagian atas</button><button data-t="side" aria-pressed="false">Pisahkan bagian samping</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="lid" aria-pressed="false">Buka tutup (masukkan kuvet)</button><button data-t="shell" aria-pressed="false">Pasang cangkang</button><button data-t="pan" aria-pressed="false">Mode geser</button></div><div class="hint" style="margin-top:6px">Seret = putar · Shift+seret atau Mode geser = geser · roda/cubit = zoom (bisa masuk ke dalam).</div></div>
 <div class="card plain"><h4>Tampilan</h4><div class="tg">
-<button data-t="lid" aria-pressed="false">Buka tutup</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="expl" aria-pressed="false">Terurai</button><button data-t="beam" aria-pressed="false">Jalur cahaya</button><button data-t="labels" aria-pressed="false">Label</button><button data-t="auto" aria-pressed="false">Putar otomatis</button></div></div>
+<button data-t="shell" aria-pressed="false">Pasang cangkang</button><button data-t="pan" aria-pressed="false">Mode geser</button><button data-t="lid" aria-pressed="false">Buka tutup</button><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="expl" aria-pressed="false">Terurai</button><button data-t="beam" aria-pressed="false">Jalur cahaya</button><button data-t="labels" aria-pressed="false">Label</button><button data-t="auto" aria-pressed="false">Putar otomatis</button></div></div>
 <div class="card plain"><h4><span class="sw" id="sw"></span>λ = <span id="lv"></span> nm</h4><input type="range" id="lam" min="190" max="1100" step="1"><div class="hint" id="lamp"></div></div>
 <div class="card plain"><h4 id="ti">Komponen</h4><div class="hint" id="info">Seret untuk memutar, roda/cubit untuk zoom, klik komponen untuk penjelasan.</div></div>
 <div class="hint plain">Model skematis disederhanakan; proporsi mengikuti unit UV-1700 PharmaSpec di laboratorium, bukan gambar teknik pabrikan.</div></div></div>
@@ -1012,6 +1015,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
   const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const norm = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
   function rotX(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const y = p[1] - piv[1], z = p[2] - piv[2]; return [p[0], piv[1] + y * c - z * s, piv[2] + y * s + z * c]; }
+  function rotZ(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const x = p[0] - piv[0], y = p[1] - piv[1]; return [piv[0] + x * c - y * s, piv[1] + x * s + y * c, p[2]]; }
   function rotY(p, piv, ang) { const s = Math.sin(ang), c = Math.cos(ang); const x = p[0] - piv[0], z = p[2] - piv[2]; return [piv[0] + x * c + z * s, p[1], piv[2] - x * s + z * c]; }
 
   const INFO = {
@@ -1043,6 +1047,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     card: ['Slot IC card · CONTRAST', 'Kartu memori metode/data dengan tombol EJECT; pengatur kontras LCD di sebelahnya.'],
     fan: ['Kipas & catu daya', 'Pendingin dan catu daya 230 V AC (dianjurkan melalui UPS/stabilizer).'],
     plate: ['Pelat identitas', 'UV-1700 PharmaSpec · UV-VIS SPECTROPHOTOMETER.'],
+    console: ['Panel kendali', 'Rumah LCD dan papan tombol pada bagian depan atas; cangkang lain dilepas pada tampilan terbuka.'],
     warn: ['Label peringatan', 'WARNING — HOT SURFACE: dinginkan lampu hingga suhu ruang sebelum penggantian.']
   };
   const COMPART = new Set(['compartment', 'holderR', 'holderS', 'cuvR', 'cuvS']);
@@ -1050,13 +1055,15 @@ input[type=range]{width:100%;accent-color:var(--acc)}
   class Model3D {
     constructor(canvas, opt) {
       this.cv = canvas; this.ctx = canvas.getContext('2d'); this.opt = opt || {};
-      this.yaw = -32; this.pitch = 24; this.dist = 84; this.target = [0, 9, 0];
+      this.yaw = -32; this.pitch = 24; this.dist = 54; this.target = [0, 9, 0];
       this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.topX = 0; this.topT = 0; this.sideX = 0; this.sideT = 0; this.xray = 0; this.xrayT = 0;
       this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false; this.ph = null; this.dispAbs = null; this.onLight = null; this._dots = [];
       this.lam = 550; this.lampSwitch = 340.8; this.abs = 0; this.status = 'READY'; this.solColor = '#8e2c8f';
+      this.shell = 0; this.shellT = 0; this.fanAng = 0; this.fanW = 1; this.panMode = false; this.compSel = false; this._vis = true;
       this._build(); this._bind(); this._loop = this._loop.bind(this);
       this._ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.draw()) : null;
       if (this._ro) this._ro.observe(canvas.parentElement || canvas);
+      if (typeof IntersectionObserver !== 'undefined') new IntersectionObserver(es => { this._vis = es[0].isIntersecting; if (this._vis) this._kick(); }).observe(canvas);
       this.draw();
     }
     _build() {
@@ -1087,6 +1094,19 @@ input[type=range]{width:100%;accent-color:var(--acc)}
           }
         }
       };
+
+      const basis = a => { const w = norm(a); const h = Math.abs(w[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0]; const u = norm(cross(h, w)); const v = cross(w, u); return [u, v, w]; };
+      const pushQ = (id, grp, v, col, o) => P.push({ id, grp, col, alpha: o.alpha == null ? 1 : o.alpha, emi: o.emi || 0, bias: o.bias || 0, tf: o.tf || null, ex: o.ex || null, key: 'q', v, text: null, dyn: o.dyn || null, ds: !!o.ds, fan: o.fan || null });
+      // benda putar (lathe): profil [[jari-jari, tinggi], ...] diputar mengelilingi sumbu ax dari titik p0
+      const lathe = (id, grp, p0, ax, prof, col, o, n) => {
+        o = o || {}; n = n || 14; const [u, v, w] = basis(ax);
+        const pt = (r, h, i) => { const a = i / n * 2 * Math.PI, c = Math.cos(a), s = Math.sin(a); return [p0[0] + r * (u[0] * c + v[0] * s) + h * w[0], p0[1] + r * (u[1] * c + v[1] * s) + h * w[1], p0[2] + r * (u[2] * c + v[2] * s) + h * w[2]]; };
+        for (let k = 0; k < prof.length - 1; k++) for (let i = 0; i < n; i++) {
+          const [r0, h0] = prof[k], [r1, h1] = prof[k + 1]; const cc = (o.segCols && o.segCols[k]) || col;
+          const q = [pt(r0, h0, i), pt(r0, h0, i + 1), pt(r1, h1, i + 1), pt(r1, h1, i)];
+          pushQ(id, grp, r0 === 0 ? [q[3], q[0], q[1], q[2]] : q, cc, o);
+        }
+      };
       // palet mengikuti foto unit: krem-mustard, alas abu-abu arang, kompartemen hitam
       const BEIGE = '#d8bf7f', BEIGE2 = '#e2cb8e', GREY = '#4a5058', DARK = '#1e2126', CREAM = '#efe9d6';
       box('base', 'body', -23, 23, 0, 3, -24.5, 24.5, GREY, { cell: 6 });
@@ -1113,17 +1133,53 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       // bangku optik
       box('pcb', 'inner', -21.8, -12, 3, 3.6, -22, -6, '#1d6b45');
       [[-20, -19], [-17, -15], [-14, -10]].forEach(([a, b], k) => box('pcb', 'inner', a, b, 3.6, 4.4, -20 + k * 4, -18 + k * 4, '#15181d'));
-      box('fan', 'inner', -21.6, -15, 3, 9, -23.6, -21.8, '#3a4048');
+
+      // kipas pendingin aksial: rangka, hub, tujuh bilah melengkung yang berputar
+      const FC = [-18.3, 6, -22.7];
+      box('fan', 'inner', -21.3, -20.6, 3, 9, -23.6, -21.8, '#3a4048'); box('fan', 'inner', -16, -15.3, 3, 9, -23.6, -21.8, '#3a4048');
+      box('fan', 'inner', -20.6, -16, 3, 3.7, -23.6, -21.8, '#3a4048'); box('fan', 'inner', -20.6, -16, 8.3, 9, -23.6, -21.8, '#3a4048');
+      box('fan', 'inner', -21.3, -15.3, 3, 9, -23.6, -23.4, '#22252a', { cell: 99 });
+      lathe('fan', 'inner', [FC[0], FC[1], -23.4], [0, 0, 1], [[0, 0], [1.0, 0], [1.0, 1.4], [0, 1.4]], '#16181c', { segCols: ['#16181c', '#16181c', '#3a3f47'] }, 14);
+      for (let b = 0; b < 7; b++) {
+        const th = b * 2 * Math.PI / 7, pp = (r, ang, z) => [FC[0] + r * Math.cos(ang), FC[1] + r * Math.sin(ang), FC[2] + z];
+        pushQ('fan', 'inner', [pp(1.0, th, -0.3), pp(2.7, th + 0.22, -0.3), pp(2.7, th + 0.72, 0.3), pp(1.0, th + 0.55, 0.3)], b % 2 ? '#2c3037' : '#3b4048', { ds: true, fan: FC });
+      }
+      // catu daya: trafo berlilitan tembaga
+      lathe('fan', 'inner', [-7.5, 3, -16.5], [0, 1, 0], [[0, 0], [2.6, 0], [2.6, 3.8], [0, 3.8]], '#2b2d33', { segCols: ['#2b2d33', '#2b2d33', '#aab0b8'] }, 16);
+      lathe('fan', 'inner', [-7.5, 4.0, -16.5], [0, 1, 0], [[2.72, 0], [2.72, 1.7]], '#b87333', { ds: true }, 16);
+
+      [[-14, -8.5], [-16.2, -8.5], [-18.4, -8.5], [-20.4, -10.5]].forEach(([x, z]) => lathe('pcb', 'inner', [x, 3.6, z], [0, 1, 0], [[0, 0], [0.75, 0], [0.75, 1.8], [0, 1.8]], '#1c3f8f', { segCols: ['#1c3f8f', '#1c3f8f', '#c9ccd2'] }, 10));
       box('lamphouse', 'inner', 14, 22.2, 3, 4, -23.4, -9, '#3a4048');
       box('lamphouse', 'inner', 21.6, 22.2, 4, 12, -23.4, -9, '#4a515b', { alpha: 0.9 });
-      box('d2', 'inner', 18, 20.2, 4, 11.5, -21, -18.6, '#d9d4ff', { dyn: 'd2' });
-      box('wi', 'inner', 18, 20.2, 4, 10.5, -14.2, -11.8, '#fff1b8', { dyn: 'wi' });
-      box('mirror', 'inner', 15, 15.6, 7.5, 11.5, -18, -14, '#cfd8e6', { dyn: 'mirror' });
+
+      // lampu deuterium: soket, bohlam kuarsa berkubah, anoda, jendela pancar
+      lathe('d2', 'inner', [19.1, 4, -19.8], [0, 1, 0], [[0, 0], [1.6, 0], [1.6, 1.4], [1.0, 1.4], [1.0, 2.0]], '#3a4048', {}, 16);
+      lathe('d2', 'inner', [19.1, 6, -19.8], [0, 1, 0], [[1.25, 0], [1.25, 3.9], [1.0, 5.0], [0.55, 5.7], [0, 6.0]], '#d9d4ff', { alpha: 0.62, dyn: 'd2' }, 16);
+      lathe('d2', 'inner', [19.1, 7.2, -19.8], [0, 1, 0], [[0, 0], [0.7, 0], [0.7, 3.4], [0, 3.4]], '#2e3238', {}, 10);
+      lathe('d2', 'inner', [18.55, 9.5, -19.8], [-1, 0, 0], [[0, 0], [0.38, 0], [0.38, 0.45], [0, 0.45]], '#ffffff', { dyn: 'd2', bias: -0.5 }, 10);
+      // lampu wolfram-iodin: kapsul halogen horizontal, filamen, penyangga
+      lathe('wi', 'inner', [19.1, 4, -13], [0, 1, 0], [[0, 0], [1.0, 0], [1.0, 3.2], [0.5, 3.2], [0.5, 5.0], [0, 5.0]], '#4a515b', {}, 12);
+      lathe('wi', 'inner', [17.6, 9.5, -13], [1, 0, 0], [[0, 0], [0.7, 0], [0.95, 0.4], [0.95, 2.6], [0.7, 3.0], [0, 3.0]], '#fff1b8', { alpha: 0.5, dyn: 'wi' }, 14);
+      lathe('wi', 'inner', [17.9, 9.5, -13], [1, 0, 0], [[0, 0], [0.28, 0], [0.28, 2.4], [0, 2.4]], '#fff1b8', { dyn: 'wi' }, 8);
+      lathe('mirror', 'inner', [15.05, 9.5, -16], [1, 0, 0], [[0, 0], [2.3, 0], [2.3, 0.5], [0, 0.5]], '#cfd8e6', { ds: true, tf: [['y', [15.3, 0, -16], -25]], segCols: ['#7b8794', '#aeb8c6', '#eef3fa'] }, 20);
+      lathe('mirror', 'inner', [15.3, 3.2, -16], [0, 1, 0], [[0, 0], [1.4, 0], [1.4, 2.6], [0.4, 2.6], [0.4, 5.6], [0, 5.6]], '#2d3138', {}, 12);
       box('slit1', 'inner', 11, 11.4, 6, 13, -18.5, -16.4, DARK); box('slit1', 'inner', 11, 11.4, 6, 13, -15.6, -13.5, DARK);
       box('mono', 'inner', -2, 10.5, 3, 4, -23.2, -9, '#2d323a');
       box('mono', 'inner', -2, 10.5, 4, 12.5, -23.2, -22.7, '#3a4048', { alpha: 0.55 });
       box('mono', 'inner', -2, -1.5, 4, 12.5, -22.7, -9, '#3a4048', { alpha: 0.55 });
-      box('grating', 'inner', 1.5, 5.5, 5.5, 12.5, -21.8, -20.6, '#9fb3cf', { faceCol: { f: '#c9d6ea' } });
+
+      { // kisi difraksi cekung: segmen-segmen busur beriridesensi
+        const GC = [3.5, -14.2], GR = 7, GR2 = 8.1, y0 = 5.5, y1 = 12.5, NA = 8, cols = ['#c9d6ea', '#d9c9ea', '#c9eadb', '#eadcc9'];
+        const A = (R, a, y) => [GC[0] + R * Math.sin(a * D2R), y, GC[1] - R * Math.cos(a * D2R)];
+        for (let i = 0; i < NA; i++) {
+          const a0 = -24 + 48 * i / NA, a1 = -24 + 48 * (i + 1) / NA;
+          pushQ('grating', 'inner', [A(GR, a0, y0), A(GR, a1, y0), A(GR, a1, y1), A(GR, a0, y1)], cols[i % 4], {});
+          pushQ('grating', 'inner', [A(GR2, a1, y0), A(GR2, a0, y0), A(GR2, a0, y1), A(GR2, a1, y1)], '#6d7a8c', {});
+          pushQ('grating', 'inner', [A(GR, a0, y1), A(GR, a1, y1), A(GR2, a1, y1), A(GR2, a0, y1)], '#8a97aa', {});
+          pushQ('grating', 'inner', [A(GR, a0, y0), A(GR2, a0, y0), A(GR2, a1, y0), A(GR, a1, y0)], '#55606f', {});
+        }
+        lathe('grating', 'inner', [3.5, 3, -21.7], [0, 1, 0], [[0, 0], [1.6, 0], [1.6, 2.5], [0, 2.5]], '#3a4048', {}, 12);
+      }
       box('slit2', 'inner', 1.5, 2.6, 6, 13, -9.4, -9, DARK); box('slit2', 'inner', 3.4, 4.5, 6, 13, -9.4, -9, DARK);
       box('split', 'inner', 2.4, 3.6, 6.5, 12, 1.4, 4.6, '#7fe6f7', { alpha: 0.7, tf: [['y', [3, 0, 3], 45]] });
       box('mirror2', 'inner', 2.4, 3.6, 6.5, 12, 11.4, 14.6, '#cfd8e6', { tf: [['y', [3, 0, 13], -45]] });
@@ -1143,7 +1199,13 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       holder('holderR', 3); holder('holderS', 13);
       box('cuvR', 'inner', -9.8, -7.2, 6.6, 14.2, 1.7, 4.3, '#d9f3f7', { alpha: 0.35, bias: -0.4 });
       box('cuvS', 'inner', -9.8, -7.2, 6.6, 14.2, 11.7, 14.3, '#8e2c8f', { alpha: 0.55, bias: -0.4, dyn: 'cuvS' });
-      box('detR', 'inner', -21.6, -19.6, 8, 11.5, 1.6, 4.4, '#2a3346'); box('detS', 'inner', -21.6, -19.6, 8, 11.5, 11.6, 14.4, '#2a3346');
+
+      [['detR', 3], ['detS', 13]].forEach(([id, z]) => {
+        lathe(id, 'inner', [-21.8, 9.5, z], [1, 0, 0], [[0, 0], [1.25, 0], [1.25, 1.9], [1.7, 1.9], [1.7, 2.2], [0, 2.2]], '#aeb4bd', {}, 14);
+        lathe(id, 'inner', [-19.58, 9.5, z], [1, 0, 0], [[0, 0], [0.85, 0], [0.85, 0.05], [0, 0.05]], '#1e3a8a', { emi: 0.08, bias: -0.4 }, 12);
+        [-0.6, 0, 0.6].forEach(dz => lathe(id, 'inner', [-22.8, 9.5, z + dz], [1, 0, 0], [[0, 0], [0.12, 0], [0.12, 1.0], [0, 1.0]], '#c8a24a', {}, 6));
+        box(id, 'inner', -21.0, -20.2, 3, 8.2, z - 0.7, z + 0.7, '#2a3346');
+      });
       const covO = { cell: 4.5 };
       box('cover', 'cover', -23, -15, 13.5, 15, -24.5, 24.5, BEIGE2, covO);
       box('cover', 'cover', -2, 23, 13.5, 15, -24.5, 24.5, BEIGE2, covO);
@@ -1151,14 +1213,15 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       box('cover', 'cover', -15, -2, 13.5, 15, 20, 24.5, BEIGE2, covO);
       for (let i = 0; i < 14; i++) box('vent', 'cover', 6 + i * 1.15, 6.55 + i * 1.15, 15, 15.25, -23.5, -15.5, '#c6ae6c');
       box('lid', 'lid', -15.2, -1.8, 15, 16.6, -2.2, 20.2, '#dcc589', { cell: 4, faceCol: { u: '#111215' } });
-      box('keypad', 'cover', 2, 21, 15, 16.2, 13, 23.5, CREAM, { bias: -0.6 });
+      box('console', 'panel', 1.5, 22.4, 9, 15, 15.6, 24.5, BEIGE, { cell: 4.5 }); box('console', 'panel', 6, 17, 9, 16.5, 7.4, 10.4, BEIGE, { cell: 4.5 });
+      box('keypad', 'panel', 2, 21, 15, 16.2, 13, 23.5, CREAM, { bias: -0.6 });
       const keys = [];
       for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) keys.push([2.8 + c * 3.0, 14.2 + r * 2.2]);
-      keys.forEach(([x, z], k) => box('keypad', 'cover', x, x + 1.9, 16.2, 16.55, z, z + 1.3, k % 6 === 5 ? '#7c93c9' : '#cfd4dc', { bias: -0.8 }));
-      box('lcd', 'cover', 9, 14, 15, 17.5, 7.5, 10, '#ddd6bd', { bias: -0.6 });
+      keys.forEach(([x, z], k) => box('keypad', 'panel', x, x + 1.9, 16.2, 16.55, z, z + 1.3, k % 6 === 5 ? '#7c93c9' : '#cfd4dc', { bias: -0.8 }));
+      box('lcd', 'panel', 9, 14, 15, 17.5, 7.5, 10, '#ddd6bd', { bias: -0.6 });
       const tilt = [['x', [11.5, 16.5, 9], -18]];
-      box('lcd', 'cover', 3.5, 19.5, 16.5, 28.5, 8.2, 10.2, '#ebe5cf', { tf: tilt, bias: -0.7, cell: 99 });
-      box('lcd', 'cover', 6, 17, 18.3, 26.6, 10.2, 10.35, '#a99af2', { tf: tilt, bias: -4, emi: 0.08, dyn: 'lcd', text: { face: 'f', w: 130, h: 96, lines: [] } });
+      box('lcd', 'panel', 3.5, 19.5, 16.5, 28.5, 8.2, 10.2, '#ebe5cf', { tf: tilt, bias: -0.7, cell: 99 });
+      box('lcd', 'panel', 6, 17, 18.3, 26.6, 10.2, 10.35, '#a99af2', { tf: tilt, bias: -4, emi: 0.08, dyn: 'lcd', text: { face: 'f', w: 130, h: 96, lines: [] } });
     }
     setLam(l) { this.lam = l; this.draw(); }
     toggle(what, on) {
@@ -1168,23 +1231,26 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (what === 'top') this.topT = flip(this.topT);
       if (what === 'side') this.sideT = flip(this.sideT);
       if (what === 'xray') this.xrayT = flip(this.xrayT);
+      if (what === 'shell') this.shellT = flip(this.shellT);
+      if (what === 'pan') this.panMode = on == null ? !this.panMode : !!on;
       if (what === 'beam') this.beam = on == null ? !this.beam : !!on;
       if (what === 'labels') this.labels = on == null ? !this.labels : !!on;
       if (what === 'auto') this.auto = on == null ? !this.auto : !!on;
       this._kick(); return this.state();
     }
-    state() { return { lid: this.lidT, expl: this.explT, top: this.topT, side: this.sideT, xray: this.xrayT, beam: this.beam, labels: this.labels, auto: this.auto }; }
+    state() { return { lid: this.lidT, expl: this.explT, top: this.topT, side: this.sideT, xray: this.xrayT, shell: this.shellT, pan: this.panMode, beam: this.beam, labels: this.labels, auto: this.auto }; }
     view(name) {
       const V = { depan: [0, 8], samping: [90, 10], atas: [0, 88], belakang: [180, 14], iso: [-32, 24], kompartemen: [-8, 55] };
       const v = V[name] || V.iso; this._anim = { from: [this.yaw, this.pitch], to: v, t: 0 }; this._kick();
     }
-    zoom(f) { this.dist = Math.max(38, Math.min(260, this.dist * f)); this.draw(); }
+    zoom(f) { this.dist = Math.max(14, Math.min(260, this.dist * f)); this.draw(); }
     focus(v) { this._anim = { from: [this.yaw, this.pitch, this.dist, this.target.slice()], to: v, t: 0, full: true }; this._kick(); }
-    reset() { this.dist = 84; this.view('iso'); this.sel = null; if (this.opt.onPick) this.opt.onPick(null); }
+    reset() { this.sel = null; this.compSel = false; if (!this.tour) this.hl = new Set(); this.focus([-32, 24, 54, [0, 9, 0]]); if (this.opt.onPick) this.opt.onPick(null); }
     _kick() { if (!this._running) { this._running = true; this._last = performance.now(); requestAnimationFrame(this._loop); } }
     _loop(now) {
       const dt = Math.min(0.05, (now - this._last) / 1000); this._last = now;
       const ease = (cur, tgt, sp) => { const d = tgt - cur; return Math.abs(d) < 0.002 ? tgt : cur + d * Math.min(1, dt * sp); };
+      this.shell = ease(this.shell, this.shellT, 4); this.fanW = ease(this.fanW, this.status === 'OFF' ? 0 : 1, 1.5); this.fanAng += this.fanW * dt * 9;
       this.lid = ease(this.lid, this.lidT, 5); this.topX = ease(this.topX, this.topT, 4); this.sideX = ease(this.sideX, this.sideT, 4); this.explT = Math.max(this.topT, this.sideT); this.expl = Math.max(this.topX, this.sideX); this.xray = ease(this.xray, this.xrayT, 5);
       if (this._anim) {
         const a = this._anim; a.t = Math.min(1, a.t + dt * 2.2); const k = a.t < 0.5 ? 2 * a.t * a.t : 1 - Math.pow(-2 * a.t + 2, 2) / 2;
@@ -1195,9 +1261,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       }
       if (this.ph) this._phStep(dt);
       if (this.auto && !this._drag) this.yaw += dt * 18;
-      if (this.flow && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
+      if ((this.flow || this.fanW > 0.02) && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
       this._ld = now; this.draw();
-      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam) || this.ph;
+      const busy = this.shell !== this.shellT || (this.fanW > 0.02 && this._vis) || this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam) || this.ph;
       if (busy) requestAnimationFrame(this._loop); else this._running = false;
     }
     _phPath() {
@@ -1262,6 +1328,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
       if (part.grp === 'lid') { q = rotX(q, [0, 15, -2.2], -102 * this.lid * D2R); q = [q[0], q[1] + 16 * this.topX, q[2]]; }
       if (part.grp === 'cover') q = [q[0], q[1] + 16 * this.topX, q[2]];
+      if (part.grp === 'panel') q = [q[0], q[1] - 6 + 16 * this.topX, q[2]];
+      if (part.fan) q = rotZ(q, part.fan, this.fanAng);
       if (part.id === 'cuvR' || part.id === 'cuvS') q = [q[0], q[1] + 9 * this.lid, q[2]];
       if (part.ex) q = [q[0] + part.ex[0] * this.sideX, q[1] + part.ex[1] * this.sideX, q[2] + part.ex[2] * this.sideX];
       if (part.id === 'grating') q = rotY(q, [3.5, 0, -21.2], (this.lam - 600) * 0.012 * D2R);
@@ -1299,22 +1367,24 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       const camPos = [0, 0, this.dist];
       const lampUV = this.lam < this.lampSwitch;
       const items = [];
-      const coverA = 1 - 0.82 * this.xray, wallA = 1 - 0.75 * this.xray;
-      const closed = this.xray < 0.04 && this.expl < 0.04;
+      const coverA = 1 - 0.82 * this.xray, wallA = 1 - 0.75 * this.xray, shl = this.shell;
+      const closed = shl > 0.5 && this.xray < 0.04 && this.expl < 0.04;
       for (const part of this.parts) {
         const wv = part.v.map(p => this._xf(p, part));
         const cvs = wv.map(p => this._cam(p));
         const n = norm(cross(sub(cvs[1], cvs[0]), sub(cvs[3], cvs[0])));
         const cen = [(cvs[0][0] + cvs[2][0]) / 2, (cvs[0][1] + cvs[2][1]) / 2, (cvs[0][2] + cvs[2][2]) / 2];
         let alpha = part.alpha;
-        if (part.grp === 'cover' || part.grp === 'lid') alpha *= coverA;
-        if (part.grp === 'walls' || part.id === 'body') alpha *= wallA;
+        if (part.grp === 'cover' || part.grp === 'lid') alpha *= coverA * shl;
+        if (part.grp === 'panel') alpha *= coverA;
+        if (part.grp === 'walls' || part.id === 'body') alpha *= wallA * shl;
         if (alpha < 0.02) continue;
         if (part.grp === 'inner' && closed && !(this.lid > 0.05 && COMPART.has(part.id))) continue;
         const facing = dot(n, sub(camPos, cen)) > 0;
-        if (!facing && alpha > 0.97) continue;
+        if (!facing && alpha > 0.97 && !part.ds) continue;
+        if (cvs.some(c => this.dist * (1 + 0.28 * this.expl) - c[2] < 2.5)) continue;
         const wn = norm(cross(sub(wv[1], wv[0]), sub(wv[3], wv[0])));
-        let k = 0.5 + 0.55 * Math.max(0, dot(wn, light));
+        let k = 0.5 + 0.55 * (part.ds ? Math.abs(dot(wn, light)) : Math.max(0, dot(wn, light)));
         if (this.tour && part.grp === 'inner' && !this.hl.has(part.id)) k *= 0.62;
         let col = part.col, emi = part.emi;
         if (part.dyn === 'd2') { emi = lampUV ? 0.45 : 0.0; col = lampUV ? '#e4dcff' : '#9a96b5'; }
@@ -1326,7 +1396,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         items.push({ part, pts: cvs.map(c => this._proj(c)), depth: this.dist - cen[2] + part.bias + (part.grp === 'inner' ? 0.35 : 0) + (facing ? 0 : 0.02), fill: shade(col, k, emi), alpha, facing });
       }
       if (this.beam) {
-        const y = 9.5, by = this.lid > 0.5 || this.xray > 0.5 || this.expl > 0.5;
+        const y = 9.5, by = this.lid > 0.5 || this.xray > 0.5 || this.expl > 0.5 || shl < 0.5;
         const src = lampUV ? [19.1, y, -19.8] : [19.1, y, -13];
         const path = [[src, [15.3, y, -16]], [[15.3, y, -16], [11.2, y, -15]], [[11.2, y, -15], [3.5, y, -21]], [[3.5, y, -21], [3, y, -9.2]], [[3, y, -9.2], [3, y, 3]], [[3, y, 3], [3, y, 13]], [[3, y, 3], [-8.5, y, 3]], [[-8.5, y, 3], [-19.6, y, 3]], [[3, y, 13], [-8.5, y, 13]], [[-8.5, y, 13], [-19.6, y, 13]]];
         path.forEach(([a, b], si) => {
@@ -1385,7 +1455,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     }
     _labels(ctx) {
       const A0 = [['mono', [4, 12.6, -22.5]], ['lamphouse', [16, 4.5, -22]], ['d2', [19, 12, -20]], ['fan', [-18, 9.5, -22.5]], ['wi', [19, 11, -13]], ['mirror', [15.3, 12, -16]], ['slit1', [11.2, 13.5, -15]], ['grating', [3.5, 13, -21]], ['slit2', [3, 13.5, -9.2]], ['split', [3, 12.5, 3]], ['holderR', [-8.5, 13, 3]], ['holderS', [-8.5, 13, 13]], ['detS', [-20.6, 12, 13]], ['detR', [-20.6, 12, 3]], ['pcb', [-17, 5, -14]], ['lcd', [11.5, 29, 6]], ['keypad', [12, 17, 22]], ['lid', [-8.5, 17, 9]], ['card', [23.3, 12, 6]]];
-      const A = this.tour ? A0.filter(([id]) => this.hl.has(id)) : A0.filter(([id]) => id !== 'mono' && id !== 'lamphouse');
+      const A = (this.tour || this.compSel) ? A0.filter(([id]) => this.hl.has(id)) : A0.filter(([id]) => id !== 'mono' && id !== 'lamphouse');
       ctx.font = '600 11px Inter, Arial';
       const placed = [];
       const L = A.map(([id, p0]) => { const part = this.parts.find(q => q.id === id); const p = part ? this._xf(p0, part) : p0; return { id, s: this._proj(this._cam(p)) }; }).sort((a, b) => a.s[1] - b.s[1]);
@@ -1409,12 +1479,14 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     _bind() {
       const cv = this.cv; cv.style.touchAction = 'none';
       let pts = new Map(), start = null, pinch = null;
-      cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); start = { x: e.clientX, y: e.clientY, yaw: this.yaw, pitch: this.pitch, moved: false }; this._drag = true; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: this.dist }; } });
+      cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); start = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, yaw: this.yaw, pitch: this.pitch, moved: false, pan: e.shiftKey || e.button === 2 || this.panMode }; this._drag = true; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: this.dist }; } });
       cv.addEventListener('pointermove', e => {
         if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
-        if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); this.dist = Math.max(55, Math.min(260, pinch.dist * pinch.d / Math.max(10, d))); start.moved = true; this.draw(); return; }
+        if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); this.dist = Math.max(14, Math.min(260, pinch.dist * pinch.d / Math.max(10, d))); start.moved = true; this.draw(); return; }
         if (!start) return; const dx = e.clientX - start.x, dy = e.clientY - start.y;
         if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
+        if (start.pan) { const ddx = e.clientX - start.lx, ddy = e.clientY - start.ly; start.lx = e.clientX; start.ly = e.clientY; const sc = this.dist / this._f * 1.1, cy = Math.cos(-this.yaw * D2R), sy = Math.sin(-this.yaw * D2R), cp = Math.cos(this.pitch * D2R), sp = Math.sin(this.pitch * D2R);
+          const R = [cy, 0, sy], U = [sy * sp, cp, -cy * sp]; this.target = [0, 1, 2].map(k => this.target[k] - R[k] * ddx * sc + U[k] * ddy * sc); this._anim = null; this.draw(); return; }
         this.yaw = start.yaw - dx * 0.45; this.pitch = Math.max(-10, Math.min(89, start.pitch + dy * 0.35)); this._anim = null; this.draw();
       });
       const up = e => {
@@ -1427,6 +1499,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       };
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
       cv.addEventListener('wheel', e => { e.preventDefault(); this.zoom(e.deltaY > 0 ? 1.08 : 1 / 1.08); }, { passive: false });
+      cv.addEventListener('contextmenu', e => e.preventDefault());
+      cv.addEventListener('dblclick', e => { const r = cv.getBoundingClientRect(); const id = this.pickAt(e.clientX - r.left, e.clientY - r.top); if (id && this.opt.onDbl) this.opt.onDbl(id); });
       cv.tabIndex = 0;
       cv.addEventListener('keydown', e => {
         const k = e.key; if (k === 'ArrowLeft') this.yaw -= 6; else if (k === 'ArrowRight') this.yaw += 6; else if (k === 'ArrowUp') this.pitch = Math.min(89, this.pitch + 5); else if (k === 'ArrowDown') this.pitch = Math.max(-10, this.pitch - 5); else if (k === '+' || k === '=') this.zoom(0.9); else if (k === '-') this.zoom(1.1); else return;
@@ -1441,6 +1515,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solColor: "#8e2c8f", lampSwitch: 340.8, xray: true, lid: false, compact: false, auto: false}, /*__INIT__*/null || {});
 (function(){
   var SL = window.SL, $ = function(s){return document.querySelector(s)};
+  INIT.xray = false;
   if (INIT.compact) $('#wrap').classList.add('compact');
   var m = new SL.Model3D($('#c'), { onPick: function(i){ $('#ti').textContent = i ? i.title : 'Komponen'; $('#info').textContent = i ? i.text : 'Klik komponen untuk penjelasan.'; } });
   m.lampSwitch = INIT.lampSwitch; m.abs = INIT.abs; m.status = INIT.status; m.solColor = INIT.solColor;
@@ -1467,6 +1542,52 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
       f: 'Menampilkan λ, absorbansi atau %T, dan lampu aktif.', p: 'Pengendali LCD menampilkan data digital; PC menerima data lewat RS-232C.', m: 'Layar LCD dan papan tombol membran.', h: 'Hasil akhir yang dipakai untuk kurva kalibrasi.' }
   ];
   var EPSB = 0.2, cur = 0, seen = {};
+  var COMP = [
+    { n: 'Lampu deuterium (D₂)', ids: ['d2'], v: [-38, 24],
+      f: 'Sumber radiasi kontinu daerah ultraviolet (±190–350 nm).', p: 'Busur listrik mengeksitasi molekul D₂ menjadi D₂* yang berdisosiasi; selisih energi dipancarkan sebagai kontinum UV.', m: 'Bohlam berjendela kuarsa (transparan UV) berisi D₂ bertekanan rendah; katoda berpijar dan anoda berlubang.', h: 'Dipakai bila λ di bawah titik pergantian lampu (±340,8 nm); membatasi batas bawah UV.' },
+    { n: 'Lampu wolfram-iodin (WI)', ids: ['wi'], v: [-38, 24],
+      f: 'Sumber radiasi kontinu daerah tampak dan inframerah dekat (±340–1100 nm).', p: 'Filamen wolfram berpijar (±3000 K) memancarkan radiasi benda hitam; siklus halogen mengembalikan wolfram ke filamen.', m: 'Filamen W dalam kapsul kuarsa berisi gas iodin/halogen.', h: 'Dipakai untuk pengukuran zat berwarna (λ > 340,8 nm); intensitas di UV rendah.' },
+    { n: 'Cermin pemilih sumber', ids: ['mirror'], v: [-30, 26],
+      f: 'Memilih berkas dari D₂ atau WI sesuai panjang gelombang terpilih.', p: 'Pemantulan; motor memutar cermin ke posisi lampu yang dikehendaki.', m: 'Kaca berlapis aluminium/dielektrik pada poros motor stepper.', h: 'Menentukan lampu aktif dan stabilitas intensitas awal.' },
+    { n: 'Celah masuk', ids: ['slit1'], v: [-30, 26],
+      f: 'Membatasi berkas yang masuk ke monokromator.', p: 'Pembatasan spasial berkas; bersama celah keluar menentukan lebar pita spektral.', m: 'Pelat logam hitam dengan bukaan sempit.', h: 'Lebar celah mengatur resolusi spektral dan energi cahaya.' },
+    { n: 'Kisi difraksi', ids: ['grating'], v: [-20, 26],
+      f: 'Menyebarkan cahaya polikromatik menjadi spektrum.', p: 'Difraksi: nλ = d (sin α + sin β); sudut kisi menentukan λ keluaran.', m: 'Kisi holografik cekung berlapis aluminium pada penyangga yang diputar motor.', h: 'Menetapkan panjang gelombang pengukuran dan resolusi.' },
+    { n: 'Celah keluar', ids: ['slit2'], v: [-26, 26],
+      f: 'Meloloskan pita sempit di sekitar λ terpilih.', p: 'Seleksi spasial pada bidang fokus spektrum.', m: 'Pelat logam hitam dengan bukaan sempit.', h: 'Menentukan kemurnian spektral dan intensitas ke detektor.' },
+    { n: 'Pembagi berkas', ids: ['split', 'mirror2'], v: [-46, 28],
+      f: 'Membagi berkas menjadi berkas referensi dan berkas sampel (double-beam).', p: 'Pemantulan dan transmisi parsial pada permukaan semi-reflektif.', m: 'Pelat kuarsa semi-reflektif dan cermin pengarah.', h: 'Mengoreksi fluktuasi lampu sehingga baseline stabil.' },
+    { n: 'Kuvet dan kompartemen', ids: ['holderR', 'holderS', 'cuvR', 'cuvS'], v: [-16, 34],
+      f: 'Menempatkan blanko dan sampel pada jalur berkas.', p: 'Absorpsi menurut hukum Lambert–Beer: A = ε · b · C.', m: 'Kuvet kuarsa jalur 1 cm pada dudukan hitam.', h: 'Sumber utama sinyal; A sebanding dengan konsentrasi.' },
+    { n: 'Detektor referensi', ids: ['detR'], v: [-70, 26],
+      f: 'Mengukur intensitas berkas referensi (I₀).', p: 'Efek fotolistrik pada sambungan p–n silikon: foton menghasilkan arus.', m: 'Fotodioda Si dalam kemasan logam (TO-can) berjendela.', h: 'Penyebut pada T = I/I₀.' },
+    { n: 'Detektor sampel', ids: ['detS'], v: [-70, 26],
+      f: 'Mengukur intensitas berkas yang melewati sampel (I).', p: 'Efek fotolistrik pada sambungan p–n silikon.', m: 'Fotodioda Si dalam kemasan logam (TO-can) berjendela.', h: 'Pembilang pada T = I/I₀; A = log(I₀/I).' },
+    { n: 'Papan elektronik', ids: ['pcb'], v: [-30, 34],
+      f: 'Menguatkan, mendigitalkan, dan mengolah sinyal detektor.', p: 'Penguat → ADC → mikroprosesor menghitung %T dan A = −log₁₀ T.', m: 'PCB bermikroprosesor, IC, dan kapasitor elektrolit.', h: 'Menghasilkan nilai absorbansi terkoreksi.' },
+    { n: 'Kipas dan catu daya', ids: ['fan'], v: [-18, 24],
+      f: 'Mendinginkan lampu/elektronik dan menyuplai daya 230 V AC.', p: 'Kipas aksial memindahkan udara; trafo menurunkan tegangan.', m: 'Kipas tujuh bilah, trafo berlilitan tembaga.', h: 'Suhu lampu stabil menjaga baseline; gunakan UPS/stabilizer.' },
+    { n: 'Layar LCD dan tombol', ids: ['lcd', 'keypad', 'console'], v: [-24, 30],
+      f: 'Menampilkan λ, absorbansi atau %T, dan lampu aktif; menerima perintah.', p: 'Pengendali LCD menampilkan data digital; PC lewat RS-232C.', m: 'LCD dan papan tombol membran.', h: 'Antarmuka hasil ukur di alat.' }
+  ];
+  function compBounds(ids) {
+    var mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
+    m.parts.forEach(function (pt) { if (ids.indexOf(pt.id) < 0) return; pt.v.forEach(function (q) { var w = m._xf(q, pt); for (var k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], w[k]); mx[k] = Math.max(mx[k], w[k]); } }); });
+    return { c: [(mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, (mn[2] + mx[2]) / 2], s: Math.max(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]) };
+  }
+  function pickComp(k) {
+    var c = COMP[k], b = compBounds(c.ids), d = Math.max(20, Math.min(95, b.s * 2.6 + 12));
+    m.hl = new Set(c.ids); m.sel = null; m.labels = true; m.compSel = true; m.beamLimit = 99; m.focus([c.v[0], c.v[1], d, b.c]);
+    document.querySelectorAll('#chips button').forEach(function (x, i) { x.classList.toggle('on', i === k); });
+    $('#cmpi').innerHTML = '<div class="tt">' + c.n + '</div><div class="kv"><b>Fungsi</b><span>' + c.f + '</span><b>Prinsip</b><span>' + c.p + '</span><b>Material / jenis</b><span>' + c.m + '</span><b>Hubungan dengan pengukuran</b><span>' + c.h + '</span></div>';
+  }
+  (function () {
+    var box = $('#chips'); if (!box) return;
+    COMP.forEach(function (c, k) { var b = document.createElement('button'); b.textContent = c.n.replace(/ \(.*\)/, ''); b.addEventListener('click', function () { pickComp(k); }); box.appendChild(b); });
+    var r = document.createElement('button'); r.textContent = '⟲ Tampilan awal'; r.addEventListener('click', function () { m.reset(); document.querySelectorAll('#chips button').forEach(function (x) { x.classList.remove('on'); }); $('#cmpi').innerHTML = '<div class="hint">Pilih komponen atau klik dua kali pada bagian di model.</div>'; }); box.appendChild(r);
+    m.opt.onDbl = function (id) { for (var k = 0; k < COMP.length; k++) if (COMP[k].ids.indexOf(id) >= 0) { pickComp(k); return; } };
+  })();
+
   function mixc(a, b, t) { var p = function (h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }, x = p(a), y = p(b); return '#' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0'); }).join(''); }
   function fm(v, d) { return v.toFixed(d).replace('.', ','); }
   function meter() {
@@ -1488,7 +1609,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     var sb = $('#steps'); TOUR.forEach(function (_, k) { var b = document.createElement('button'); b.textContent = k + 1; b.title = TOUR[k].t; b.addEventListener('click', function () { goStep(k); }); sb.appendChild(b); });
     $('#prev').addEventListener('click', function () { goStep(cur - 1); }); $('#next').addEventListener('click', function () { goStep(cur === TOUR.length - 1 ? 0 : cur + 1); });
     $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
-    INIT.xray = true;
+    INIT.xray = false;
   }
   var LST = ['1. Lampu D₂/WI memancarkan radiasi kontinu; cermin memilih sumber.', '2. Celah masuk membentuk berkas sempit menuju monokromator.', '3. Kisi difraksi menguraikan cahaya menjadi spektrum.', '4. Celah keluar meloloskan satu panjang gelombang (monokromatik).', '5. Berkas menuju pembagi berkas.', '6. Pembagi membelah berkas: referensi melewati blanko, sampel melewati kuvet sampel dan sebagian diserap (titik oranye).', '7. Fotodioda menghitung cahaya yang tiba: I₀ (referensi) dan I (sampel).', '8. Sinyal listrik dari fotodioda menuju PCB dan LCD.', '9. Rangkaian elektronik menghitung A = log(I₀/I); nilai tampil di layar LCD.'];
   if (INIT.tour) {
@@ -1508,7 +1629,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     window.addEventListener('message', function (e) { var d = e.data; if (!d || d.src !== 'uv1700') return;
       if (d.cmd === 'tour') goStep(d.k); else if (d.cmd === 'lam') setLam(d.v); else if (d.cmd === 'abs') { m.abs = d.v; m._kick(); } else if (d.cmd === 'sol') { m.solColor = d.v; m._kick(); } });
   }
-  m.toggle('beam', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
+  m.toggle('beam', true); if (INIT.shell) m.toggle('shell', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
   setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
   document.addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return;
     if (b.dataset.t){ m.toggle(b.dataset.t); sync(); }
@@ -1542,6 +1663,7 @@ canvas#c{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .hud{display:none;position:absolute;right:8px;top:8px;background:rgba(20,18,58,.9);color:#fff;border-radius:12px;padding:8px 12px;font:600 11px 'JetBrains Mono',monospace;text-align:right;min-width:150px}
 .hud .sc{font-size:22px;line-height:1.1}.hud .tm{color:#a5b4fc}
 .bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a3e635);width:0}
+.ikbar{position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:6;display:none;gap:6px;align-items:center;background:rgba(20,18,58,.88);padding:6px 8px;border-radius:12px;color:#e0e7ff;font:500 12px 'JetBrains Mono',monospace}.ikbar.show{display:flex}.ikbar button{border:0;border-radius:8px;padding:6px 10px;background:#fff;color:#1e1b4b;font:600 12px Inter,sans-serif;cursor:pointer}
 .toast{z-index:7;position:absolute;left:50%;top:50px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 .toast.show{opacity:1}.toast.info{background:#14123a;color:#fff}.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#e11d48;color:#fff}.toast.warn{background:#f59e0b;color:#1f1300}
 .modal{position:absolute;inset:0;background:rgba(20,18,58,.45);display:none;align-items:center;justify-content:center;z-index:8}
@@ -1616,11 +1738,12 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
   <div class="stage"><canvas id="c" aria-label="Meja praktikum 3D"></canvas>
     <div class="views">
       <button data-v="meja" class="on">Meja</button><button data-v="alat">UV-1700</button><button data-v="kompartemen">Kompartemen</button>
-      <button data-v="isi">Labu & kuvet</button><button data-v="komputer">Komputer</button><button data-v="belakang">Kabel & UPS</button>
+      <button data-v="isi">Labu & kuvet</button><button data-v="komputer">Komputer</button><button data-v="belakang">Kabel & UPS</button><button data-v="ik">Buku IK</button>
     </div>
     <div class="hud"><div>SKOR PROSEDUR</div><div class="sc" id="score">100</div><div class="tm" id="clock">00:00</div><div class="bar"><i id="prog"></i></div></div>
     <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="sound" aria-pressed="true">Suara</button><button data-t="pip">Layar komputer</button></div>
     <div class="pip" id="pip"><div class="ph"><span>MONITOR · <span id="pcst" style="color:#8b93b8">MATI</span></span><span><button data-t="pipbig" id="pipbig">Perbesar</button><button data-t="pipx">Tutup</button></span></div><canvas id="pc" width="1040" height="610"></canvas></div>
+    <div class="ikbar" id="ikbar"><button data-ik="-1">◀ Halaman</button><span id="ikpg"></span><button data-ik="1">Halaman ▶</button><button data-ik="0">Tutup buku</button></div>
     <div class="toast" id="toast"></div>
     <div class="sub" id="sub"></div>
     <div class="inner" id="inner"><div class="itop"><span class="ibadge" id="ibadge"></span><button id="icx"></button></div><iframe id="innerf" title="UV-1700"></iframe><div class="icap"><b id="icT"></b><span id="icF"></span></div></div>
@@ -1723,7 +1846,7 @@ const RACK = { R: [-31, 0.2, 4], S: [-31, 0.2, 10] }, CELL = { R: [-8.5, 6.6, 3]
 const ST = {
   cab: [0, 0, 0, 0, 0, 0, 0, 0, 0], cabled: false, ups: false, pc: 0, pcBoot: 0, printer: false, inst: 'off', initLines: [], warmLeft: 0, warmSkipped: false,
   pcctrl: false, sw: false, connected: false, lid: 0, xray: 0, xrayT: 0, xrayUser: false, autoX: true, sound: true, lam: AN.lam_ref, lastA: 0, lcdFold: 0,
-  silica: 'comp', silicaPos: [-8.5, 6, 8], logbook: null, tidy: false, paper: 0, chairZ: 66, wash: null, pour: null, stream: null,
+  silica: 'comp', silicaPos: [-8.5, 6, 8], logbook: null, ikp: 0, ikT: 0, tidy: false, paper: 0, chairZ: 66, wash: null, pour: null, stream: null,
   cuv: { R: { where: 'rak', pos: RACK.R.slice(), content: null, level: 0, dirty: false, smudge: 0, flip: 0, wet: false }, S: { where: 'rak', pos: RACK.S.slice(), content: null, level: 0, dirty: false, smudge: 0, flip: 0, wet: false } },
   zero: null, win: null, menu: null, dlg: null, busyMsg: null, ptab: 'std',
   spectrum: null, peaks: null, smethod: null, pmethod: null, stdTable: [], unkTable: [], files: [], prints: [],
@@ -1732,7 +1855,7 @@ const ST = {
 
 /* ================= geometri ================= */
 const P = [];
-function quad(id, grp, v, col, o) { P.push({ id, grp, v, col, alpha: o.alpha == null ? 1 : o.alpha, emi: o.emi || 0, bias: o.bias || 0, tf: o.tf || null, dyn: o.dyn || null, text: o.text || null, ds: !!o.ds, bg: !!o.bg }); }
+function quad(id, grp, v, col, o) { P.push({ id, grp, v, col, alpha: o.alpha == null ? 1 : o.alpha, emi: o.emi || 0, bias: o.bias || 0, tf: o.tf || null, dyn: o.dyn || null, text: o.text || null, ds: !!o.ds, bg: !!o.bg, leaf: o.leaf == null ? null : o.leaf, lside: o.lside || null }); }
 function box(id, grp, x0, x1, y0, y1, z0, z1, col, o) {
   o = o || {};
   const faces = [['f', [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]], ['b', [[x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0]]],
@@ -1854,10 +1977,13 @@ box('cpu', 'room', -104, -90, 33.5, 35.6, 14.25, 14.45, '#101113', { bias: -3, c
 box('cpu', 'room', -104, -90, 26.5, 31.5, 14.25, 14.4, '#f8f8f6', { bias: -3.2, cell: 99, text: { face: 'f', w: 140, h: 50, lines: [['19.01.01.24.2005', 70, 21, 'center', '700 14px Courier New', '#111'], ['2.08.01.11.138.', 70, 41, 'center', '700 14px Courier New', '#111']] } });
 box('cpu', 'room', -101, -93, 18, 19.2, 14.25, 14.4, '#111214', { bias: -3, cell: 99 });
 box('cpu', 'room', -98.6, -95.4, 9, 12.2, 14.25, 14.7, '#7d838c', { bias: -3.2, cell: 99, dyn: 'pcled' });
-box('monitor', 'room', -66, -50, -1.4, -0.2, -22, -10, '#141518'); box('monitor', 'room', -60, -56, -0.2, 13, -18, -15.8, '#1b1c20');
-box('monitor', 'room', -82, -34, 12, 40, -17, -14.6, '#0e0f12', { cell: 8 });
-box('screen', 'room', -81, -35, 13.6, 39.2, -14.6, -14.4, '#000000', { bias: -3, dyn: 'screen', dynFace: 'f', text: { face: 'f', w: 1040, h: 610, screen: true } });
-box('monitor', 'room', -37.6, -36.6, 12.6, 13.2, -14.6, -14.3, '#222', { bias: -3.3, dyn: 'monled' });
+cyl('monitor', 'room', -58, -16, 8.5, -1.4, -0.4, '#1a1b1f', { cell: 99 }, 18); cyl('monitor', 'room', -58, -16, 3.2, -0.4, 0.4, '#24262b', {}, 14);
+box('monitor', 'room', -60.5, -55.5, 0.4, 11.5, -18.2, -15.4, '#1b1c20', { cell: 99 });
+box('monitor', 'room', -82, -34, 11, 41.5, -17.4, -14.6, '#0e0f12', { cell: 99, skip: ['f'] });
+box('monitor', 'room', -82, -34, 11, 13.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 }); box('monitor', 'room', -82, -34, 40.2, 41.5, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 });
+box('monitor', 'room', -82, -81, 13.2, 40.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 }); box('monitor', 'room', -35, -34, 13.2, 40.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 });
+box('screen', 'room', -81, -35, 13.2, 40.2, -14.6, -14.5, '#000000', { bias: -25, dyn: 'screen', dynFace: 'f', cell: 99, text: { face: 'f', w: 1040, h: 610, screen: true } });
+box('monitor', 'room', -37.6, -36.6, 11.7, 12.4, -14.6, -14.3, '#222', { bias: -26, dyn: 'monled' });
 box('keyboard', 'room', -84, -52, -1.4, -0.4, 0, 11, '#16171a', { cell: 6 });
 for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) box('keyboard', 'room', -83 + c * 2.2, -81.3 + c * 2.2, -0.4, 0.1, 0.8 + r * 2.0, 2.3 + r * 2.0, '#2a2c31', { bias: -0.5 });
 box('mousepad', 'room', -50, -39, -1.4, -1.15, 0, 11, '#efe08a'); box('mouse', 'room', -46, -42, -1.15, 0.5, 3, 8.5, '#111214', { faceCol: { t: '#9aa0a8' } });
@@ -1895,6 +2021,16 @@ box('beaker', 'beakerW', BKX + 2.8, BKX + 4.0, 5.6, 6.5, BKZ - 0.6, BKZ + 0.6, '
 box('beaker', 'beakerW', BKX - 1.6, BKX + 1.6, 0.4, 3.6, BKZ + 3.18, BKZ + 3.3, '#ffffff', { bias: -3, cell: 99, text: { face: 'f', w: 90, h: 72, lines: [['LIMBAH', 45, 40, 'center', '700 19px Arial', '#111827']] } });
 box('logbook', 'room', -104, -88, -1.4, -0.4, 20, 33, '#1e3a8a', { cell: 99, faceCol: { t: '#22409a' }, text: { face: 't', w: 120, h: 100, lines: [['LOG BOOK', 60, 40, 'center', '700 15px Arial', '#e0e7ff'], ['UV-1700', 60, 60, 'center', '600 12px Arial', '#c7d2fe']] } });
 box('logbook', 'room', -86, -85.4, -0.6, -0.1, 21, 31, '#111', {});
+
+// ---- Buku Instruksi Kerja (IK/LAB.INST/6): dibuka seperti buku asli ----
+const IKL = 7, IKX = -124, IKW = 16, IKZ0 = 20, IKZ1 = 33, IKTH = 0.14, IKB = -0.9;
+box('ikbook', 'room', IKX, IKX + IKW, -1.4, IKB, IKZ0, IKZ1, '#6b1313', { cell: 99 });
+for (let i = 0; i < IKL; i++) {
+  const y0 = IKB + (IKL - 1 - i) * IKTH, y1 = y0 + IKTH, cov = i === 0, col = cov ? '#7f1d1d' : '#fbfaf4';
+  box('ikbook', 'ikleaf', IKX, IKX + IKW, y0, y1, IKZ0, IKZ1, col, { cell: 99, leaf: i, faceCol: { f: '#efece2', r: '#efece2', b: '#efece2' } });
+  box('ikbook', 'ikleaf', IKX, IKX + IKW, y1, y1 + 0.01, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'f', bias: -2, skip: ['f', 'b', 'l', 'r', 'u'], text: { face: 't', w: 640, h: 520, ik: 2 * i } });
+  box('ikbook', 'ikleaf', IKX, IKX + IKW, y0 - 0.01, y0, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'b', bias: -2, skip: ['f', 'b', 'l', 'r', 't'], text: { face: 'u', w: 640, h: 520, ik: 2 * i + 1, rot: true } });
+}
 box('drymat', 'room', -20, -7, -1.4, -1.25, 26, 34, '#ffffff', { cell: 99 });
 // labu takar 50 mL: alas datar, badan bulat, leher panjang bergaris tera, sumbat biru
 const FLY = -1.4, FS = 0.74;
@@ -1941,7 +2077,7 @@ const INFO = {
   tissue: ['Kotak tisu', 'Tisu untuk mengelap dinding bening kuvet dari tetesan dan sidik jari sebelum dimasukkan. Dua botol kecil putih di atasnya berisi cairan pembersih lensa/kuvet.'],
   cuvcase: ['Kotak kuvet kuarsa', 'Wadah penyimpanan kuvet kuarsa setelah kering.'], bottle: ['Botol semprot akuades', 'Botol semprot (wash bottle) berisi akuades untuk membilas kuvet sebelum dibilas dengan larutan yang akan diukur.'], chair: ['Kursi kerja', 'Setelah selesai, kursi dirapikan ke tempat aman (IK C.11).'], floor: ['Lantai', ''],
   beaker: ['Gelas piala Sampel X', 'Berisi sampel dengan konsentrasi yang tidak diketahui; dituang ke kuvet saat pengukuran sampel.'], etanol: ['Etanol', 'Pembilas pertama saat mengeringkan kuvet (IK D.1).'], aseton: ['Aseton', 'Pembilas terakhir; cepat menguap sehingga kuvet kering sempurna (IK D.1).'],
-  logbook: ['Log Book alat', 'Catat semua kejadian dan tanda tangani dengan nama jelas (IK C.1).'], drymat: ['Alas tisu pengering', 'Tempat kuvet dibalik hingga kering.'],
+  ikbook: ['Buku Instruksi Kerja IK/LAB.INST/6', 'Klik untuk membuka. Gunakan tombol Halaman untuk membalik; isinya sama dengan prosedur pada panel langkah.'], logbook: ['Log Book alat', 'Catat semua kejadian dan tanda tangani dengan nama jelas (IK C.1).'], drymat: ['Alas tisu pengering', 'Tempat kuvet dibalik hingga kering.'],
   flask: ['Labu takar 50 mL', 'Berisi blanko, deret standar, atau Sampel X; larutan mencapai garis tera di leher, warna makin pekat seiring konsentrasi. Sumbat dibuka saat larutan dituang ke kuvet.'],
   silica: ['Silica gel', 'Penyerap lembap di kompartemen. Dikeluarkan sebelum pengukuran dan dimasukkan kembali setelah alat dimatikan (IK C.7).'],
   cuvR: ['Kuvet referensi', 'Kuvet kuarsa 1 cm berisi blanko, di sel referensi (belakang).'], cuvS: ['Kuvet sampel', 'Kuvet kuarsa 1 cm untuk blanko, standar, atau sampel, di sel sampel (depan).'],
@@ -1959,10 +2095,10 @@ const INFO = {
 const cv = $('#c'), ctx = cv.getContext('2d'), pcc = $('#pc'), pctx = pcc.getContext('2d');
 const VIEWS = { meja: [-14, 26, 270, [-18, 6, 0]], alat: [-30, 24, 100, [0, 9, 0]], kompartemen: [-12, 58, 62, [-8, 8, 8]], kerja: [-26, 34, 100, [-40, 3, 16]],
   komputer: [-6, 10, 105, [-62, 20, -6]], ups: [-34, 18, 115, [44, 8, -12]], belakang: [200, 34, 230, [-25, 4, -25]], printer: [-30, 22, 75, [-116, 4, -4]],
-  kering: [-20, 45, 70, [-20, 2, 22]], log: [-15, 50, 70, [-96, 0, 20]], isi: [-18, 32, 128, [-52, 5, 18]], kursi: [-24, 24, 210, [-24, -26, 50]] };
+  kering: [-20, 45, 70, [-20, 2, 22]], log: [-15, 50, 70, [-96, 0, 20]], ik: [-1, 70, 40, [-124, -1, 27.5]], isi: [-18, 32, 128, [-52, 5, 18]], kursi: [-24, 24, 210, [-24, -26, 50]] };
 const CAM = { yaw: -14, pitch: 26, dist: 270, target: [-18, 6, 0] };
 let camAnim = null, viewName = 'meja';
-function setView(name) { const v = VIEWS[name]; if (!v || name === viewName && !camAnim) { if (v) viewName = name; return; } viewName = name; camAnim = { from: [CAM.yaw, CAM.pitch, CAM.dist, CAM.target.slice()], to: v, t: 0 };
+function setView(name) { if (name === 'ik') ST.ikT = Math.max(1, ST.ikT); else ST.ikT = 0; $('#ikbar').classList.toggle('show', name === 'ik'); const v = VIEWS[name]; if (!v || name === viewName && !camAnim) { if (v) viewName = name; return; } viewName = name; camAnim = { from: [CAM.yaw, CAM.pitch, CAM.dist, CAM.target.slice()], to: v, t: 0 };
   $$('.views button').forEach(b => b.classList.toggle('on', b.dataset.v === name)); dirty = true; }
 function camXf(p) { const t = CAM.target; const x = p[0] - t[0], y = p[1] - t[1], z = p[2] - t[2];
   const cy = Math.cos(-CAM.yaw * D2R), sy = Math.sin(-CAM.yaw * D2R); const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
@@ -1972,6 +2108,7 @@ function proj(c) { const zc = CAM.dist - c[2]; return [CX + FOC * c[0] / zc, CY 
 function xf(p, part) {
   let q = p;
   if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : ax === 'z' ? rotZ(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
+  if (part.leaf != null) { const a = Math.max(0, Math.min(1, ST.ikp - part.leaf)); if (a > 0) q = rotZ(q, [IKX, IKB + IKL * IKTH / 2, 0], a * Math.PI); return q; }
   const g = part.grp;
   if (g === 'lid') q = rotX(q, [0, 15, -2.2], -102 * ST.lid * D2R);
   else if (g === 'lcdp') q = rotX(q, [11.5, 16.5, 9], 84 * ST.lcdFold * D2R);
@@ -2085,14 +2222,14 @@ function paint(list) {
     if (it.alpha > 0.97) { ctx.strokeStyle = it.fill; ctx.lineWidth = 1; ctx.stroke(); }
     if (selId && it.part.id === selId) { ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.2; ctx.stroke(); }
     ctx.globalAlpha = 1;
-    if (it.part.text && it.facing) faceText(it.part, p);
+    if (it.part.text && it.facing && (it.part.leaf == null || ikShow(it.part))) faceText(it.part, p);
     if (it.facing && it.alpha > 0.3 && !it.part.bg) drawn.push({ id: it.part.id, p });
   }
 }
 function faceText(part, p) {
   const t = part.text, TL = p[3], TR = p[2], BL = p[0]; const dpr = cv.width / Math.max(1, W);
   ctx.save(); ctx.setTransform((TR[0] - TL[0]) / t.w * dpr, (TR[1] - TL[1]) / t.w * dpr, (BL[0] - TL[0]) / t.h * dpr, (BL[1] - TL[1]) / t.h * dpr, TL[0] * dpr, TL[1] * dpr);
-  if (t.screen) ctx.drawImage(pcc, 0, 0, t.w, t.h); else if (t.lcd) drawLCD(ctx);
+  if (t.ik != null) { if (t.rot) { ctx.translate(t.w, t.h); ctx.rotate(Math.PI); } ctx.drawImage(ikTex(t.ik), 0, 0, t.w, t.h); } else if (t.screen) ctx.drawImage(pcc, 0, 0, t.w, t.h); else if (t.lcd) drawLCD(ctx);
   else for (const [s, x, y, al, font, col] of t.lines) { ctx.font = font; ctx.fillStyle = col; ctx.textAlign = al; ctx.fillText(s, x, y); }
   ctx.restore();
 }
@@ -2654,7 +2791,7 @@ function openLog() { return new Promise(res => { const m = $('#logm'); $('#lg_t'
 let logResolve = null;
 
 /* ================= panel ================= */
-function pipSync() { $('#pip').classList.toggle('hide', !ST.pc || !!ST.pipClosed); }
+function pipSync() { $('#pip').classList.toggle('hide', !ST.pc || ST.pipClosed !== false); }
 function sync() { pipSync();
   const R = ST.cuv.R, S = ST.cuv.S, ch = [];
   const chip = (t, s) => ch.push('<span class="chip ' + (s === 2 ? 'on' : s === 1 ? 'mid' : '') + '">' + t + '</span>');
@@ -2693,13 +2830,60 @@ function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; tw.el += PAUSED ? 0 : dt * 1000 * SPD; const t = tw.dur <= 0 ? 1 : Math.min(1, tw.el / tw.dur); tw.fn(t); dirty = true; if (t >= 1) { tweens.splice(i, 1); tw.res(); } }
   const e = (cur, tgt, sp) => { const d = tgt - cur; return Math.abs(d) < 0.002 ? tgt : cur + d * Math.min(1, dt * sp); };
+  if (ST.ikp !== ST.ikT) { const d = ST.ikT - ST.ikp; ST.ikp = Math.abs(d) < 0.01 ? ST.ikT : ST.ikp + Math.sign(d) * Math.min(Math.abs(d), dt * 2.4); dirty = true; $('#ikpg').textContent = 'Spread ' + Math.round(ST.ikT) + '/' + IKL; }
   const nx = e(ST.xray, ST.xrayT, 5); if (nx !== ST.xray) { ST.xray = nx; dirty = true; }
   if (camAnim) { const a = camAnim; a.t = Math.min(1, a.t + (PAUSED ? 0 : dt * 1.6 * Math.max(1, SPD))); const k = ease(a.t); let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
     CAM.yaw = a.from[0] + dy * k; CAM.pitch = a.from[1] + (a.to[1] - a.from[1]) * k; CAM.dist = a.from[2] + (a.to[2] - a.from[2]) * k; CAM.target = lerp3(a.from[3], a.to[3], k); if (a.t >= 1) camAnim = null; dirty = true; }
   if (ST.inst === 'warm' && !ST.warmSkipped) { ST.warmLeft -= PAUSED ? 0 : dt * 90 * SPD; if (ST.warmLeft <= 0) { ST.warmLeft = 0; ST.inst = 'ready'; beep(1400, 0.2); ok('Pemanasan selesai: lampu stabil.'); sync(); } dirty = true; }
-  if (now - lastPC > 200) { lastPC = now; if (ST.pc && ST.pcSeen !== ST.pc && ST.pc === 1) ST.pipClosed = false; ST.pcSeen = ST.pc; pipSync(); $('#clock').textContent = mmss((now - ST.t0) / 1000); if (ST.inst === 'warm') sync(); drawPC(); dirty = true; }
+  if (now - lastPC > 200) { lastPC = now; ST.pcSeen = ST.pc; pipSync(); $('#clock').textContent = mmss((now - ST.t0) / 1000); if (ST.inst === 'warm') sync(); drawPC(); dirty = true; }
   if (dirty) { dirty = false; draw(); }
   requestAnimationFrame(loop);
+}
+
+
+/* ================= isi Buku IK ================= */
+function ikShow(part) { const i = part.leaf, p = ST.ikp; return part.lside === 'f' ? (i >= Math.floor(p + 1e-6) && i <= Math.floor(p + 1e-6) + 1) : (i <= Math.ceil(p - 1e-6) - 1 && i >= Math.ceil(p - 1e-6) - 2); }
+const IKC = {}; let IKPAGES = null;
+function ikBuild() {
+  const m = document.createElement('canvas').getContext('2d'); m.font = '14px Arial'; const W0 = 600, IND = 26;
+  const wrap = (t, w) => { const out = []; let cur = ''; for (const wd of t.split(' ')) { const tt = cur ? cur + ' ' + wd : wd; if (m.measureText(tt).width > w && cur) { out.push(cur); cur = wd; } else cur = tt; } if (cur) out.push(cur); return out; };
+  const L = []; let last = '';
+  STEPS.forEach((st, i) => { if (st.sec !== last) { last = st.sec; L.push({ k: 'sec', t: st.sec }); }
+    const tx = (typeof stepT === 'function' ? stepT(i) : st.t); const ws = wrap(tx, W0 - IND); ws.forEach((l, j) => L.push({ k: 'step', n: j === 0 ? (st.no || '') : '', t: l })); L.push({ k: 'gap' }); });
+  L.push({ k: 'sign' });
+  const pages = [[]]; let y = 0; const H = 350;
+  for (const ln of L) { const h = ln.k === 'sec' ? 30 : ln.k === 'gap' ? 5 : ln.k === 'sign' ? 120 : 19; if (y + h > H) { pages.push([]); y = 0; if (ln.k === 'gap') continue; } pages[pages.length - 1].push(ln); y += h; }
+  IKPAGES = pages;
+}
+function ikTex(s) {
+  if (IKC[s]) return IKC[s];
+  if (!IKPAGES) ikBuild();
+  const cv2 = document.createElement('canvas'); cv2.width = 640; cv2.height = 520; const c = cv2.getContext('2d');
+  c.fillStyle = s === 0 ? '#7f1d1d' : '#fbfaf4'; c.fillRect(0, 0, 640, 520); c.textBaseline = 'alphabetic';
+  if (s === 0) {
+    c.strokeStyle = '#e8c76a'; c.lineWidth = 4; c.strokeRect(24, 24, 592, 472); c.fillStyle = '#f3e3b0'; c.textAlign = 'center';
+    c.font = '700 22px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 320, 90); c.font = '500 16px Arial'; c.fillText('Laboratorium Instrumentasi · Analisis Kimia', 320, 118);
+    c.font = '700 40px Arial'; c.fillText('INSTRUKSI KERJA', 320, 230); c.font = '600 24px Arial'; c.fillText('SPEKTROFOTOMETER UV-VIS', 320, 270); c.fillText('SHIMADZU UV-1700 PharmaSpec', 320, 304);
+    c.font = '700 22px Courier New'; c.fillText('IK/LAB.INST/6', 320, 380); c.font = '500 15px Arial'; c.fillText('Salinan terkendali · Revisi 00', 320, 420); return IKC[s] = cv2;
+  }
+  const hdr = () => {
+    c.strokeStyle = '#111'; c.lineWidth = 1.6; c.strokeRect(24, 20, 592, 86); c.beginPath(); c.moveTo(110, 20); c.lineTo(110, 106); c.moveTo(440, 20); c.lineTo(440, 106); c.moveTo(24, 62); c.lineTo(440, 62); c.stroke();
+    c.fillStyle = '#1e3a8a'; c.beginPath(); c.arc(67, 63, 28, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 17px Arial'; c.textAlign = 'center'; c.fillText('AKA', 67, 69);
+    c.fillStyle = '#111'; c.font = '700 14px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 275, 46); c.font = '500 12px Arial'; c.fillText('Laboratorium Instrumentasi', 275, 84);
+    c.textAlign = 'left'; c.font = '600 11.5px Arial'; c.fillText('Kode : IK/LAB.INST/6', 450, 44); c.fillText('Revisi : 00', 450, 64); c.fillText('Halaman : ' + s + ' / ' + IKPAGES.length, 450, 84);
+    c.textAlign = 'center'; c.font = '700 13px Arial'; c.fillText('INSTRUKSI KERJA SPEKTROFOTOMETER UV-VIS', 320, 126); };
+  hdr();
+  const pg = IKPAGES[s - 1]; c.textAlign = 'left'; let y = 150;
+  if (!pg) { c.fillStyle = '#9ca3af'; c.font = 'italic 14px Arial'; c.textAlign = 'center'; c.fillText('Catatan', 320, 170); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; for (let k = 0; k < 14; k++) { c.beginPath(); c.moveTo(40, 200 + k * 22); c.lineTo(600, 200 + k * 22); c.stroke(); } return IKC[s] = cv2; }
+  for (const ln of pg) {
+    if (ln.k === 'sec') { y += 12; c.fillStyle = '#111'; c.font = '700 15px Arial'; c.fillText(ln.t, 30, y); y += 18; }
+    else if (ln.k === 'gap') y += 5;
+    else if (ln.k === 'step') { c.fillStyle = '#111'; c.font = '14px Arial'; if (ln.n !== '') { c.textAlign = 'right'; c.fillText(ln.n + '.', 52, y); c.textAlign = 'left'; } c.fillText(ln.t, 58, y); y += 19; }
+    else if (ln.k === 'sign') { y += 20; c.font = '14px Arial'; c.textAlign = 'center'; c.fillStyle = '#111'; c.fillText('Mengetahui,', 140, y); c.fillText('Disiapkan oleh,', 500, y); y += 20; c.fillText('Kepala Laboratorium Instrumentasi', 140, y); c.fillText('Penanggung jawab alat', 500, y);
+      y += 64; c.fillText('( ............................. )', 140, y); c.fillText('( ............................. )', 500, y); c.textAlign = 'left'; }
+  }
+  c.fillStyle = '#6b7280'; c.font = '11px Arial'; c.textAlign = 'center'; c.fillText('— ' + s + ' —', 320, 508);
+  return IKC[s] = cv2;
 }
 
 /* ================= input ================= */
@@ -2707,6 +2891,7 @@ function pickAt(x, y) {
   const inPoly = (p, px, py) => { let c = false; for (let i = 0, j = 3; i < 4; j = i++) { if (((p[i][1] > py) !== (p[j][1] > py)) && (px < (p[j][0] - p[i][0]) * (py - p[i][1]) / (p[j][1] - p[i][1]) + p[i][0])) c = !c; } return c; };
   for (let i = drawn.length - 1; i >= 0; i--) if (inPoly(drawn[i].p, x, y)) return drawn[i].id; return null;
 }
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-ik]'); if (!b) return; const d = +b.dataset.ik; if (d === 0) { setView('meja'); } else ST.ikT = Math.max(1, Math.min(IKL, Math.round(ST.ikT) + d)); dirty = true; });
 (function bind() {
   let pts = new Map(), start = null, pinch = null;
   cv.addEventListener('pointerdown', e => { try { cv.setPointerCapture(e.pointerId); } catch (_) { } pts.set(e.pointerId, [e.clientX, e.clientY]); start = { x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch, moved: false }; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: CAM.dist }; } });
@@ -2715,7 +2900,7 @@ function pickAt(x, y) {
     if (!start) return; const dx = e.clientX - start.x, dy = e.clientY - start.y; if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
     CAM.yaw = start.yaw - dx * 0.4; CAM.pitch = Math.max(-5, Math.min(89, start.pitch + dy * 0.3)); camAnim = null; dirty = true; });
   const up = e => { if (!pts.has(e.pointerId)) return; pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
-    if (pts.size === 0) { if (start && !start.moved) { const r = cv.getBoundingClientRect(); const id = pickAt(e.clientX - r.left, e.clientY - r.top); selId = id; const inf = id && INFO[id];
+    if (pts.size === 0) { if (start && !start.moved) { const r = cv.getBoundingClientRect(); const id = pickAt(e.clientX - r.left, e.clientY - r.top); selId = id; if (id === 'ikbook' && viewName !== 'ik') setView('ik'); const inf = id && INFO[id];
       $('#ti').textContent = inf ? inf[0] : 'Info objek'; $('#info').textContent = inf ? (inf[1] || 'Komponen bangku optik UV-1700.') : 'Klik objek pada meja untuk penjelasan.'; dirty = true; } start = null; } };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
   cv.addEventListener('wheel', e => { e.preventDefault(); CAM.dist = Math.max(40, Math.min(460, CAM.dist * (e.deltaY > 0 ? 1.08 : 1 / 1.08))); camAnim = null; dirty = true; }, { passive: false });
@@ -3255,13 +3440,21 @@ def page_lab():
             if len(res["std"]) < 2:
                 st.error("Data standar tidak ditemukan; pastikan teks diawali #STANDAR dan berisi pasangan C;A.")
             else:
-                set_calibration(pd.DataFrame({"C": [c_ for c_, _ in res["std"]], "A": [a_ for _, a_ in res["std"]], "Pakai": True}), "simulasi",
-                                name=a["nama"] + " (praktikum virtual)", unit="mg/L", lam=res["lam"], analyte=akey)
+                stdv = list(res["std"])
+                if not any(abs(c_) < 1e-12 for c_, _ in stdv):
+                    stdv = [(0.0, 0.0)] + stdv
+                set_calibration(pd.DataFrame({"C": [c_ for c_, _ in stdv], "A": [a_ for _, a_ in stdv], "Pakai": True}), "simulasi",
+                                name=a["rumus"], unit="mg/L", lam=res["lam"], analyte=akey)
+                if res["smp"]:
+                    nan_ = float("nan"); O_ = S.setdefault("olah", _olah_defaults()); n_ = len(res["smp"])
+                    O_["s"] = pd.DataFrame({"Sampel": ["Blanko Sampel"] + [f"Sampel {i + 1}" for i in range(n_)], "Bobot (kg)": [nan_] * (n_ + 1), "Volume labu takar (L)": [nan_] * (n_ + 1),
+                                            "Volume (L)": [nan_] * (n_ + 1), "Abs": [0.0] + [float(v) for v in res["smp"]], "FP": [nan_] + [1.0] * n_})
+                    O_["ver"] = O_.get("ver", 0) + 1
                 if res["smp"]:
                     S["samples"] = [s_ for s_ in S["samples"] if s_.get("src") != "praktikum"] + [
                         new_sample(f"Sampel X {a['rumus']} (praktikum)", "; ".join(fmt(v, 4) for v in res["smp"]), "simulasi", akey)]
                 log(f"Hasil praktikum virtual diimpor: {len(res['std'])} standar, {len(res['smp'])} pembacaan sampel.")
-                st.success(f"{len(res['std'])} titik standar dan {len(res['smp'])} pembacaan sampel dikirim. Buka halaman Kurva Kalibrasi untuk evaluasi.")
+                st.success(f"{len(res['std'])} titik standar dan {len(res['smp'])} pembacaan sampel dikirim. Buka menu Olah data; lengkapi bobot, volume labu, dan FP sampel.")
 
 
 # ---------------------------------------------------------------------------
@@ -3344,103 +3537,146 @@ def page_qc():
 # ---------------------------------------------------------------------------
 # Halaman: Kurva Kalibrasi
 # ---------------------------------------------------------------------------
+def _fl(x):
+    try:
+        v = float(x)
+        return v if math.isfinite(v) else float("nan")
+    except (TypeError, ValueError):
+        return float("nan")
+
+
+def _olah_defaults():
+    nan = float("nan")
+    return {"s": pd.DataFrame({"Sampel": ["Blanko Sampel", "Sampel 1", "Sampel 2"], "Bobot (kg)": [nan] * 3, "Volume labu takar (L)": [nan] * 3,
+                               "Volume (L)": [nan] * 3, "Abs": [nan] * 3, "FP": [nan, 1.0, 1.0]}),
+            "sp": pd.DataFrame({"Sampel": ["Sampel 3 (+ spike)"], "Bobot (kg)": [nan], "Volume labu takar (L)": [nan], "Abs": [nan], "FP": [1.0]}),
+            "c_std": "", "v_std": "", "m_std": "", "rpd_lim": 5.0, "ver": 0}
+
+
+def olah_calc(df, reg):
+    """Tiap baris: Cons terukur = (Abs − b)/a; Cons terkoreksi = Cons terukur − Cons blanko; Kadar = Cons terkoreksi × FP × V labu / bobot."""
+    nan = float("nan")
+    rows, cblank = [], 0.0
+    for _, r in df.iterrows():
+        name = str(r.get("Sampel", "") or "")
+        A = _fl(r.get("Abs"))
+        cons = (A - reg.intercept) / reg.slope if not math.isnan(A) else nan
+        isb = name.strip().lower().startswith("blanko")
+        if isb and not math.isnan(cons):
+            cblank = cons
+        rows.append({"name": name, "blank": isb, "A": A, "cons": cons, "fp": _fl(r.get("FP")), "vl": _fl(r.get("Volume labu takar (L)")), "m": _fl(r.get("Bobot (kg)"))})
+    for q in rows:
+        q["corr"] = nan if q["blank"] else q["cons"] - cblank
+        q["kadar"] = q["corr"] * q["fp"] * q["vl"] / q["m"] if not q["blank"] and q["m"] > 0 and not any(math.isnan(v) for v in (q["corr"], q["fp"], q["vl"])) else nan
+    return rows, cblank
+
+
+def olah_table(rows):
+    f = lambda x, d=4: "" if (x is None or (isinstance(x, float) and math.isnan(x))) else fmt(x, d)
+    return pd.DataFrame({"Sampel": [q["name"] for q in rows], "Abs": [f(q["A"], 3) for q in rows], "Cons terukur (mg/L)": [f(q["cons"]) for q in rows],
+                         "Cons terkoreksi (mg/L)": ["" if q["blank"] else f(q["corr"]) for q in rows], "Kadar (mg/kg)": ["" if q["blank"] else f(q["kadar"], 2) for q in rows]})
+
+
 def page_calibration():
-    header("Analisis", "Kurva Kalibrasi", "Regresi kuadrat terkecil y = ax + b dengan pita kepercayaan 95 %, uji Mandel, LOD/LOQ, dan prediksi invers sampel (Miller & Miller).")
-    c1, c2, c3, c4 = st.columns([2.2, 1, 1, 1.2])
-    S["cal_name"] = c1.text_input("Analit / metode", S["cal_name"], placeholder="mis. Fe dengan 1,10-fenantrolin")
-    units = ["mg/L", "µg/mL", "ppm", "µg/L", "mmol/L", "mol/L", "%b/v"]
-    S["cal_unit"] = c2.selectbox("Satuan", units, index=units.index(S["cal_unit"]))
-    lam_txt = c3.text_input("λ ukur (nm)", fmt(S["cal_lambda"], 1) if S["cal_lambda"] else "")
+    header("Analisis", "Olah data", "Empat tabel mengikuti lembar kerja: (1) deret standar, (2) kadar sampel, (3) presisi %RPD, (4) akurasi %Recovery.")
+    O = S.setdefault("olah", _olah_defaults())
+    for k_, v_ in _olah_defaults().items():
+        O.setdefault(k_, v_)
+    c1, c2 = st.columns([2, 1])
+    S["cal_name"] = c1.text_input("Analit / metode", S["cal_name"], placeholder="mis. Cr(VI) dengan difenilkarbazida")
+    lam_txt = c2.text_input("λ ukur (nm)", fmt(S["cal_lambda"], 1) if S["cal_lambda"] else "")
     S["cal_lambda"] = num_in(lam_txt, None) if lam_txt else None
     S["cal_zero"] = False
-    L, Rr = st.columns([1, 1.6], gap="large")
+    S["cal_unit"] = "mg/L"
+    ver = O["ver"]
+    if S["settings"]["mode"] == "latihan":
+        if st.button("Muat data contoh (lembar kerja Cr(VI))"):
+            set_calibration(pd.DataFrame({"C": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], "A": [0.0, 0.080, 0.155, 0.234, 0.312, 0.380], "Pakai": True}), "contoh", name="Cr(VI)", unit="mg/L")
+            O["s"] = pd.DataFrame({"Sampel": ["Blanko Sampel", "Sampel 1", "Sampel 2"], "Bobot (kg)": [float("nan"), 0.0004, 0.0004], "Volume labu takar (L)": [float("nan"), 0.25, 0.25],
+                                   "Volume (L)": [float("nan"), 0.05, 0.05], "Abs": [-0.001, 0.191, 0.184], "FP": [float("nan"), 100.0, 100.0]})
+            O["sp"] = pd.DataFrame({"Sampel": ["Sampel 3 (+ spike)"], "Bobot (kg)": [0.0004], "Volume labu takar (L)": [0.25], "Abs": [0.193], "FP": [100.0]})
+            O["c_std"], O["v_std"], O["m_std"] = "1000", "0,001", "0,0004"
+            O["ver"] += 1; st.rerun()
+
+    # ---------------- 1. deret standar
+    st.subheader("1. Tabel hasil pengukuran deret standar")
+    L, Rr = st.columns([1, 1.5], gap="large")
     with L:
-        html("<b>Larutan standar</b> " + src_pill(S["cal_src"]))
-        edited = st.data_editor(S["cal_base"], key=f"cal_{S['cal_ver']}", num_rows="dynamic", hide_index=True, **WIDE,
-                                column_config={"C": st.column_config.NumberColumn(f"C ({S['cal_unit']})", format="%.4f"),
-                                               "A": st.column_config.NumberColumn("Absorbansi", format="%.4f"),
-                                               "Pakai": st.column_config.CheckboxColumn("Pakai", default=True)})
+        edited = st.data_editor(S["cal_base"], key=f"cal_{S['cal_ver']}", num_rows="dynamic", hide_index=False, column_order=("C", "A"), **WIDE,
+                                column_config={"C": st.column_config.NumberColumn("Konsentrasi (mg/L)", format="%.4f"), "A": st.column_config.NumberColumn("Abs", format="%.4f")})
         S["cal_cur"] = edited
-        if not df_same(edited, S["cal_base"]) and S["cal_src"] in ("simulasi", "contoh"):
-            S["cal_src"] = "campuran"
-        paste = st.text_area("Tempel dua kolom dari Excel (C lalu A)", height=90, placeholder="0,5\t0,101\n1,0\t0,198")
-        b1, b2, b3 = st.columns(3)
-        if b1.button("Masukkan") and paste.strip():
-            res = parse_csv(paste)
-            if res["ok"]:
-                add = pd.DataFrame({"C": res["cols"][0], "A": res["cols"][1], "Pakai": True}).dropna()
-                set_calibration(pd.concat([cal_points(), add], ignore_index=True), "pengguna"); st.rerun()
-            else:
-                st.error(res["reason"])
-        if S["settings"]["mode"] == "latihan" and b2.button("Data contoh"):
-            set_calibration(pd.DataFrame({"C": [0.5, 1, 2, 3, 4, 5], "A": [0.102, 0.197, 0.401, 0.598, 0.792, 1.001], "Pakai": True}), "contoh",
-                            name="Fe(II)–1,10-fenantrolin (data contoh)", unit="mg/L", lam=510.0, analyte="fephen")
-            S["samples"] = [dict(new_sample("Air sumur A (contoh)", "0,452; 0,448; 0,455", "contoh"), steps=[{"V pipet (mL)": 10.0, "V labu (mL)": 50.0}])]
-            st.rerun()
-        if b3.button("Kosongkan"):
-            set_calibration(_empty_cal(), "pengguna"); st.rerun()
-        up = st.file_uploader("Impor CSV standar (C; A)", type=["csv", "txt"], key="calcsv")
-        if up is not None and st.button("Impor"):
-            res = parse_csv(up.getvalue().decode("utf-8", errors="replace"))
-            if res["ok"]:
-                set_calibration(pd.DataFrame({"C": res["cols"][0], "A": res["cols"][1], "Pakai": True}).dropna(), "impor"); st.rerun()
-            else:
-                st.error(res["reason"])
-    reg = cal_reg()
-    pts = cal_points()
-    with Rr:
-        tabs = st.tabs(["Kurva", "Residual", "Uji Mandel"])
-        with tabs[0]:
-            fig = fig_base(f"Konsentrasi ({S['cal_unit']})", "Absorbansi (A)", 380)
-            fig.update_layout(hovermode="closest")
-            if reg and reg.ok:
-                xs = np.linspace(min(0, reg.xmin), reg.xmax * 1.05, 80); yh = reg.slope * xs + reg.intercept; bd = reg.band(xs)
-                fig.add_trace(go.Scatter(x=np.r_[xs, xs[::-1]], y=np.r_[yh + bd, (yh - bd)[::-1]], fill="toself", fillcolor="rgba(124,58,237,.12)", line=dict(width=0), name="SK 95 % garis", hoverinfo="skip"))
-                fig.add_trace(go.Scatter(x=xs, y=yh, mode="lines", name="Regresi", line=dict(color=PAL[4], width=2.2)))
-            fig.add_trace(go.Scatter(x=pts["C"], y=pts["A"], mode="markers", name="Standar", marker=dict(color=PAL[0], size=11, line=dict(color="white", width=1.5))))
-            if reg and reg.ok:
-                for s in S["samples"]:
-                    r = sample_res(s, reg)
-                    if r:
-                        fig.add_trace(go.Scatter(x=[r["c_meas"]], y=[r["A_mean"]], mode="markers+text", name=s["name"], text=[s["name"]], textposition="top right",
-                                                 error_x=dict(type="data", array=[r["ci"]], color=PAL[2]), marker=dict(symbol="diamond", size=13, color=PAL[2])))
-            show(fig)
-        with tabs[1]:
-            if reg and reg.ok:
-                fig = fig_base(f"Konsentrasi ({S['cal_unit']})", "Residual terstandar", 300); fig.update_layout(hovermode="closest")
-                fig.add_trace(go.Bar(x=pts["C"], y=reg.std_residuals, marker_color=[PAL[2] if abs(v) > CR["std_res_max"] else PAL[0] for v in reg.std_residuals], name="e/s"))
-                for sgn in (1, -1):
-                    fig.add_hline(y=sgn * CR["std_res_max"], line_dash="dot", line_color="#8a91b5")
-                show(fig)
-        md = mandel(pts["C"].values, pts["A"].values) if reg and reg.ok and not S["cal_zero"] else None
-        with tabs[2]:
-            if md:
-                xs = np.linspace(reg.xmin, reg.xmax, 80)
-                fig = fig_base(f"Konsentrasi ({S['cal_unit']})", "Absorbansi (A)", 300); fig.update_layout(hovermode="closest")
-                fig.add_trace(go.Scatter(x=pts["C"], y=pts["A"], mode="markers", name="Standar", marker=dict(color=PAL[0], size=9)))
-                fig.add_trace(go.Scatter(x=xs, y=reg.slope * xs + reg.intercept, mode="lines", name="Linear", line=dict(color=PAL[4])))
-                fig.add_trace(go.Scatter(x=xs, y=np.polyval(md["quad"], xs), mode="lines", name="Kuadratik", line=dict(color=PAL[3], dash="dash")))
-                show(fig)
-                kpis([("F Mandel", fmt(md["F"], 2), "DS² / s²(kuadratik)", "indigo"), ("F kritis", fmt(md["Fcrit"], 2), f"F(1; {md['n'] - 3}; 0,99)", "violet"),
-                      ("s linear", sig(md["s_lin"], 3), "s_y/x", "teal"), ("s kuadratik", sig(md["s_quad"], 3), "", "amber")])
-                verdict(md["linear_ok"], "model linear memadai" if md["linear_ok"] else "kelengkungan signifikan")
-            else:
-                st.info("Uji Mandel memerlukan ≥ 5 titik dan model dengan intersep.")
-        if not reg or not reg.ok:
-            st.info(reg.reason if reg else "Minimal 3 titik valid diperlukan untuk regresi.")
+        reg = cal_reg()
+        if reg and reg.ok:
+            rr = math.copysign(math.sqrt(max(0.0, reg.r2)), reg.slope)
+            st.dataframe(pd.DataFrame({"Parameter": ["r", "intercept", "slope"], "Nilai": [fmt(rr, 4), fmt(reg.intercept, 4), fmt(reg.slope, 4)]}), hide_index=True, **WIDE)
         else:
-            html(f'<div class="eq">{reg.equation()}   ·   R² = {fmt(reg.r2, 5)}</div>')
-            kpis([("R²", fmt(reg.r2, 5), "memenuhi" if reg.r2 >= CR["r2_min"] else "di bawah kriteria", "teal" if reg.r2 >= CR["r2_min"] else "rose"),
-                  ("Kemiringan a", sig(reg.slope), f"± {sig(reg.ci_slope, 2)} (SK 95 %)", "indigo"),
-                  ("Intersep b", "0 (dipaksa)" if reg.through_zero else sig(reg.intercept, 3), "" if reg.through_zero else f"± {sig(reg.ci_intercept, 2)}", "violet"),
-                  ("s y/x", sig(reg.sxy, 3), f"n = {reg.n}", "amber"),
-                  ("LOD", f"{sig(reg.lod, 3)}", S["cal_unit"], "teal"), ("LOQ", f"{sig(reg.loq, 3)}", S["cal_unit"], "teal")])
-            with st.container(border=True):
-                st.markdown("**Interpretasi otomatis**")
-                for p in calib_interpretation(reg, S["cal_unit"], CR["r2_min"], CR["std_res_max"], S["settings"]["dec"], md):
-                    st.markdown("- " + p)
-    page_samples(reg)
-    page_qc()
+            st.info("Isi minimal 3 titik standar (konsentrasi dan Abs).")
+    with Rr:
+        pts = cal_points()
+        fig = fig_base("Konsentrasi (mg/L)", "Abs", 300); fig.update_layout(hovermode="closest", showlegend=False)
+        if reg and reg.ok:
+            xs = np.linspace(min(0, reg.xmin), reg.xmax * 1.05, 50)
+            fig.add_trace(go.Scatter(x=xs, y=reg.slope * xs + reg.intercept, mode="lines", line=dict(color=PAL[0], width=2)))
+            fig.update_layout(title=dict(text=f"y = {fmt(reg.slope, 4)}x + {fmt(reg.intercept, 4)}  ·  R = {fmt(rr, 4)}", font=dict(size=13)))
+        fig.add_trace(go.Scatter(x=pts["C"], y=pts["A"], mode="markers", marker=dict(color=PAL[0], size=10, line=dict(color="white", width=1.2))))
+        show(fig)
+    if not (reg and reg.ok):
+        return
+
+    # ---------------- 2. kadar sampel
+    st.subheader("2. Tabel hasil perhitungan kadar")
+    st.caption("Cons terukur = (Abs − intercept) / slope  ·  Cons terkoreksi = Cons terukur − Cons blanko  ·  Kadar = Cons terkoreksi × FP × Volume labu takar / Bobot sampel.")
+    cfg = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
+           "Volume (L)": st.column_config.NumberColumn(format="%.4f"), "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
+    O["s"] = st.data_editor(O["s"], key=f"olah_s_{ver}", num_rows="dynamic", hide_index=True, column_config=cfg, **WIDE)
+    rows, cblank = olah_calc(O["s"], reg)
+    st.dataframe(olah_table(rows), hide_index=True, **WIDE)
+    smp = [q for q in rows if not q["blank"]]
+
+    # ---------------- 3. presisi
+    st.subheader("3. Tabel presisi")
+    if len(smp) >= 2 and not any(math.isnan(q["kadar"]) for q in smp[:2]):
+        k1, k2 = smp[0]["kadar"], smp[1]["kadar"]
+        c1_, sel, rpd = (k1 + k2) / 2, abs(k1 - k2), rpd_pct(k1, k2)
+        st.dataframe(pd.DataFrame({"Sampel": [smp[0]["name"], smp[1]["name"], "Rerata (C1)", "Selisih", "RPD%"],
+                                   "Kadar (mg/kg)": [fmt(k1, 2), fmt(k2, 2), fmt(c1_, 2), fmt(sel, 2), fmt(rpd, 2)]}), hide_index=True, **WIDE)
+        O["rpd_lim"] = st.number_input("Batas %RPD", 0.1, 50.0, float(O["rpd_lim"]), 0.5)
+        f2 = lambda x: fmt(x, 2).replace(",", "{,}")
+        st.latex(r"\%RPD = \frac{|C_1 - C_2|}{\bar{C}} \times 100 = \frac{" + f2(sel) + "}{" + f2(c1_) + r"} \times 100 = " + f2(rpd) + r"\ \%")
+        verdict(rpd <= O["rpd_lim"], f"%RPD = {fmt(rpd, 2)} % " + (f"≤ {fmt(O['rpd_lim'], 1)} %" if rpd <= O["rpd_lim"] else f"> {fmt(O['rpd_lim'], 1)} %"))
+    else:
+        c1_ = float("nan")
+        st.info("Lengkapi dua sampel pertama pada tabel 2 (bobot, volume labu, Abs, FP).")
+
+    # ---------------- 4. akurasi
+    st.subheader("4. Tabel akurasi")
+    st.markdown("**Perhitungan konsentrasi sampel + spike (C3)**")
+    cfg2 = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
+            "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
+    O["sp"] = st.data_editor(O["sp"], key=f"olah_sp_{ver}", num_rows="fixed", hide_index=True, column_config=cfg2, **WIDE)
+    sp_rows, _ = olah_calc(O["sp"], reg)
+    st.dataframe(olah_table(sp_rows), hide_index=True, **WIDE)
+    c3 = sp_rows[0]["kadar"] if sp_rows else float("nan")
+    st.markdown("**Perhitungan konsentrasi spike (C2)**")
+    g1, g2, g3, g4 = st.columns(4)
+    O["c_std"] = g1.text_input("Cons. standar (mg/L)", O["c_std"]); O["v_std"] = g2.text_input("Volume standar (L)", O["v_std"]); O["m_std"] = g3.text_input("Bobot sampel (kg)", O["m_std"])
+    cs_, vs_, ms_ = num_in(O["c_std"]), num_in(O["v_std"]), num_in(O["m_std"])
+    c2v = cs_ * vs_ / ms_ if not any(math.isnan(x) for x in (cs_, vs_, ms_)) and ms_ > 0 else float("nan")
+    g4.metric("C2 (mg/kg)", "" if math.isnan(c2v) else fmt(c2v, 2))
+    st.markdown("**Perhitungan %Recovery**")
+    if not any(math.isnan(x) for x in (c1_, c2v, c3)) and c2v > 0:
+        Rv = (c3 - c1_) / c2v * 100
+        ok_ = CR["rec_min"] <= Rv <= CR["rec_max"]
+        st.dataframe(pd.DataFrame({"Sampel": [sp_rows[0]["name"]], "Rerata kadar C1 (mg/kg)": [fmt(c1_, 2)], "Cons. spike C2 (mg/kg)": [fmt(c2v, 2)],
+                                   "Cons. spl + spike C3 (mg/kg)": [fmt(c3, 2)], "%Recovery": [fmt(Rv, 2)], "Kesimpulan": ["MS" if ok_ else "TMS"]}), hide_index=True, **WIDE)
+        f2 = lambda x: fmt(x, 2).replace(",", "{,}")
+        st.latex(r"\%Recovery = \frac{C_3 - C_1}{C_2} \times 100 = \frac{" + f2(c3) + " - " + f2(c1_) + "}{" + f2(c2v) + r"} \times 100 = " + f2(Rv) + r"\ \%")
+        r1, r2 = st.columns(2)
+        CR["rec_min"] = r1.number_input("Batas bawah recovery (%)", 0.0, 200.0, float(CR["rec_min"]), 1.0)
+        CR["rec_max"] = r2.number_input("Batas atas recovery (%)", 0.0, 200.0, float(CR["rec_max"]), 1.0)
+        verdict(ok_, f"%Recovery = {fmt(Rv, 2)} % (kriteria {fmt(CR['rec_min'], 0)}–{fmt(CR['rec_max'], 0)} %): " + ("MS (memenuhi syarat)" if ok_ else "TMS (tidak memenuhi syarat)"))
+    else:
+        st.info("Lengkapi tabel presisi (C1), tabel sampel + spike (C3), dan data spike (C2).")
 
 
 def page_samples(reg):
