@@ -1208,12 +1208,12 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       });
       const covO = { cell: 4.5 };
       box('cover', 'cover', -23, -15, 13.5, 15, -24.5, 24.5, BEIGE2, covO);
-      box('cover', 'cover', -2, 23, 13.5, 15, -24.5, 24.5, BEIGE2, covO);
+      box('cover', 'cover', -2, 23, 13.5, 15, -24.5, 7, BEIGE2, covO); box('cover', 'cover', -2, 1.5, 13.5, 15, 7, 24.5, BEIGE2, covO); box('cover', 'cover', 22.4, 23, 13.5, 15, 7, 24.5, BEIGE2, covO);
       box('cover', 'cover', -15, -2, 13.5, 15, -24.5, -2, BEIGE2, covO);
       box('cover', 'cover', -15, -2, 13.5, 15, 20, 24.5, BEIGE2, covO);
       for (let i = 0; i < 14; i++) box('vent', 'cover', 6 + i * 1.15, 6.55 + i * 1.15, 15, 15.25, -23.5, -15.5, '#c6ae6c');
       box('lid', 'lid', -15.2, -1.8, 15, 16.6, -2.2, 20.2, '#dcc589', { cell: 4, faceCol: { u: '#111215' } });
-      box('console', 'panel', 1.5, 22.4, 9, 15, 15.6, 24.5, BEIGE, { cell: 4.5 }); box('console', 'panel', 6, 17, 9, 16.5, 7.4, 10.4, BEIGE, { cell: 4.5 });
+      box('console', 'panel', 1.5, 22.4, 9, 15, 7, 24.5, BEIGE, { cell: 4.5 }); box('console', 'panel', 6, 17, 9, 16.5, 7.4, 10.4, BEIGE, { cell: 4.5 });
       box('keypad', 'panel', 2, 21, 15, 16.2, 13, 23.5, CREAM, { bias: -0.6 });
       const keys = [];
       for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) keys.push([2.8 + c * 3.0, 14.2 + r * 2.2]);
@@ -1328,7 +1328,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       if (part.tf) for (const [ax, piv, deg] of part.tf) q = ax === 'x' ? rotX(q, piv, deg * D2R) : rotY(q, piv, deg * D2R);
       if (part.grp === 'lid') { q = rotX(q, [0, 15, -2.2], -102 * this.lid * D2R); q = [q[0], q[1] + 16 * this.topX, q[2]]; }
       if (part.grp === 'cover') q = [q[0], q[1] + 16 * this.topX, q[2]];
-      if (part.grp === 'panel') q = [q[0], q[1] - 6 + 16 * this.topX, q[2]];
+      if (part.grp === 'panel') q = [q[0], q[1] + 16 * this.topX, q[2]];
       if (part.fan) q = rotZ(q, part.fan, this.fanAng);
       if (part.id === 'cuvR' || part.id === 'cuvS') q = [q[0], q[1] + 9 * this.lid, q[2]];
       if (part.ex) q = [q[0] + part.ex[0] * this.sideX, q[1] + part.ex[1] * this.sideX, q[2] + part.ex[2] * this.sideX];
@@ -3604,15 +3604,18 @@ def _fl(x):
         return float("nan")
 
 
+BCOL, VCOL = "Bobot Sampel (kg)", "Volume Labu Takar (L)"
+
+
 def _olah_defaults():
     nan = float("nan")
-    return {"s": pd.DataFrame({"Sampel": ["Blanko Sampel", "Sampel 1", "Sampel 2"], "Bobot (kg)": [nan] * 3, "Volume labu takar (L)": [nan] * 3,
-                               "Volume (L)": [nan] * 3, "Abs": [nan] * 3, "FP": [nan, 1.0, 1.0]}),
-            "sp": pd.DataFrame({"Sampel": ["Sampel 3 (+ spike)"], "Bobot (kg)": [nan], "Volume labu takar (L)": [nan], "Abs": [nan], "FP": [1.0]}),
-            "c_std": "", "v_std": "", "m_std": "", "rpd_lim": 5.0, "ver": 0}
+    return {"s": pd.DataFrame({"Sampel": ["Blanko Sampel", "1", "2"], BCOL: [nan] * 3, VCOL: [nan] * 3, "Volume Sampel (L)": [nan] * 3, "Abs": [nan] * 3, "FP": [nan] * 3}),
+            "sp": pd.DataFrame({"Sampel": ["3"], BCOL: [nan], "Volume Sampel (L)": [nan], "Abs": [nan], "FP": [nan]}),
+            "c2": pd.DataFrame({"Cons. Standar (mg/L)": [nan], "Volume Standar (L)": [nan]}),
+            "rpd_lim": 5.0, "ver": 0}
 
 
-def olah_calc(df, reg, cmin=None, blank=None):
+def olah_calc(df, reg, cmin=None, blank=None, vcol=VCOL):
     """Cons terukur = (Abs − b)/a. Koreksi blanko hanya dipakai bila Cons blanko ≥ 0,1 × konsentrasi standar terkecil;
     bila lebih kecil, Cons terkoreksi = Cons terukur. Kadar = Cons terkoreksi × FP × V labu / bobot."""
     nan = float("nan")
@@ -3625,7 +3628,7 @@ def olah_calc(df, reg, cmin=None, blank=None):
         isb = name.strip().lower().startswith("blanko")
         if isb and not math.isnan(cons):
             cblank = cons
-        rows.append({"name": name, "blank": isb, "A": A, "cons": cons, "fp": _fl(r.get("FP")), "vl": _fl(r.get("Volume labu takar (L)")), "m": _fl(r.get("Bobot (kg)"))})
+        rows.append({"name": name, "blank": isb, "A": A, "cons": cons, "fp": _fl(r.get("FP")), "vl": _fl(r.get(vcol)), "m": _fl(r.get(BCOL))})
     lim = 0.1 * cmin if cmin and cmin > 0 else nan
     if blank is not None:
         cb_used, info = blank
@@ -3646,10 +3649,12 @@ def olah_table(rows):
 
 
 def page_calibration():
-    header("Analisis", "Olah data", "Empat tabel mengikuti lembar kerja: (1) deret standar, (2) kadar sampel, (3) presisi %RPD, (4) akurasi %Recovery.")
+    header("Analisis", "Olah data", "Mengikuti lembar kerja Excel: (1) deret standar, (2) kadar sampel, (3) presisi, (4) akurasi.")
     O = S.setdefault("olah", _olah_defaults())
     for k_, v_ in _olah_defaults().items():
         O.setdefault(k_, v_)
+    if BCOL not in O["s"].columns or "c2" not in O or "Cons. Standar (mg/L)" not in O["c2"].columns or BCOL not in O["sp"].columns:
+        O.update(_olah_defaults())
     c1, c2 = st.columns([2, 1])
     S["cal_name"] = c1.text_input("Analit / metode", S["cal_name"], placeholder="mis. Cr(VI) dengan difenilkarbazida")
     lam_txt = c2.text_input("λ ukur (nm)", fmt(S["cal_lambda"], 1) if S["cal_lambda"] else "")
@@ -3658,12 +3663,13 @@ def page_calibration():
     S["cal_unit"] = "mg/L"
     ver = O["ver"]
     if S["settings"]["mode"] == "latihan":
-        if st.button("Muat data contoh (lembar kerja Cr(VI))"):
+        if st.button("Muat data contoh (lembar kerja Excel Cr(VI))"):
             set_calibration(pd.DataFrame({"C": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], "A": [0.0, 0.080, 0.155, 0.234, 0.312, 0.380], "Pakai": True}), "contoh", name="Cr(VI)", unit="mg/L")
-            O["s"] = pd.DataFrame({"Sampel": ["Blanko Sampel", "Sampel 1", "Sampel 2"], "Bobot (kg)": [float("nan"), 0.0004, 0.0004], "Volume labu takar (L)": [float("nan"), 0.25, 0.25],
-                                   "Volume (L)": [float("nan"), 0.05, 0.05], "Abs": [-0.001, 0.191, 0.184], "FP": [float("nan"), 100.0, 100.0]})
-            O["sp"] = pd.DataFrame({"Sampel": ["Sampel 3 (+ spike)"], "Bobot (kg)": [0.0004], "Volume labu takar (L)": [0.25], "Abs": [0.193], "FP": [100.0]})
-            O["c_std"], O["v_std"], O["m_std"] = "1000", "0,001", "0,0004"
+            nan = float("nan")
+            O["s"] = pd.DataFrame({"Sampel": ["Blanko Sampel", "1", "2"], BCOL: [nan, 0.4006 / 1000, 0.4007 / 1000], VCOL: [nan, 0.25, 0.25], "Volume Sampel (L)": [nan, 0.05, 0.05],
+                                   "Abs": [-0.001, 0.191, 0.184], "FP": [nan, 100.0, 100.0]})
+            O["sp"] = pd.DataFrame({"Sampel": ["3"], BCOL: [0.4023 / 1000], "Volume Sampel (L)": [0.25], "Abs": [0.193], "FP": [100.0]})
+            O["c2"] = pd.DataFrame({"Cons. Standar (mg/L)": [1000.0], "Volume Standar (L)": [0.001]})
             O["ver"] += 1; st.rerun()
 
     # ---------------- 1. deret standar
@@ -3697,12 +3703,20 @@ def page_calibration():
 
     # ---------------- 2. kadar sampel
     st.subheader("2. Tabel hasil perhitungan kadar")
-    st.caption("Cons terukur = (Abs − intercept) / slope  ·  Cons terkoreksi = Cons terukur − Cons blanko (hanya bila Cons blanko ≥ 0,1 × konsentrasi standar terkecil; jika lebih kecil, Cons terkoreksi = Cons terukur)  ·  Kadar = Cons terkoreksi × FP × Volume labu takar / Bobot sampel.")
-    cfg = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
-           "Volume (L)": st.column_config.NumberColumn(format="%.4f"), "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
-    O["s"] = st.data_editor(O["s"], key=f"olah_s_{ver}", num_rows="dynamic", hide_index=True, column_config=cfg, **WIDE)
+    st.caption("Isi kolom putih (Bobot, Volume, Abs, FP). Cons terukur = (Abs − intercept) / slope  ·  Cons terkoreksi = Cons terukur − Cons blanko (hanya bila Cons blanko ≥ 0,1 × konsentrasi standar terkecil; jika lebih kecil, Cons terkoreksi = Cons terukur)  ·  Kadar = Cons terukur (terkoreksi) × FP × Volume labu takar / Bobot sampel.")
+    cfg = {"Bobot Sampel (kg)": st.column_config.NumberColumn(format="%.7f"), "Volume Labu Takar (L)": st.column_config.NumberColumn(format="%.4f"),
+           "Volume Sampel (L)": st.column_config.NumberColumn(format="%.4f"), "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
+    O["s"] = st.data_editor(O["s"], key=f"olah_s_{ver}", num_rows="fixed", hide_index=True, column_config=cfg, **WIDE)
     rows, blk = olah_calc(O["s"], reg if ok_reg else None, cmin)
-    st.dataframe(olah_table(rows), hide_index=True, **WIDE)
+    nanv = float("nan")
+    t2 = pd.DataFrame({"Sampel": [q["name"] for q in rows], "Bobot Sampel (kg)": [fmt(q["m"], 7) if not math.isnan(q["m"]) else "" for q in rows],
+                       "Volume Labu Takar (L)": [fmt(q["vl"], 4) if not math.isnan(q["vl"]) else "" for q in rows],
+                       "Volume Sampel (L)": [fmt(_fl(v), 4) if not math.isnan(_fl(v)) else "" for v in O["s"]["Volume Sampel (L)"]],
+                       "Abs": [fmt(q["A"], 3) if not math.isnan(q["A"]) else "" for q in rows], "Cons terukur (mg/L)": [fmt(q["cons"], 4) if not math.isnan(q["cons"]) else "" for q in rows],
+                       "FP": [fmt(q["fp"], 2) if not math.isnan(q["fp"]) else "" for q in rows],
+                       "Cons Terkoreksi": ["" if (q["blank"] or math.isnan(q["corr"])) else fmt(q["corr"], 4) for q in rows],
+                       "Kadar Cr (VI) (mg/kg)": ["" if (q["blank"] or math.isnan(q["kadar"])) else fmt(q["kadar"], 2) for q in rows]})
+    st.dataframe(t2, hide_index=True, **WIDE)
     bi = blk[1]
     if not math.isnan(bi["cblank"]):
         if bi["use"]:
@@ -3713,48 +3727,59 @@ def page_calibration():
 
     # ---------------- 3. presisi
     st.subheader("3. Tabel presisi")
-    if len(smp) >= 2 and not any(math.isnan(q["kadar"]) for q in smp[:2]):
-        k1, k2 = smp[0]["kadar"], smp[1]["kadar"]
-        c1_, sel, rpd = (k1 + k2) / 2, abs(k1 - k2), rpd_pct(k1, k2)
-        st.dataframe(pd.DataFrame({"Sampel": [smp[0]["name"], smp[1]["name"], "Rerata (C1)", "Selisih", "RPD%"],
-                                   "Kadar (mg/kg)": [fmt(k1, 2), fmt(k2, 2), fmt(c1_, 2), fmt(sel, 2), fmt(rpd, 2)]}), hide_index=True, **WIDE)
-        O["rpd_lim"] = st.number_input("Batas %RPD", 0.1, 50.0, float(O["rpd_lim"]), 0.5)
+    k1 = smp[0]["kadar"] if len(smp) > 0 else nanv
+    k2 = smp[1]["kadar"] if len(smp) > 1 else nanv
+    have = not (math.isnan(k1) or math.isnan(k2))
+    c1_ = (k1 + k2) / 2 if have else nanv
+    sel = abs(k1 - k2) if have else nanv
+    rpd = rpd_pct(k1, k2) if have else nanv
+    g2 = lambda x: "" if math.isnan(x) else fmt(x, 2)
+    st.dataframe(pd.DataFrame({"Sampel": [smp[0]["name"] if smp else "1", smp[1]["name"] if len(smp) > 1 else "2", "Rerata (C1)", "Selisih", "RPD%"],
+                               "Kadar Cr(VI) (mg/kg)": [g2(k1), g2(k2), g2(c1_), g2(sel), g2(rpd)]}), hide_index=True, **WIDE)
+    O["rpd_lim"] = st.number_input("Batas %RPD", 0.1, 50.0, float(O["rpd_lim"]), 0.5)
+    if have:
         f2 = lambda x: fmt(x, 2).replace(",", "{,}")
         st.latex(r"\%RPD = \frac{|C_1 - C_2|}{\bar{C}} \times 100 = \frac{" + f2(sel) + "}{" + f2(c1_) + r"} \times 100 = " + f2(rpd) + r"\ \%")
         verdict(rpd <= O["rpd_lim"], f"%RPD = {fmt(rpd, 2)} % " + (f"≤ {fmt(O['rpd_lim'], 1)} %" if rpd <= O["rpd_lim"] else f"> {fmt(O['rpd_lim'], 1)} %"))
     else:
-        c1_ = float("nan")
-        st.info("Lengkapi dua sampel pertama pada tabel 2 (bobot, volume labu, Abs, FP).")
+        st.info("Tabel terisi otomatis setelah Bobot, Volume, Abs, dan FP sampel 1 dan 2 pada tabel 2 diisi.")
 
     # ---------------- 4. akurasi
     st.subheader("4. Tabel akurasi")
-    st.markdown("**Perhitungan konsentrasi sampel + spike (C3)**")
-    cfg2 = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
+    st.markdown("**Tabel perhitungan konsentrasi sampel + spike (C3)**")
+    cfg2 = {"Bobot Sampel (kg)": st.column_config.NumberColumn(format="%.7f"), "Volume Sampel (L)": st.column_config.NumberColumn(format="%.4f"),
             "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
     O["sp"] = st.data_editor(O["sp"], key=f"olah_sp_{ver}", num_rows="fixed", hide_index=True, column_config=cfg2, **WIDE)
-    sp_rows, _ = olah_calc(O["sp"], reg if ok_reg else None, cmin, blank=blk)
-    st.dataframe(olah_table(sp_rows), hide_index=True, **WIDE)
-    c3 = sp_rows[0]["kadar"] if sp_rows else float("nan")
-    st.markdown("**Perhitungan konsentrasi spike (C2)**")
-    g1, g2, g3, g4 = st.columns(4)
-    O["c_std"] = g1.text_input("Cons. standar (mg/L)", O["c_std"]); O["v_std"] = g2.text_input("Volume standar (L)", O["v_std"]); O["m_std"] = g3.text_input("Bobot sampel (kg)", O["m_std"])
-    cs_, vs_, ms_ = num_in(O["c_std"]), num_in(O["v_std"]), num_in(O["m_std"])
-    c2v = cs_ * vs_ / ms_ if not any(math.isnan(x) for x in (cs_, vs_, ms_)) and ms_ > 0 else float("nan")
-    g4.metric("C2 (mg/kg)", "" if math.isnan(c2v) else fmt(c2v, 2))
-    st.markdown("**Perhitungan %Recovery**")
-    if not any(math.isnan(x) for x in (c1_, c2v, c3)) and c2v > 0:
-        Rv = (c3 - c1_) / c2v * 100
-        ok_ = CR["rec_min"] <= Rv <= CR["rec_max"]
-        st.dataframe(pd.DataFrame({"Sampel": [sp_rows[0]["name"]], "Rerata kadar C1 (mg/kg)": [fmt(c1_, 2)], "Cons. spike C2 (mg/kg)": [fmt(c2v, 2)],
-                                   "Cons. spl + spike C3 (mg/kg)": [fmt(c3, 2)], "%Recovery": [fmt(Rv, 2)], "Kesimpulan": ["MS" if ok_ else "TMS"]}), hide_index=True, **WIDE)
+    sp_rows, _ = olah_calc(O["sp"], reg if ok_reg else None, cmin, blank=blk, vcol="Volume Sampel (L)")
+    q3 = sp_rows[0]
+    st.dataframe(pd.DataFrame({"Sampel": [q3["name"]], "Bobot Sampel (kg)": [fmt(q3["m"], 7) if not math.isnan(q3["m"]) else ""], "Volume Sampel (L)": [fmt(q3["vl"], 4) if not math.isnan(q3["vl"]) else ""],
+                               "Abs": [fmt(q3["A"], 3) if not math.isnan(q3["A"]) else ""], "Cons. terukur (mg/L)": [fmt(q3["cons"], 4) if not math.isnan(q3["cons"]) else ""],
+                               "FP": [fmt(q3["fp"], 2) if not math.isnan(q3["fp"]) else ""], "Cons Terkoreksi": ["" if math.isnan(q3["corr"]) else fmt(q3["corr"], 4)],
+                               "Kadar Cr (VI) (mg/kg)": ["" if math.isnan(q3["kadar"]) else fmt(q3["kadar"], 2)]}), hide_index=True, **WIDE)
+    c3 = q3["kadar"]
+    st.markdown("**Tabel perhitungan konsentrasi spike (C2)**")
+    O["c2"] = st.data_editor(O["c2"], key=f"olah_c2_{ver}", num_rows="fixed", hide_index=True, **WIDE,
+                             column_config={"Cons. Standar (mg/L)": st.column_config.NumberColumn(format="%.2f"), "Volume Standar (L)": st.column_config.NumberColumn(format="%.5f")})
+    cs_, vs_ = _fl(O["c2"].iloc[0, 0]), _fl(O["c2"].iloc[0, 1]); ms_ = q3["m"]
+    c2v = cs_ * vs_ / ms_ if not any(math.isnan(x) for x in (cs_, vs_, ms_)) and ms_ > 0 else nanv
+    st.dataframe(pd.DataFrame({"Cons. Standar (mg/L)": [fmt(cs_, 2) if not math.isnan(cs_) else ""], "Volume Standar (L)": [fmt(vs_, 5) if not math.isnan(vs_) else ""],
+                               "Bobot Sampel (kg)": [fmt(ms_, 7) if not math.isnan(ms_) else ""], "C2 (mg/kg)": ["" if math.isnan(c2v) else fmt(c2v, 2)]}), hide_index=True, **WIDE)
+    st.caption("Bobot sampel pada tabel C2 otomatis sama dengan bobot sampel + spike (C3).")
+    st.markdown("**Tabel perhitungan %Recovery**")
+    ready = not any(math.isnan(x) for x in (c1_, c2v, c3)) and c2v > 0
+    Rv = (c3 - c1_) / c2v * 100 if ready else nanv
+    ok_ = ready and CR["rec_min"] <= Rv <= CR["rec_max"]
+    st.dataframe(pd.DataFrame({"Sampel": [q3["name"]], "Rerata Kadar Cr(VI) C1 (mg/kg)": [g2(c1_)], "Cons. Spike C2 (mg/kg)": [g2(c2v)],
+                               "Cons. spl + spike C3 (mg/kg)": [g2(c3)], "%Recovery": [g2(Rv)], "Kesimpulan": [("MS" if ok_ else "TMS") if ready else ""]}), hide_index=True, **WIDE)
+    r1, r2 = st.columns(2)
+    CR["rec_min"] = r1.number_input("Batas bawah recovery (%)", 0.0, 200.0, float(CR["rec_min"]), 1.0)
+    CR["rec_max"] = r2.number_input("Batas atas recovery (%)", 0.0, 200.0, float(CR["rec_max"]), 1.0)
+    if ready:
         f2 = lambda x: fmt(x, 2).replace(",", "{,}")
         st.latex(r"\%Recovery = \frac{C_3 - C_1}{C_2} \times 100 = \frac{" + f2(c3) + " - " + f2(c1_) + "}{" + f2(c2v) + r"} \times 100 = " + f2(Rv) + r"\ \%")
-        r1, r2 = st.columns(2)
-        CR["rec_min"] = r1.number_input("Batas bawah recovery (%)", 0.0, 200.0, float(CR["rec_min"]), 1.0)
-        CR["rec_max"] = r2.number_input("Batas atas recovery (%)", 0.0, 200.0, float(CR["rec_max"]), 1.0)
         verdict(ok_, f"%Recovery = {fmt(Rv, 2)} % (kriteria {fmt(CR['rec_min'], 0)}–{fmt(CR['rec_max'], 0)} %): " + ("MS (memenuhi syarat)" if ok_ else "TMS (tidak memenuhi syarat)"))
     else:
-        st.info("Lengkapi tabel presisi (C1), tabel sampel + spike (C3), dan data spike (C2).")
+        st.info("Tabel terisi otomatis setelah tabel presisi (C1), tabel sampel + spike (C3), dan data spike (C2) lengkap.")
 
 
 def page_samples(reg):
