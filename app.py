@@ -1579,7 +1579,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     var c = COMP[k], b = compBounds(c.ids), d = Math.max(20, Math.min(95, b.s * 2.6 + 12));
     m.hl = new Set(c.ids); m.sel = null; m.labels = true; m.compSel = true; m.beamLimit = 99; m.focus([c.v[0], c.v[1], d, b.c]);
     document.querySelectorAll('#chips button').forEach(function (x, i) { x.classList.toggle('on', i === k); });
-    $('#cmpi').innerHTML = '<div class="tt">' + c.n + '</div><div class="kv"><b>Fungsi</b><span>' + c.f + '</span><b>Prinsip</b><span>' + c.p + '</span><b>Material / jenis</b><span>' + c.m + '</span><b>Hubungan dengan pengukuran</b><span>' + c.h + '</span></div>';
+    $('#cmpi').innerHTML = '<div class="tt">' + c.n + '</div><div class="kv"><b>Fungsi</b><span>' + c.f + '</span></div>';
   }
   (function () {
     var box = $('#chips'); if (!box) return;
@@ -1599,7 +1599,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
   function goStep(i) {
     cur = Math.max(0, Math.min(TOUR.length - 1, i)); var s = TOUR[cur]; seen[cur] = 1;
     m.hl = new Set(s.ids); m.beamLimit = s.lim; m.focus(INIT.slave ? [s.v[0], Math.min(s.v[1], 26), s.v[2] * 0.6, s.v[3]] : s.v); m.sel = null;
-    $('#tt').textContent = (cur + 1) + '. ' + s.t; $('#tx').innerHTML = '<div class="kv"><b>Fungsi</b><span>' + s.f + '</span><b>Prinsip</b><span>' + s.p + '</span><b>Material / jenis</b><span>' + s.m + '</span><b>Hubungan dengan pengukuran</b><span>' + s.h + '</span></div>';
+    $('#tt').textContent = (cur + 1) + '. ' + s.t; $('#tx').innerHTML = '<div class="kv"><b>Fungsi</b><span>' + s.f + '</span></div>';
     document.querySelectorAll('#steps button').forEach(function (b, k) { b.classList.toggle('on', k === cur); b.classList.toggle('seen', k !== cur && !!seen[k]); });
     $('#prev').disabled = cur === 0; $('#next').textContent = cur === TOUR.length - 1 ? 'Ulangi tur ↺' : 'Berikutnya ▶';
     m.labels = true; sync();
@@ -1627,7 +1627,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
   if (INIT.slave) {
     $('#wrap').classList.add('slave');
     window.addEventListener('message', function (e) { var d = e.data; if (!d || d.src !== 'uv1700') return;
-      if (d.cmd === 'tour') goStep(d.k); else if (d.cmd === 'lam') setLam(d.v); else if (d.cmd === 'abs') { m.abs = d.v; m._kick(); } else if (d.cmd === 'sol') { m.solColor = d.v; m._kick(); } });
+      if (d.cmd === 'tour') goStep(d.k); else if (d.cmd === 'cmp') pickComp(d.k); else if (d.cmd === 'lam') setLam(d.v); else if (d.cmd === 'abs') { m.abs = d.v; m._kick(); } else if (d.cmd === 'sol') { m.solColor = d.v; m._kick(); } });
   }
   m.toggle('beam', true); if (INIT.shell) m.toggle('shell', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
   setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
@@ -1664,6 +1664,7 @@ canvas#c{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .hud .sc{font-size:22px;line-height:1.1}.hud .tm{color:#a5b4fc}
 .bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a3e635);width:0}
 .ikbar{position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:6;display:none;gap:6px;align-items:center;background:rgba(20,18,58,.88);padding:6px 8px;border-radius:12px;color:#e0e7ff;font:500 12px 'JetBrains Mono',monospace}.ikbar.show{display:flex}.ikbar button{border:0;border-radius:8px;padding:6px 10px;background:#fff;color:#1e1b4b;font:600 12px Inter,sans-serif;cursor:pointer}
+.ikread{position:absolute;inset:0;z-index:9;background:rgba(20,18,58,.86);display:none;flex-direction:column;align-items:center;padding:8px;gap:8px}.ikread.show{display:flex}.ikbar2{display:flex;gap:6px}.ikbar2 button{border:0;border-radius:8px;padding:6px 12px;background:#fff;color:#1e1b4b;font:600 12px Inter,sans-serif;cursor:pointer}.ikpgs{flex:1;min-height:0;display:flex;gap:8px;justify-content:center;width:100%}.ikpgs canvas{height:100%;max-width:49%;object-fit:contain;background:#fff;border-radius:3px}
 .toast{z-index:7;position:absolute;left:50%;top:50px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 .toast.show{opacity:1}.toast.info{background:#14123a;color:#fff}.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#e11d48;color:#fff}.toast.warn{background:#f59e0b;color:#1f1300}
 .modal{position:absolute;inset:0;background:rgba(20,18,58,.45);display:none;align-items:center;justify-content:center;z-index:8}
@@ -1679,6 +1680,7 @@ canvas#c{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
 .card h4{margin:0 0 7px;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
+.chips button.chip{border:0;cursor:pointer}.chips button.chip:hover{background:#e0e3f7}
 .chip{font:500 11px 'JetBrains Mono',monospace;padding:3px 8px;border-radius:99px;background:#f1f2f8;color:#6b7194}
 .chip.on{background:#dff7f1;color:#0b7a6e}.chip.mid{background:#fff4d6;color:#9a6a00}
 .now{background:linear-gradient(135deg,#eef0ff,#f5efff);border-color:#d9d4ff}
@@ -1741,9 +1743,10 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
       <button data-v="isi">Labu & kuvet</button><button data-v="komputer">Komputer</button><button data-v="belakang">Kabel & UPS</button><button data-v="ik">Buku IK</button>
     </div>
     <div class="hud"><div>SKOR PROSEDUR</div><div class="sc" id="score">100</div><div class="tm" id="clock">00:00</div><div class="bar"><i id="prog"></i></div></div>
-    <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="sound" aria-pressed="true">Suara</button><button data-t="pip">Layar komputer</button></div>
+    <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="sound" aria-pressed="true">Suara</button><button data-t="pip">Zoom monitor</button></div>
     <div class="pip" id="pip"><div class="ph"><span>MONITOR · <span id="pcst" style="color:#8b93b8">MATI</span></span><span><button data-t="pipbig" id="pipbig">Perbesar</button><button data-t="pipx">Tutup</button></span></div><canvas id="pc" width="1040" height="610"></canvas></div>
-    <div class="ikbar" id="ikbar"><button data-ik="-1">◀ Halaman</button><span id="ikpg"></span><button data-ik="1">Halaman ▶</button><button data-ik="0">Tutup buku</button></div>
+    <div class="ikbar" id="ikbar"><button data-ik="-1">◀ Halaman</button><span id="ikpg"></span><button data-ik="1">Halaman ▶</button><button data-ikr="1">Baca besar</button><button data-ik="0">Tutup buku</button></div>
+    <div class="ikread" id="ikread"><div class="ikbar2"><button data-ik="-1">◀ Halaman</button><button data-ik="1">Halaman ▶</button><button data-ikr="0">Tutup ✕</button></div><div class="ikpgs"><canvas id="ikA" width="720" height="1020"></canvas><canvas id="ikB" width="720" height="1020"></canvas></div></div>
     <div class="toast" id="toast"></div>
     <div class="sub" id="sub"></div>
     <div class="inner" id="inner"><div class="itop"><span class="ibadge" id="ibadge"></span><button id="icx"></button></div><iframe id="innerf" title="UV-1700"></iframe><div class="icap"><b id="icT"></b><span id="icF"></span></div></div>
@@ -1760,6 +1763,7 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
       <div class="ctl"><button id="b_rst"></button><button id="b_prev"></button><button id="b_next"></button></div>
       <div class="ctl"><span class="lb" id="lb_spd"></span><button data-spd="0.5">0,5×</button><button data-spd="1">1×</button><button data-spd="2">2×</button><span class="lb" id="lb_lng" style="margin-left:6px"></span><button data-lng="id">ID</button><button data-lng="en">EN</button></div>
       <button class="go" id="gobtn" style="display:none">Kerjakan</button></div>
+    <div class="card"><div class="sec" id="cmpT" style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--muted);margin-bottom:6px">ZOOM KOMPONEN UV-1700</div><div class="chips" id="cmps"></div></div>
     <div class="card"><details class="man"><summary>Semua langkah IK/LAB.INST/6 <span id="ikn"></span></summary><div class="ik" id="iklist" style="margin-top:6px"></div>
       <div class="hint" style="margin-top:6px"><span class="rk">REK</span> halaman 1 IK belum difoto; langkah bagian A dan B-Spektrum 1–5 disusun dari prosedur baku UVProbe dan perlu dicocokkan dengan IK asli.</div></details></div>
     <div class="card"><details class="man"><summary>Status alat <span id="ident" style="text-transform:none;letter-spacing:0"></span></summary><div class="chips" id="chips" style="margin-top:6px"></div></details></div>
@@ -1982,8 +1986,8 @@ box('monitor', 'room', -60.5, -55.5, 0.4, 11.5, -18.2, -15.4, '#1b1c20', { cell:
 box('monitor', 'room', -82, -34, 11, 41.5, -17.4, -14.6, '#0e0f12', { cell: 99, skip: ['f'] });
 box('monitor', 'room', -82, -34, 11, 13.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 }); box('monitor', 'room', -82, -34, 40.2, 41.5, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 });
 box('monitor', 'room', -82, -81, 13.2, 40.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 }); box('monitor', 'room', -35, -34, 13.2, 40.2, -14.6, -14.4, '#17181c', { cell: 99, bias: -4 });
-box('screen', 'room', -81, -35, 13.2, 40.2, -14.6, -14.5, '#000000', { bias: -25, dyn: 'screen', dynFace: 'f', cell: 99, text: { face: 'f', w: 1040, h: 610, screen: true } });
-box('monitor', 'room', -37.6, -36.6, 11.7, 12.4, -14.6, -14.3, '#222', { bias: -26, dyn: 'monled' });
+box('screen', 'room', -81, -35, 13.2, 40.2, -14.6, -14.5, '#000000', { bias: -6, dyn: 'screen', dynFace: 'f', cell: 99, text: { face: 'f', w: 1040, h: 610, screen: true } });
+box('monitor', 'room', -37.6, -36.6, 11.7, 12.4, -14.6, -14.3, '#222', { bias: -7, dyn: 'monled' });
 box('keyboard', 'room', -84, -52, -1.4, -0.4, 0, 11, '#16171a', { cell: 6 });
 for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) box('keyboard', 'room', -83 + c * 2.2, -81.3 + c * 2.2, -0.4, 0.1, 0.8 + r * 2.0, 2.3 + r * 2.0, '#2a2c31', { bias: -0.5 });
 box('mousepad', 'room', -50, -39, -1.4, -1.15, 0, 11, '#efe08a'); box('mouse', 'room', -46, -42, -1.15, 0.5, 3, 8.5, '#111214', { faceCol: { t: '#9aa0a8' } });
@@ -2022,15 +2026,6 @@ box('beaker', 'beakerW', BKX - 1.6, BKX + 1.6, 0.4, 3.6, BKZ + 3.18, BKZ + 3.3, 
 box('logbook', 'room', -104, -88, -1.4, -0.4, 20, 33, '#1e3a8a', { cell: 99, faceCol: { t: '#22409a' }, text: { face: 't', w: 120, h: 100, lines: [['LOG BOOK', 60, 40, 'center', '700 15px Arial', '#e0e7ff'], ['UV-1700', 60, 60, 'center', '600 12px Arial', '#c7d2fe']] } });
 box('logbook', 'room', -86, -85.4, -0.6, -0.1, 21, 31, '#111', {});
 
-// ---- Buku Instruksi Kerja (IK/LAB.INST/6): dibuka seperti buku asli ----
-const IKL = 7, IKX = -124, IKW = 16, IKZ0 = 20, IKZ1 = 33, IKTH = 0.14, IKB = -0.9;
-box('ikbook', 'room', IKX, IKX + IKW, -1.4, IKB, IKZ0, IKZ1, '#6b1313', { cell: 99 });
-for (let i = 0; i < IKL; i++) {
-  const y0 = IKB + (IKL - 1 - i) * IKTH, y1 = y0 + IKTH, cov = i === 0, col = cov ? '#7f1d1d' : '#fbfaf4';
-  box('ikbook', 'ikleaf', IKX, IKX + IKW, y0, y1, IKZ0, IKZ1, col, { cell: 99, leaf: i, faceCol: { f: '#efece2', r: '#efece2', b: '#efece2' } });
-  box('ikbook', 'ikleaf', IKX, IKX + IKW, y1, y1 + 0.01, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'f', bias: -2, skip: ['f', 'b', 'l', 'r', 'u'], text: { face: 't', w: 640, h: 520, ik: 2 * i } });
-  box('ikbook', 'ikleaf', IKX, IKX + IKW, y0 - 0.01, y0, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'b', bias: -2, skip: ['f', 'b', 'l', 'r', 't'], text: { face: 'u', w: 640, h: 520, ik: 2 * i + 1, rot: true } });
-}
 box('drymat', 'room', -20, -7, -1.4, -1.25, 26, 34, '#ffffff', { cell: 99 });
 // labu takar 50 mL: alas datar, badan bulat, leher panjang bergaris tera, sumbat biru
 const FLY = -1.4, FS = 0.74;
@@ -2095,7 +2090,7 @@ const INFO = {
 const cv = $('#c'), ctx = cv.getContext('2d'), pcc = $('#pc'), pctx = pcc.getContext('2d');
 const VIEWS = { meja: [-14, 26, 270, [-18, 6, 0]], alat: [-30, 24, 100, [0, 9, 0]], kompartemen: [-12, 58, 62, [-8, 8, 8]], kerja: [-26, 34, 100, [-40, 3, 16]],
   komputer: [-6, 10, 105, [-62, 20, -6]], ups: [-34, 18, 115, [44, 8, -12]], belakang: [200, 34, 230, [-25, 4, -25]], printer: [-30, 22, 75, [-116, 4, -4]],
-  kering: [-20, 45, 70, [-20, 2, 22]], log: [-15, 50, 70, [-96, 0, 20]], ik: [-1, 70, 40, [-124, -1, 27.5]], isi: [-18, 32, 128, [-52, 5, 18]], kursi: [-24, 24, 210, [-24, -26, 50]] };
+  kering: [-20, 45, 70, [-20, 2, 22]], log: [-15, 50, 70, [-96, 0, 20]], ik: [-1, 78, 46, [-118, -1, 26.5]], isi: [-18, 32, 128, [-52, 5, 18]], kursi: [-24, 24, 210, [-24, -26, 50]] };
 const CAM = { yaw: -14, pitch: 26, dist: 270, target: [-18, 6, 0] };
 let camAnim = null, viewName = 'meja';
 function setView(name) { if (name === 'ik') ST.ikT = Math.max(1, ST.ikT); else ST.ikT = 0; $('#ikbar').classList.toggle('show', name === 'ik'); const v = VIEWS[name]; if (!v || name === viewName && !camAnim) { if (v) viewName = name; return; } viewName = name; camAnim = { from: [CAM.yaw, CAM.pitch, CAM.dist, CAM.target.slice()], to: v, t: 0 };
@@ -2178,7 +2173,7 @@ function draw() {
       else if (dy === 'liqR' || dy === 'liqS') { const c = ST.cuv[dy[3]]; col = c.content ? SOL[c.content].col : '#fff'; }
     }
     if (selId && part.id === selId) emi += 0.15;
-    const it = { part, pts: cs.map(proj), depth: CAM.dist - cen[2] + part.bias + (part.grp === 'inner' || part.grp === 'comp' ? 0.35 : 0) + (facing ? 0 : 0.02), fill: shade(col, lk, emi), alpha, facing };
+    const it = { part, pts: cs.map(proj), depth: CAM.dist - cen[2] + part.bias + (part.grp === 'inner' || part.grp === 'comp' ? 0.35 : 0) + (facing ? 0 : 0.02), fill: shade(col, lk, emi), alpha, facing, cs };
     (part.bg ? bg : items).push(it);
   }
   bg.sort((a, b) => b.depth - a.depth); paint(bg);
@@ -2222,11 +2217,32 @@ function paint(list) {
     if (it.alpha > 0.97) { ctx.strokeStyle = it.fill; ctx.lineWidth = 1; ctx.stroke(); }
     if (selId && it.part.id === selId) { ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.2; ctx.stroke(); }
     ctx.globalAlpha = 1;
-    if (it.part.text && it.facing && (it.part.leaf == null || ikShow(it.part))) faceText(it.part, p);
+    if (it.part.text && it.facing && (it.part.leaf == null || ikShow(it.part))) faceText(it.part, p, it);
     if (it.facing && it.alpha > 0.3 && !it.part.bg) drawn.push({ id: it.part.id, p });
   }
 }
-function faceText(part, p) {
+let SCRCS = null;
+function screenHit(x, y) {
+  if (!SCRCS) return null; const N = 12, M = 8, bl = (u, v) => proj(lerp3(lerp3(SCRCS[0], SCRCS[1], u), lerp3(SCRCS[3], SCRCS[2], u), v));
+  for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) { const u0 = i / N, u1 = (i + 1) / N, v0 = j / M, v1 = (j + 1) / M, q = [bl(u0, v0), bl(u1, v0), bl(u1, v1), bl(u0, v1)];
+    let c = false; for (let a = 0, b = 3; a < 4; b = a++) { if (((q[a][1] > y) !== (q[b][1] > y)) && (x < (q[b][0] - q[a][0]) * (y - q[a][1]) / (q[b][1] - q[a][1]) + q[a][0])) c = !c; }
+    if (c) { const TL = q[3], TR = q[2], BL = q[0], dx = x - TL[0], dy = y - TL[1], ax = TR[0] - TL[0], ay = TR[1] - TL[1], bx = BL[0] - TL[0], by = BL[1] - TL[1], det = ax * by - ay * bx || 1; const fu = (dx * by - dy * bx) / det, fv = (ax * dy - ay * dx) / det;
+      return { x: (u0 + fu * (u1 - u0)) * 1040, y: (1 - v1 + fv * (v1 - v0)) * 610 }; } }
+  return null;
+}
+function pcPress(x, y) { const b = pcBtns.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h); if (!b) return;
+  if (b.act.startsWith('tab')) { ACT[b.act](); drawPC(); } else if (ACT[b.act]) run(() => ACT[b.act]()); }
+function screenMesh(t, cs) {
+  SCRCS = cs;
+  const N = 12, M = 8, bl = (u, v) => proj(lerp3(lerp3(cs[0], cs[1], u), lerp3(cs[3], cs[2], u), v)), dpr = cv.width / Math.max(1, W), sw = t.w / N, sh = t.h / M;
+  for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) {
+    const u0 = i / N, u1 = (i + 1) / N, v0 = j / M, v1 = (j + 1) / M, TL = bl(u0, v1), TR = bl(u1, v1), BL = bl(u0, v0);
+    ctx.save(); ctx.setTransform((TR[0] - TL[0]) / sw * dpr, (TR[1] - TL[1]) / sw * dpr, (BL[0] - TL[0]) / sh * dpr, (BL[1] - TL[1]) / sh * dpr, TL[0] * dpr, TL[1] * dpr);
+    ctx.drawImage(pcc, u0 * t.w, (1 - v1) * t.h, sw, sh, -1, -1, sw + 2, sh + 2); ctx.restore();
+  }
+}
+function faceText(part, p, it) {
+  if (part.text.screen && it && it.cs) { screenMesh(part.text, it.cs); return; }
   const t = part.text, TL = p[3], TR = p[2], BL = p[0]; const dpr = cv.width / Math.max(1, W);
   ctx.save(); ctx.setTransform((TR[0] - TL[0]) / t.w * dpr, (TR[1] - TL[1]) / t.w * dpr, (BL[0] - TL[0]) / t.h * dpr, (BL[1] - TL[1]) / t.h * dpr, TL[0] * dpr, TL[1] * dpr);
   if (t.ik != null) { if (t.rot) { ctx.translate(t.w, t.h); ctx.rotate(Math.PI); } ctx.drawImage(ikTex(t.ik), 0, 0, t.w, t.h); } else if (t.screen) ctx.drawImage(pcc, 0, 0, t.w, t.h); else if (t.lcd) drawLCD(ctx);
@@ -2830,7 +2846,7 @@ function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; tw.el += PAUSED ? 0 : dt * 1000 * SPD; const t = tw.dur <= 0 ? 1 : Math.min(1, tw.el / tw.dur); tw.fn(t); dirty = true; if (t >= 1) { tweens.splice(i, 1); tw.res(); } }
   const e = (cur, tgt, sp) => { const d = tgt - cur; return Math.abs(d) < 0.002 ? tgt : cur + d * Math.min(1, dt * sp); };
-  if (ST.ikp !== ST.ikT) { const d = ST.ikT - ST.ikp; ST.ikp = Math.abs(d) < 0.01 ? ST.ikT : ST.ikp + Math.sign(d) * Math.min(Math.abs(d), dt * 2.4); dirty = true; $('#ikpg').textContent = 'Spread ' + Math.round(ST.ikT) + '/' + IKL; }
+  if (ST.ikp !== ST.ikT) { const d = ST.ikT - ST.ikp; ST.ikp = Math.abs(d) < 0.01 ? ST.ikT : ST.ikp + Math.sign(d) * Math.min(Math.abs(d), dt * 2.4); dirty = true; $('#ikpg').textContent = 'Hal. ' + (2 * Math.round(ST.ikT) - 1) + '–' + Math.min(2 * Math.round(ST.ikT), IKPAGES.length) + ' / ' + IKPAGES.length; }
   const nx = e(ST.xray, ST.xrayT, 5); if (nx !== ST.xray) { ST.xray = nx; dirty = true; }
   if (camAnim) { const a = camAnim; a.t = Math.min(1, a.t + (PAUSED ? 0 : dt * 1.6 * Math.max(1, SPD))); const k = ease(a.t); let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
     CAM.yaw = a.from[0] + dy * k; CAM.pitch = a.from[1] + (a.to[1] - a.from[1]) * k; CAM.dist = a.from[2] + (a.to[2] - a.from[2]) * k; CAM.target = lerp3(a.from[3], a.to[3], k); if (a.t >= 1) camAnim = null; dirty = true; }
@@ -2841,48 +2857,62 @@ function loop(now) {
 }
 
 
+
+/* ================= geometri Buku IK (dibuat setelah isi diketahui) ================= */
+let IKL = 4, IKMAX = 4; const IKX = -118, IKW = 12, IKZ0 = 18, IKZ1 = 35, IKTH = 0.14, IKB = -0.9;
+function ikGeom() {
+  ikBuild(); const Pn = IKPAGES.length;
+  if (Pn % 2) { IKL = (Pn + 1) / 2; IKMAX = IKL; } else { IKL = Pn / 2 + 1; IKMAX = Pn / 2; }
+  box('ikbook', 'room', IKX, IKX + IKW, -1.4, IKB, IKZ0, IKZ1, '#6b1313', { cell: 99 });
+  for (let i = 0; i < IKL; i++) {
+    const y0 = IKB + (IKL - 1 - i) * IKTH, y1 = y0 + IKTH, cov = i === 0, col = cov ? '#7f1d1d' : '#fbfaf4';
+    box('ikbook', 'ikleaf', IKX, IKX + IKW, y0, y1, IKZ0, IKZ1, col, { cell: 99, leaf: i, faceCol: { f: '#efece2', r: '#efece2', b: '#efece2' } });
+    box('ikbook', 'ikleaf', IKX, IKX + IKW, y1, y1 + 0.01, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'f', bias: -2, skip: ['f', 'b', 'l', 'r', 'u'], text: { face: 't', w: 480, h: 680, ik: 2 * i } });
+    box('ikbook', 'ikleaf', IKX, IKX + IKW, y0 - 0.01, y0, IKZ0, IKZ1, col, { cell: 99, leaf: i, lside: 'b', bias: -2, skip: ['f', 'b', 'l', 'r', 't'], text: { face: 'u', w: 480, h: 680, ik: 2 * i + 1, rot: true } });
+  }
+}
+
 /* ================= isi Buku IK ================= */
 function ikShow(part) { const i = part.leaf, p = ST.ikp; return part.lside === 'f' ? (i >= Math.floor(p + 1e-6) && i <= Math.floor(p + 1e-6) + 1) : (i <= Math.ceil(p - 1e-6) - 1 && i >= Math.ceil(p - 1e-6) - 2); }
-const IKC = {}; let IKPAGES = null;
+const IKC = {}; let IKPAGES = null; const IKK = 1.5, IKNAME = 'Lilis Sulistiawaty, M.Si';
 function ikBuild() {
-  const m = document.createElement('canvas').getContext('2d'); m.font = '14px Arial'; const W0 = 600, IND = 26;
+  const m = document.createElement('canvas').getContext('2d'); m.font = '15px Arial'; const W0 = 410, IND = 30;
   const wrap = (t, w) => { const out = []; let cur = ''; for (const wd of t.split(' ')) { const tt = cur ? cur + ' ' + wd : wd; if (m.measureText(tt).width > w && cur) { out.push(cur); cur = wd; } else cur = tt; } if (cur) out.push(cur); return out; };
   const L = []; let last = '';
-  STEPS.forEach((st, i) => { if (st.sec !== last) { last = st.sec; L.push({ k: 'sec', t: st.sec }); }
-    const tx = (typeof stepT === 'function' ? stepT(i) : st.t); const ws = wrap(tx, W0 - IND); ws.forEach((l, j) => L.push({ k: 'step', n: j === 0 ? (st.no || '') : '', t: l })); L.push({ k: 'gap' }); });
+  STEPS.forEach((st, i) => { if (st.sec !== last) { last = st.sec; L.push({ k: 'sec', t: st.sec.startsWith('D.') ? 'D. Mengeringkan Kuvet (Kaca)' : st.sec }); }
+    const tx = (typeof stepT === 'function' ? stepT(i) : st.t); wrap(tx, W0 - IND).forEach((l, j) => L.push({ k: 'step', n: j === 0 ? (st.no || '') : '', t: l })); L.push({ k: 'gap' }); });
   L.push({ k: 'sign' });
-  const pages = [[]]; let y = 0; const H = 350;
-  for (const ln of L) { const h = ln.k === 'sec' ? 30 : ln.k === 'gap' ? 5 : ln.k === 'sign' ? 120 : 19; if (y + h > H) { pages.push([]); y = 0; if (ln.k === 'gap') continue; } pages[pages.length - 1].push(ln); y += h; }
+  const pages = [[]]; let y = 0; const H = 482;
+  for (const ln of L) { const h = ln.k === 'sec' ? 34 : ln.k === 'gap' ? 6 : ln.k === 'sign' ? 150 : 21; if (y + h > H) { pages.push([]); y = 0; if (ln.k === 'gap') continue; } pages[pages.length - 1].push(ln); y += h; }
   IKPAGES = pages;
+}
+function ikLogo(c, cx, cy, r) {
+  c.save(); c.beginPath(); for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; c.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } c.closePath(); c.fillStyle = '#fff'; c.fill(); c.lineWidth = 2.2; c.strokeStyle = '#1e3a8a'; c.stroke();
+  c.beginPath(); c.arc(cx, cy + 2, r * 0.46, 0, 7); c.lineWidth = 3.2; c.strokeStyle = '#dc2626'; c.stroke(); c.beginPath(); c.arc(cx, cy + 2, r * 0.22, 0, 7); c.fillStyle = '#1e3a8a'; c.fill(); c.restore();
 }
 function ikTex(s) {
   if (IKC[s]) return IKC[s];
   if (!IKPAGES) ikBuild();
-  const cv2 = document.createElement('canvas'); cv2.width = 640; cv2.height = 520; const c = cv2.getContext('2d');
-  c.fillStyle = s === 0 ? '#7f1d1d' : '#fbfaf4'; c.fillRect(0, 0, 640, 520); c.textBaseline = 'alphabetic';
+  const cv2 = document.createElement('canvas'); cv2.width = 480 * IKK; cv2.height = 680 * IKK; const c = cv2.getContext('2d'); c.scale(IKK, IKK);
+  c.fillStyle = s === 0 ? '#7f1d1d' : '#fbfaf4'; c.fillRect(0, 0, 480, 680); c.textBaseline = 'alphabetic';
   if (s === 0) {
-    c.strokeStyle = '#e8c76a'; c.lineWidth = 4; c.strokeRect(24, 24, 592, 472); c.fillStyle = '#f3e3b0'; c.textAlign = 'center';
-    c.font = '700 22px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 320, 90); c.font = '500 16px Arial'; c.fillText('Laboratorium Instrumentasi · Analisis Kimia', 320, 118);
-    c.font = '700 40px Arial'; c.fillText('INSTRUKSI KERJA', 320, 230); c.font = '600 24px Arial'; c.fillText('SPEKTROFOTOMETER UV-VIS', 320, 270); c.fillText('SHIMADZU UV-1700 PharmaSpec', 320, 304);
-    c.font = '700 22px Courier New'; c.fillText('IK/LAB.INST/6', 320, 380); c.font = '500 15px Arial'; c.fillText('Salinan terkendali · Revisi 00', 320, 420); return IKC[s] = cv2;
+    c.strokeStyle = '#e8c76a'; c.lineWidth = 4; c.strokeRect(22, 22, 436, 636); ikLogo(c, 240, 130, 52); c.fillStyle = '#f3e3b0'; c.textAlign = 'center';
+    c.font = '700 22px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 240, 230); c.font = '500 15px Arial'; c.fillText('Laboratorium Instrumentasi', 240, 256);
+    c.font = '700 34px Arial'; c.fillText('INSTRUKSI KERJA', 240, 350); c.font = '600 22px Arial'; c.fillText('SPEKTROFOTOMETER UV-VIS', 240, 388); c.fillText('SHIMADZU UV-1700', 240, 420);
+    c.font = '700 20px Courier New'; c.fillText('IK/LAB.INST/6', 240, 500); return IKC[s] = cv2;
   }
-  const hdr = () => {
-    c.strokeStyle = '#111'; c.lineWidth = 1.6; c.strokeRect(24, 20, 592, 86); c.beginPath(); c.moveTo(110, 20); c.lineTo(110, 106); c.moveTo(440, 20); c.lineTo(440, 106); c.moveTo(24, 62); c.lineTo(440, 62); c.stroke();
-    c.fillStyle = '#1e3a8a'; c.beginPath(); c.arc(67, 63, 28, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 17px Arial'; c.textAlign = 'center'; c.fillText('AKA', 67, 69);
-    c.fillStyle = '#111'; c.font = '700 14px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 275, 46); c.font = '500 12px Arial'; c.fillText('Laboratorium Instrumentasi', 275, 84);
-    c.textAlign = 'left'; c.font = '600 11.5px Arial'; c.fillText('Kode : IK/LAB.INST/6', 450, 44); c.fillText('Revisi : 00', 450, 64); c.fillText('Halaman : ' + s + ' / ' + IKPAGES.length, 450, 84);
-    c.textAlign = 'center'; c.font = '700 13px Arial'; c.fillText('INSTRUKSI KERJA SPEKTROFOTOMETER UV-VIS', 320, 126); };
-  hdr();
-  const pg = IKPAGES[s - 1]; c.textAlign = 'left'; let y = 150;
-  if (!pg) { c.fillStyle = '#9ca3af'; c.font = 'italic 14px Arial'; c.textAlign = 'center'; c.fillText('Catatan', 320, 170); c.strokeStyle = '#d1d5db'; c.lineWidth = 1; for (let k = 0; k < 14; k++) { c.beginPath(); c.moveTo(40, 200 + k * 22); c.lineTo(600, 200 + k * 22); c.stroke(); } return IKC[s] = cv2; }
+  c.strokeStyle = '#111'; c.lineWidth = 1.5; c.strokeRect(24, 22, 432, 104); c.beginPath(); c.moveTo(110, 22); c.lineTo(110, 94); c.moveTo(110, 58); c.lineTo(456, 58); c.moveTo(24, 94); c.lineTo(456, 94); c.stroke();
+  ikLogo(c, 67, 62, 28); c.fillStyle = '#111'; c.textAlign = 'center'; c.font = '700 13px Arial'; c.fillText('POLITEKNIK AKA BOGOR', 283, 44); c.font = '600 11.5px Arial'; c.fillText('LABORATORIUM INSTRUMENTASI', 283, 74);
+  c.font = '600 11px Arial'; c.textAlign = 'left'; c.fillText('Kode/No : IK/LAB.INST/6', 120, 88); c.textAlign = 'right'; c.fillText('Halaman ' + s + ' dari ' + IKPAGES.length, 448, 88);
+  c.textAlign = 'center'; c.font = '700 14px Arial'; c.fillText('INSTRUKSI KERJA', 240, 111); c.font = '700 13px Arial'; c.fillText('SPEKTROFOTOMETER UV-VIS SHIMADZU UV-1700', 240, 124);
+  const pg = IKPAGES[s - 1]; c.textAlign = 'left'; let y = 160; if (!pg) return IKC[s] = cv2;
   for (const ln of pg) {
-    if (ln.k === 'sec') { y += 12; c.fillStyle = '#111'; c.font = '700 15px Arial'; c.fillText(ln.t, 30, y); y += 18; }
-    else if (ln.k === 'gap') y += 5;
-    else if (ln.k === 'step') { c.fillStyle = '#111'; c.font = '14px Arial'; if (ln.n !== '') { c.textAlign = 'right'; c.fillText(ln.n + '.', 52, y); c.textAlign = 'left'; } c.fillText(ln.t, 58, y); y += 19; }
-    else if (ln.k === 'sign') { y += 20; c.font = '14px Arial'; c.textAlign = 'center'; c.fillStyle = '#111'; c.fillText('Mengetahui,', 140, y); c.fillText('Disiapkan oleh,', 500, y); y += 20; c.fillText('Kepala Laboratorium Instrumentasi', 140, y); c.fillText('Penanggung jawab alat', 500, y);
-      y += 64; c.fillText('( ............................. )', 140, y); c.fillText('( ............................. )', 500, y); c.textAlign = 'left'; }
+    if (ln.k === 'sec') { y += 14; c.fillStyle = '#111'; c.font = '700 16px Arial'; c.fillText(ln.t, 30, y); y += 20; }
+    else if (ln.k === 'gap') y += 6;
+    else if (ln.k === 'step') { c.fillStyle = '#111'; c.font = '15px Arial'; if (ln.n !== '') { c.textAlign = 'right'; c.fillText(ln.n + '.', 52, y); c.textAlign = 'left'; } c.fillText(ln.t, 60, y); y += 21; }
+    else if (ln.k === 'sign') { y += 30; c.font = '15px Arial'; c.fillStyle = '#111'; c.fillText('Mengetahui,', 30, y); y += 20; c.fillText('Kepala Laboratorium Instrumentasi', 30, y); y += 84; c.fillText(IKNAME, 30, y); }
   }
-  c.fillStyle = '#6b7280'; c.font = '11px Arial'; c.textAlign = 'center'; c.fillText('— ' + s + ' —', 320, 508);
+  c.fillStyle = '#6b7280'; c.font = '11px Arial'; c.textAlign = 'center'; c.fillText('— ' + s + ' —', 240, 668);
   return IKC[s] = cv2;
 }
 
@@ -2891,7 +2921,10 @@ function pickAt(x, y) {
   const inPoly = (p, px, py) => { let c = false; for (let i = 0, j = 3; i < 4; j = i++) { if (((p[i][1] > py) !== (p[j][1] > py)) && (px < (p[j][0] - p[i][0]) * (py - p[i][1]) / (p[j][1] - p[i][1]) + p[i][0])) c = !c; } return c; };
   for (let i = drawn.length - 1; i >= 0; i--) if (inPoly(drawn[i].p, x, y)) return drawn[i].id; return null;
 }
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-ik]'); if (!b) return; const d = +b.dataset.ik; if (d === 0) { setView('meja'); } else ST.ikT = Math.max(1, Math.min(IKL, Math.round(ST.ikT) + d)); dirty = true; });
+function ikRead() { const o = $('#ikread'); if (!o.classList.contains('show')) return; const n = Math.round(ST.ikT), P = IKPAGES.length;
+  [['#ikA', 2 * n - 1], ['#ikB', 2 * n]].forEach(([id, side]) => { const cvx = $(id), cx = cvx.getContext('2d'); cx.clearRect(0, 0, cvx.width, cvx.height); cvx.style.visibility = side <= P ? 'visible' : 'hidden'; if (side <= P) cx.drawImage(ikTex(side), 0, 0, cvx.width, cvx.height); }); }
+document.addEventListener('click', e => { const r = e.target.closest && e.target.closest('[data-ikr]'); if (r) { $('#ikread').classList.toggle('show', r.dataset.ikr === '1'); ikRead(); return; }
+  const b = e.target.closest && e.target.closest('[data-ik]'); if (!b) return; const d = +b.dataset.ik; if (d === 0) { $('#ikread').classList.remove('show'); setView('meja'); } else ST.ikT = Math.max(1, Math.min(IKMAX, Math.round(ST.ikT) + d)); ikRead(); dirty = true; });
 (function bind() {
   let pts = new Map(), start = null, pinch = null;
   cv.addEventListener('pointerdown', e => { try { cv.setPointerCapture(e.pointerId); } catch (_) { } pts.set(e.pointerId, [e.clientX, e.clientY]); start = { x: e.clientX, y: e.clientY, yaw: CAM.yaw, pitch: CAM.pitch, moved: false }; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), dist: CAM.dist }; } });
@@ -2900,7 +2933,7 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
     if (!start) return; const dx = e.clientX - start.x, dy = e.clientY - start.y; if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
     CAM.yaw = start.yaw - dx * 0.4; CAM.pitch = Math.max(-5, Math.min(89, start.pitch + dy * 0.3)); camAnim = null; dirty = true; });
   const up = e => { if (!pts.has(e.pointerId)) return; pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
-    if (pts.size === 0) { if (start && !start.moved) { const r = cv.getBoundingClientRect(); const id = pickAt(e.clientX - r.left, e.clientY - r.top); selId = id; if (id === 'ikbook' && viewName !== 'ik') setView('ik'); const inf = id && INFO[id];
+    if (pts.size === 0) { if (start && !start.moved) { const r = cv.getBoundingClientRect(); const id = pickAt(e.clientX - r.left, e.clientY - r.top); selId = id; if (id === 'screen') { const h = screenHit(e.clientX - r.left, e.clientY - r.top); if (h) pcPress(h.x, h.y); } if (id === 'ikbook' && viewName !== 'ik') setView('ik'); const inf = id && INFO[id];
       $('#ti').textContent = inf ? inf[0] : 'Info objek'; $('#info').textContent = inf ? (inf[1] || 'Komponen bangku optik UV-1700.') : 'Klik objek pada meja untuk penjelasan.'; dirty = true; } start = null; } };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
   cv.addEventListener('wheel', e => { e.preventDefault(); CAM.dist = Math.max(40, Math.min(460, CAM.dist * (e.deltaY > 0 ? 1.08 : 1 / 1.08))); camAnim = null; dirty = true; }, { passive: false });
@@ -2914,7 +2947,7 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
     if (b.id === 'lg_ok') { ST.logbook = { t: dstr, n: $('#lg_n').value, k: $('#lg_k').value, s: $('#lg_s').value }; $('#logm').classList.remove('show'); ok('Log Book tercatat dan ditandatangani oleh ' + (ST.logbook.s || '-') + '.'); if (logResolve) { logResolve(); logResolve = null; } sync(); return; }
     if (b.dataset.act) { const a = b.dataset.act; if (ACT[a]) run(() => ACT[a]()); return; }
     if (b.dataset.v) { setView(b.dataset.v); return; }
-    if (b.dataset.t) { const k = b.dataset.t;       if (k === 'pip') { if (!ST.pc) toast('Komputer belum dinyalakan.', 'warn'); else { ST.pipClosed = false; pipSync(); } return; } if (k === 'pipx') { ST.pipClosed = true; pipSync(); return; } if (k === 'pipbig') { const bg = $('#pip').classList.toggle('big'); b.textContent = bg ? 'Kecilkan' : 'Perbesar'; return; } const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on));
+    if (b.dataset.t) { const k = b.dataset.t;       if (k === 'pip') { if (!ST.pc) toast('Komputer belum dinyalakan.', 'warn'); else { setView('komputer'); } return; } if (k === 'pipx') { ST.pipClosed = true; pipSync(); return; } if (k === 'pipbig') { const bg = $('#pip').classList.toggle('big'); b.textContent = bg ? 'Kecilkan' : 'Perbesar'; return; } const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on));
       if (k === 'xray') { ST.xrayUser = on; ST.xrayT = on ? 1 : 0; } if (k === 'sound') ST.sound = on; } });
   const s = $('#sol'); SOL_KEYS.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = SOL[k].label; s.appendChild(o); });
   $('#lam').value = AN.lam_ref;
@@ -2960,12 +2993,37 @@ async function innerSeq(ks, dwell) {
 }
 const INNER_MAP = { 3: [[0], 3.5], 7: [[0, 1], 3.5], 10: [[0, 1, 2, 3, 4, 5, 6, 7, 8], 3.2], 11: [[1, 2, 5, 6], 3], 25: [[0, 5, 6], 2.6], 26: [[0, 5, 6], 2.6], 28: [[0, 5, 6], 2.6] };
 Object.keys(INNER_MAP).forEach(k => { const s = STEPS[k], f = s.run, [ks, d] = INNER_MAP[k]; s.run = async () => { const p = f(); await Promise.all([p, innerSeq(ks, d)]); }; });
+
+const CMPL = [
+  { n: ['Lampu deuterium (D₂)', 'Deuterium lamp (D₂)'], f: ['Sumber radiasi kontinu daerah ultraviolet (±190–350 nm).', 'Continuous radiation source for the ultraviolet region (≈190–350 nm).'] },
+  { n: ['Lampu wolfram-iodin (WI)', 'Tungsten-iodine lamp (WI)'], f: ['Sumber radiasi kontinu daerah tampak dan inframerah dekat (±340–1100 nm).', 'Continuous source for the visible and near-infrared region (≈340–1100 nm).'] },
+  { n: ['Cermin pemilih sumber', 'Source selector mirror'], f: ['Memilih berkas dari lampu D₂ atau WI sesuai panjang gelombang.', 'Select the beam from the D₂ or WI lamp according to wavelength.'] },
+  { n: ['Celah masuk', 'Entrance slit'], f: ['Membatasi berkas yang masuk ke monokromator.', 'Limit the beam entering the monochromator.'] },
+  { n: ['Kisi difraksi', 'Diffraction grating'], f: ['Menyebarkan cahaya polikromatik menjadi spektrum; sudutnya menentukan λ.', 'Disperse polychromatic light into a spectrum; its angle sets λ.'] },
+  { n: ['Celah keluar', 'Exit slit'], f: ['Meloloskan pita sempit di sekitar λ terpilih.', 'Pass a narrow band around the selected λ.'] },
+  { n: ['Pembagi berkas', 'Beam splitter'], f: ['Membagi berkas menjadi berkas referensi dan sampel.', 'Split the beam into reference and sample beams.'] },
+  { n: ['Kuvet dan kompartemen', 'Cuvettes and compartment'], f: ['Menempatkan blanko dan sampel pada jalur berkas.', 'Hold the blank and the sample in the beam path.'] },
+  { n: ['Detektor referensi', 'Reference detector'], f: ['Mengukur intensitas berkas referensi (I₀).', 'Measure the reference beam intensity (I₀).'] },
+  { n: ['Detektor sampel', 'Sample detector'], f: ['Mengukur intensitas berkas yang melewati sampel (I).', 'Measure the intensity of the beam through the sample (I).'] },
+  { n: ['Papan elektronik', 'Main board'], f: ['Menguatkan, mendigitalkan, dan mengolah sinyal detektor.', 'Amplify, digitize and process the detector signal.'] },
+  { n: ['Kipas dan catu daya', 'Cooling fan and power supply'], f: ['Mendinginkan lampu/elektronik dan menyuplai daya.', 'Cool the lamps/electronics and supply power.'] },
+  { n: ['Layar LCD dan tombol', 'LCD and keypad'], f: ['Menampilkan λ, absorbansi atau %T, dan lampu aktif; menerima perintah.', 'Show λ, absorbance or %T and the active lamp; accept commands.'] }];
+function zoomComp(k) {
+  if (!INNER_ON) { toast('Model dalam tidak tersedia.', 'warn'); return; }
+  INNER.closed = false; const S = ST.cuv.S, col = (S.content && SOL[S.content] && SOL[S.content].col) || '#d9f3f7';
+  postInner({ cmd: 'sol', v: col }); postInner({ cmd: 'lam', v: ST.lam || AN.lam_ref }); showInner(true);
+  setTimeout(() => postInner({ cmd: 'cmp', k }), 250); setTimeout(() => postInner({ cmd: 'cmp', k }), 900);
+  const L = LANG === 'en' ? 1 : 0; $('#icT').textContent = CMPL[k].n[L]; $('#icF').textContent = CMPL[k].f[L];
+}
+function buildCmps() { const L = LANG === 'en' ? 1 : 0; $('#cmps').innerHTML = CMPL.map((c, k) => '<button class="chip" data-cmp="' + k + '">' + c.n[L].replace(/ \(.*\)/, '') + '</button>').join(''); $('#cmpT').textContent = L ? 'ZOOM INSTRUMENT COMPONENTS' : 'ZOOM KOMPONEN UV-1700'; }
+buildCmps();
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-cmp]'); if (b) zoomComp(+b.dataset.cmp); });
 function updateCtl() {
   const ci = curStep(), playing = PL.on && !PAUSED;
   $('#b_play').textContent = playing ? U('pause') : U('play'); $('#b_prev').textContent = U('prev'); $('#b_next').textContent = U('next'); $('#b_rst').textContent = U('rst'); $('#lb_spd').textContent = U('spd'); $('#lb_lng').textContent = U('lng');
   $('#b_prev').disabled = ci === 0 && !ST.busy; $('#b_next').disabled = ci < 0 && !ST.busy; $('#b_play').disabled = ci < 0;
   $$('[data-spd]').forEach(b => b.classList.toggle('on', +b.dataset.spd === SPD)); $$('[data-lng]').forEach(b => b.classList.toggle('on', b.dataset.lng === LANG));
-  $('#ibadge').textContent = U('badge'); $('#icx').textContent = U('close');
+  $('#ibadge').textContent = U('badge'); $('#icx').textContent = U('close'); buildCmps();
   $('#sub').textContent = ci >= 0 ? (ci + 1) + '. ' + stepT(ci) : '';
 }
 async function advance() {
@@ -2992,6 +3050,7 @@ async function onNext() {
 function restartTo(n) { try { window.name = JSON.stringify({ replay: Math.max(0, n), lang: LANG, spd: SPD }); location.reload(); } catch (e) { toast('Muat ulang halaman untuk mengulang.', 'warn'); } }
 function onPrev() { const i = curStep() < 0 ? STEPS.length : curStep(); restartTo(i - 1); }
 function onReset() { restartTo(0); }
+ikGeom();
 window.LAB = { ST, ACT, STEPS, run, curStep, readAt, ID, finishLog: () => { ST.logbook = { t: dstr, n: ID.nama, k: 'uji', s: ID.nama }; if (logResolve) { logResolve(); logResolve = null; } } };
 log('Praktikum virtual: ' + AN.nama + '. Ikuti kotak "Langkah sekarang".');
 updateOut(); sync(); drawPC(); requestAnimationFrame(loop);
@@ -3553,22 +3612,31 @@ def _olah_defaults():
             "c_std": "", "v_std": "", "m_std": "", "rpd_lim": 5.0, "ver": 0}
 
 
-def olah_calc(df, reg):
-    """Tiap baris: Cons terukur = (Abs − b)/a; Cons terkoreksi = Cons terukur − Cons blanko; Kadar = Cons terkoreksi × FP × V labu / bobot."""
+def olah_calc(df, reg, cmin=None, blank=None):
+    """Cons terukur = (Abs − b)/a. Koreksi blanko hanya dipakai bila Cons blanko ≥ 0,1 × konsentrasi standar terkecil;
+    bila lebih kecil, Cons terkoreksi = Cons terukur. Kadar = Cons terkoreksi × FP × V labu / bobot."""
     nan = float("nan")
-    rows, cblank = [], 0.0
+    ok = reg is not None and getattr(reg, "ok", False)
+    rows, cblank = [], nan
     for _, r in df.iterrows():
         name = str(r.get("Sampel", "") or "")
         A = _fl(r.get("Abs"))
-        cons = (A - reg.intercept) / reg.slope if not math.isnan(A) else nan
+        cons = (A - reg.intercept) / reg.slope if ok and not math.isnan(A) else nan
         isb = name.strip().lower().startswith("blanko")
         if isb and not math.isnan(cons):
             cblank = cons
         rows.append({"name": name, "blank": isb, "A": A, "cons": cons, "fp": _fl(r.get("FP")), "vl": _fl(r.get("Volume labu takar (L)")), "m": _fl(r.get("Bobot (kg)"))})
+    lim = 0.1 * cmin if cmin and cmin > 0 else nan
+    if blank is not None:
+        cb_used, info = blank
+    else:
+        use = not math.isnan(cblank) and (math.isnan(lim) or cblank >= lim)
+        cb_used = cblank if use else 0.0
+        info = {"cblank": cblank, "lim": lim, "use": use}
     for q in rows:
-        q["corr"] = nan if q["blank"] else q["cons"] - cblank
+        q["corr"] = nan if q["blank"] else q["cons"] - cb_used
         q["kadar"] = q["corr"] * q["fp"] * q["vl"] / q["m"] if not q["blank"] and q["m"] > 0 and not any(math.isnan(v) for v in (q["corr"], q["fp"], q["vl"])) else nan
-    return rows, cblank
+    return rows, (cb_used, info)
 
 
 def olah_table(rows):
@@ -3602,35 +3670,45 @@ def page_calibration():
     st.subheader("1. Tabel hasil pengukuran deret standar")
     L, Rr = st.columns([1, 1.5], gap="large")
     with L:
-        edited = st.data_editor(S["cal_base"], key=f"cal_{S['cal_ver']}", num_rows="dynamic", hide_index=False, column_order=("C", "A"), **WIDE,
+        base_df = S["cal_base"] if len(S["cal_base"]) else pd.DataFrame({"C": [float("nan")] * 6, "A": [float("nan")] * 6, "Pakai": [True] * 6})
+        edited = st.data_editor(base_df, key=f"cal_{S['cal_ver']}", num_rows="dynamic", hide_index=False, column_order=("C", "A"), **WIDE,
                                 column_config={"C": st.column_config.NumberColumn("Konsentrasi (mg/L)", format="%.4f"), "A": st.column_config.NumberColumn("Abs", format="%.4f")})
         S["cal_cur"] = edited
         reg = cal_reg()
+        rr = float("nan")
         if reg and reg.ok:
             rr = math.copysign(math.sqrt(max(0.0, reg.r2)), reg.slope)
-            st.dataframe(pd.DataFrame({"Parameter": ["r", "intercept", "slope"], "Nilai": [fmt(rr, 4), fmt(reg.intercept, 4), fmt(reg.slope, 4)]}), hide_index=True, **WIDE)
+            st.dataframe(pd.DataFrame({"Parameter": ["r", "r²", "intercept", "slope"], "Nilai": [fmt(rr, 4), fmt(reg.r2, 4), fmt(reg.intercept, 4), fmt(reg.slope, 4)]}), hide_index=True, **WIDE)
+            verdict(reg.r2 >= CR["r2_min"], f"r² = {fmt(reg.r2, 4)} " + (f"≥ {fmt(CR['r2_min'], 3)}" if reg.r2 >= CR["r2_min"] else f"< {fmt(CR['r2_min'], 3)} (kriteria linearitas)"))
         else:
-            st.info("Isi minimal 3 titik standar (konsentrasi dan Abs).")
+            st.dataframe(pd.DataFrame({"Parameter": ["r", "r²", "intercept", "slope"], "Nilai": ["", "", "", ""]}), hide_index=True, **WIDE)
+            st.info("Isi minimal 3 titik standar (konsentrasi dan Abs); r, r², intercept, dan slope muncul otomatis.")
     with Rr:
         pts = cal_points()
         fig = fig_base("Konsentrasi (mg/L)", "Abs", 300); fig.update_layout(hovermode="closest", showlegend=False)
         if reg and reg.ok:
             xs = np.linspace(min(0, reg.xmin), reg.xmax * 1.05, 50)
             fig.add_trace(go.Scatter(x=xs, y=reg.slope * xs + reg.intercept, mode="lines", line=dict(color=PAL[0], width=2)))
-            fig.update_layout(title=dict(text=f"y = {fmt(reg.slope, 4)}x + {fmt(reg.intercept, 4)}  ·  R = {fmt(rr, 4)}", font=dict(size=13)))
+            fig.update_layout(title=dict(text=f"y = {fmt(reg.slope, 4)}x + {fmt(reg.intercept, 4)}  ·  R = {fmt(rr, 4)}  ·  R² = {fmt(reg.r2, 4)}", font=dict(size=13)))
         fig.add_trace(go.Scatter(x=pts["C"], y=pts["A"], mode="markers", marker=dict(color=PAL[0], size=10, line=dict(color="white", width=1.2))))
         show(fig)
-    if not (reg and reg.ok):
-        return
+    pts_ = cal_points(); pos_ = pts_[pts_["C"] > 0]["C"]; cmin = float(pos_.min()) if len(pos_) else None
+    ok_reg = bool(reg and reg.ok)
 
     # ---------------- 2. kadar sampel
     st.subheader("2. Tabel hasil perhitungan kadar")
-    st.caption("Cons terukur = (Abs − intercept) / slope  ·  Cons terkoreksi = Cons terukur − Cons blanko  ·  Kadar = Cons terkoreksi × FP × Volume labu takar / Bobot sampel.")
+    st.caption("Cons terukur = (Abs − intercept) / slope  ·  Cons terkoreksi = Cons terukur − Cons blanko (hanya bila Cons blanko ≥ 0,1 × konsentrasi standar terkecil; jika lebih kecil, Cons terkoreksi = Cons terukur)  ·  Kadar = Cons terkoreksi × FP × Volume labu takar / Bobot sampel.")
     cfg = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
            "Volume (L)": st.column_config.NumberColumn(format="%.4f"), "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
     O["s"] = st.data_editor(O["s"], key=f"olah_s_{ver}", num_rows="dynamic", hide_index=True, column_config=cfg, **WIDE)
-    rows, cblank = olah_calc(O["s"], reg)
+    rows, blk = olah_calc(O["s"], reg if ok_reg else None, cmin)
     st.dataframe(olah_table(rows), hide_index=True, **WIDE)
+    bi = blk[1]
+    if not math.isnan(bi["cblank"]):
+        if bi["use"]:
+            st.caption(f"Cons blanko = {fmt(bi['cblank'], 4)} mg/L ≥ batas {fmt(bi['lim'], 4) if not math.isnan(bi['lim']) else '–'} mg/L (0,1 × standar terkecil) → blanko dipakai sebagai koreksi.")
+        else:
+            st.caption(f"Cons blanko = {fmt(bi['cblank'], 4)} mg/L < batas {fmt(bi['lim'], 4)} mg/L (0,1 × standar terkecil) → blanko tidak dipakai; Cons terkoreksi = Cons terukur.")
     smp = [q for q in rows if not q["blank"]]
 
     # ---------------- 3. presisi
@@ -3654,7 +3732,7 @@ def page_calibration():
     cfg2 = {"Bobot (kg)": st.column_config.NumberColumn(format="%.6f"), "Volume labu takar (L)": st.column_config.NumberColumn(format="%.4f"),
             "Abs": st.column_config.NumberColumn(format="%.4f"), "FP": st.column_config.NumberColumn(format="%.2f")}
     O["sp"] = st.data_editor(O["sp"], key=f"olah_sp_{ver}", num_rows="fixed", hide_index=True, column_config=cfg2, **WIDE)
-    sp_rows, _ = olah_calc(O["sp"], reg)
+    sp_rows, _ = olah_calc(O["sp"], reg if ok_reg else None, cmin, blank=blk)
     st.dataframe(olah_table(sp_rows), hide_index=True, **WIDE)
     c3 = sp_rows[0]["kadar"] if sp_rows else float("nan")
     st.markdown("**Perhitungan konsentrasi spike (C2)**")
