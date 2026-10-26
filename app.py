@@ -957,6 +957,7 @@ h4{margin:0 0 6px;font-size:13px}.hint{color:var(--muted);font-size:12px}
 input[type=range]{width:100%;accent-color:var(--acc)}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid rgba(0,0,0,.15)}
 .wrap.tour{grid-template-columns:minmax(0,1fr) 330px}
+.wrap.slave,.wrap.slave.tour{grid-template-columns:1fr!important;padding:0}.wrap.slave .side,.wrap.slave .views,.wrap.slave .tools,.wrap.slave .badge{display:none!important}.wrap.slave .stage{border:0;border-radius:0}
 .tourcard{display:none}.wrap.tour .tourcard{display:block}.wrap.tour .plain{display:none}
 .steps{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .steps button{width:28px;height:28px;padding:0;border-radius:50%;font:600 12px 'JetBrains Mono',monospace;color:var(--muted)}
@@ -976,6 +977,9 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 <div class="tools"><button data-z="0.85" title="Perbesar">+</button><button data-z="1.18" title="Perkecil">−</button><button id="rs" title="Tampilan awal">⟲</button></div>
 <div class="views"><button data-v="iso" class="on">Isometrik</button><button data-v="depan">Depan</button><button data-v="samping">Kanan</button><button data-v="belakang">Belakang</button><button data-v="atas">Atas</button><button data-v="kompartemen">Kompartemen</button></div></div>
 <div class="side"><div class="card tourcard"><div class="steps" id="steps"></div><div class="tt" id="tt"></div><div class="tx" id="tx"></div><div class="nav2"><button id="prev">◀ Sebelumnya</button><button id="next" class="pri">Berikutnya ▶</button></div></div>
+<div class="card tourcard"><h4>Animasi jalur cahaya</h4><div class="hint" id="lstage" style="min-height:34px;color:#2b2f55;font-size:12.5px">Tekan tombol untuk melihat perjalanan cahaya dari lampu sampai nilai absorbansi (contoh: C = 2,5 mg/L).</div>
+<div class="meter" style="margin:6px 0"><span>I₀</span><span class="b"><i id="lb0" style="background:#4f46e5;width:0"></i></span><b id="lv0">0</b><span>I</span><span class="b"><i id="lb1" style="background:#0d9488;width:0"></i></span><b id="lv1">0</b><span>T</span><span></span><b id="lvT">–</b><span>A</span><span></span><b id="lvA">–</b></div>
+<div class="nav2"><button id="lplay" class="pri">▶ Putar animasi cahaya</button></div></div>
 <div class="card tourcard" style="display:none!important"><h4>Eksperimen: λ dan konsentrasi</h4>
 <div class="rg"><span>λ = <b id="lv2"></b> nm</span><span id="lamp2" class="hint"></span></div><input type="range" id="lam2" min="190" max="1100" step="1">
 <div class="rg"><span>C = <b id="cv2"></b> mg/L</span><span class="hint">ε·b = 0,20 L mg⁻¹ (b = 1 cm)</span></div><input type="range" id="conc" min="0" max="10" step="0.1" value="2.5">
@@ -1048,7 +1052,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
       this.cv = canvas; this.ctx = canvas.getContext('2d'); this.opt = opt || {};
       this.yaw = -32; this.pitch = 24; this.dist = 84; this.target = [0, 9, 0];
       this.lid = 0; this.lidT = 0; this.expl = 0; this.explT = 0; this.topX = 0; this.topT = 0; this.sideX = 0; this.sideT = 0; this.xray = 0; this.xrayT = 0;
-      this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false;
+      this.beam = true; this.labels = false; this.auto = false; this.sel = null; this.hl = new Set(); this.beamLimit = 99; this.flow = false; this.tour = false; this.ph = null; this.dispAbs = null; this.onLight = null; this._dots = [];
       this.lam = 550; this.lampSwitch = 340.8; this.abs = 0; this.status = 'READY'; this.solColor = '#8e2c8f';
       this._build(); this._bind(); this._loop = this._loop.bind(this);
       this._ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.draw()) : null;
@@ -1189,11 +1193,69 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         if (a.full) { this.dist = a.from[2] + (a.to[2] - a.from[2]) * k; this.target = [0, 1, 2].map(i => a.from[3][i] + (a.to[3][i] - a.from[3][i]) * k); }
         if (a.t >= 1) this._anim = null;
       }
+      if (this.ph) this._phStep(dt);
       if (this.auto && !this._drag) this.yaw += dt * 18;
       if (this.flow && !this._anim && !this._drag && now - (this._ld || 0) < 30) { requestAnimationFrame(this._loop); return; }
       this._ld = now; this.draw();
-      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam);
+      const busy = this.lid !== this.lidT || this.expl !== this.explT || this.topX !== this.topT || this.sideX !== this.sideT || this.xray !== this.xrayT || this._anim || (this.auto && !this._drag) || (this.flow && this.beam) || this.ph;
       if (busy) requestAnimationFrame(this._loop); else this._running = false;
+    }
+    _phPath() {
+      const y = 9.5, lampUV = this.lam < this.lampSwitch, src = lampUV ? [19.1, y, -19.8] : [19.1, y, -13];
+      return { com: [src, [15.3, y, -16], [11.2, y, -15], [3.5, y, -21], [3, y, -9.2], [3, y, 3]], R: [[3, y, 3], [-8.5, y, 3], [-19.6, y, 3]], S: [[3, y, 3], [3, y, 13], [-8.5, y, 13], [-19.6, y, 13]] };
+    }
+    lightStart() {
+      const P = this._phPath(), len = pl => pl.slice(1).reduce((a, p, i) => a + Math.hypot(p[0] - pl[i][0], p[2] - pl[i][2]), 0);
+      this.ph = { t: 0, N: 30, gap: 0.22, speed: 12, T: Math.pow(10, -Math.max(0, this.abs)), P, Lc: len(P.com), LR: len(P.R), LS: len(P.S), LCell: len(P.S.slice(0, 3)), arrR: 0, arrS: 0, cnt: {}, stage: 0 };
+      const EL = [[-20.6, 12, 8], [-17, 6, -6], [-17, 5, -14], [6, 6, -14], [11.5, 26, 6]]; this.ph.EL = EL; this.ph.Le = EL.slice(1).reduce((q, p, i) => q + Math.hypot(p[0] - EL[i][0], p[1] - EL[i][1], p[2] - EL[i][2]), 0); this.ph.lead = P.com[0];
+      this.dispAbs = 0; this.xrayT = 1; this.lidT = 0; this._anim = null; this._kick();
+    }
+    _phAt(pl, d) {
+      let acc = 0;
+      for (let i = 1; i < pl.length; i++) { const L = Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][2] - pl[i - 1][2]); if (d <= acc + L || i === pl.length - 1) { const u = Math.max(0, Math.min(1, (d - acc) / L)); return [pl[i - 1][0] + (pl[i][0] - pl[i - 1][0]) * u, pl[i - 1][1], pl[i - 1][2] + (pl[i][2] - pl[i - 1][2]) * u]; } acc += L; }
+      return pl[pl.length - 1];
+    }
+    _phStep(dt) {
+      const h = this.ph; h.t += dt; this._dots = [];
+      const col = this.lam < 380 ? '#c4b5fd' : lamColor(this.lam), pre = '#fffbe8';
+      const cum = [0]; for (let i = 1; i < h.P.com.length; i++) cum.push(cum[i - 1] + Math.hypot(h.P.com[i][0] - h.P.com[i - 1][0], h.P.com[i][2] - h.P.com[i - 1][2]));
+      let lead = h.lead || h.P.com[0];
+      for (let k = 0; k < h.N; k++) {
+        const d = (h.t - k * h.gap) * h.speed; if (d < 0) continue;
+        const absorbed = (((k + 0.5) * 0.6180339887) % 1) >= h.T;
+        if (d <= h.Lc) { const seg = cum.findIndex((c, i) => i > 0 && d <= c), p = this._phAt(h.P.com, d); this._dots.push({ p, c: seg <= 2 ? pre : col, a: 1 }); if (k === 0) { lead = p; h.stage = Math.max(h.stage, Math.max(0, seg - 1)); } continue; }
+        const e = d - h.Lc;
+        if (k === 0) { h.stage = Math.max(h.stage, 5); lead = this._phAt(h.P.R, Math.min(e, h.LR)); }
+        if (e <= h.LR + 2) { if (e <= h.LR) this._dots.push({ p: this._phAt(h.P.R, e), c: col, a: 1 }); else if (!h.cnt['r' + k]) { h.cnt['r' + k] = 1; h.arrR++; } }
+        if (e <= h.LS + 2) {
+          if (absorbed && e > h.LCell - 2.5) { const f = Math.max(0, 1 - (e - (h.LCell - 2.5)) / 2.5); if (f > 0) this._dots.push({ p: this._phAt(h.P.S, Math.min(e, h.LCell)), c: '#f97316', a: f }); }
+          else if (e <= h.LS) this._dots.push({ p: this._phAt(h.P.S, e), c: col, a: 1 });
+          else if (!h.cnt['s' + k]) { h.cnt['s' + k] = 1; h.arrS++; }
+        }
+      }
+      h.lead = lead;
+      if (h.arrR + h.arrS > 0) h.stage = Math.max(h.stage, 6);
+      const pend = (h.N - 1) * h.gap + (h.Lc + h.LS + 2) / h.speed + 0.2;
+      if (h.t >= pend) {
+        if (h.e0 == null) h.e0 = h.t;
+        const te = h.t - h.e0, EL = h.EL; h.stage = 7;
+        for (let k = 0; k < 6; k++) { const u = te * 0.34 - k * 0.07; if (u < 0 || u > 1) continue; const p = this._phAt3(EL, u * h.Le); this._dots.push({ p, c: '#22d3ee', a: 1 }); if (k === 0) h.lead = p; }
+        if (te > 3.2) { h.stage = 8; h.lead = [11.5, 26, 6]; const q = Math.min(1, (te - 3.2) / 1.2); this.dispAbs = this.abs * q * (2 - q); }
+        if (te > 4.6) { this.dispAbs = this.abs; h.done = true; }
+      }
+      if (!this._drag) {
+        const G = { 0: [-34, 40, 70], 1: [-30, 42, 64], 2: [-18, 44, 62], 3: [-8, 46, 62], 4: [6, 50, 66], 5: [12, 56, 72], 6: [20, 50, 68], 7: [-14, 34, 74], 8: [0, 14, 52] }[h.stage];
+        const r = Math.min(1, dt * 2.6), L = h.lead, T = this.target;
+        this.target = [T[0] + (L[0] - T[0]) * r, T[1] + (L[1] - T[1]) * r, T[2] + (L[2] - T[2]) * r];
+        this.yaw += (G[0] - this.yaw) * r * 0.7; this.pitch += (G[1] - this.pitch) * r * 0.7; this.dist += (G[2] - this.dist) * r * 0.7;
+      }
+      if (this.onLight) this.onLight({ stage: h.stage, arrR: h.arrR, arrS: h.arrS, N: h.N, done: !!h.done });
+      if (h.done) { this.ph = null; this._dots = []; }
+    }
+    _phAt3(pl, d) {
+      let acc = 0;
+      for (let i = 1; i < pl.length; i++) { const L = Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1], pl[i][2] - pl[i - 1][2]); if (d <= acc + L || i === pl.length - 1) { const u = Math.max(0, Math.min(1, (d - acc) / L)); return [0, 1, 2].map(j => pl[i - 1][j] + (pl[i][j] - pl[i - 1][j]) * u); } acc += L; }
+      return pl[pl.length - 1];
     }
     _xf(p, part) {
       let q = p;
@@ -1278,6 +1340,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
           }
         });
       }
+      if (this.ph) for (const d of this._dots) { const c = this._cam(d.p), pr = this._proj(c); items.push({ dot: true, pa: pr, depth: this.dist - c[2] - 0.6, col: d.c, a: d.a, r: Math.max(2.5, 0.5 * this._f / pr[2]) }); }
       items.sort((a, b) => b.depth - a.depth);
       this._drawn = [];
       ctx.lineJoin = 'round';
@@ -1289,6 +1352,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
           ctx.beginPath(); ctx.moveTo(it.pa[0], it.pa[1]); ctx.lineTo(it.pb[0], it.pb[1]); ctx.stroke(); ctx.restore();
           continue;
         }
+        if (it.dot) { ctx.save(); ctx.fillStyle = it.col; ctx.globalAlpha = 0.3 * it.a; ctx.beginPath(); ctx.arc(it.pa[0], it.pa[1], it.r * 2.3, 0, 6.2832); ctx.fill(); ctx.globalAlpha = it.a; ctx.beginPath(); ctx.arc(it.pa[0], it.pa[1], it.r, 0, 6.2832); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); continue; }
         const p = it.pts; ctx.globalAlpha = it.alpha;
         ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]); for (let i = 1; i < 4; i++) ctx.lineTo(p[i][0], p[i][1]); ctx.closePath();
         ctx.fillStyle = it.fill; ctx.fill();
@@ -1310,7 +1374,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
         ctx.fillStyle = 'rgba(255,255,255,.85)'; [16, 44, 72].forEach(yy => ctx.fillRect(8, yy - 6, 24, 5));
         ctx.fillStyle = '#1b1248'; ctx.font = '500 17px "JetBrains Mono", monospace'; ctx.textAlign = 'right';
         ctx.fillText(this.lam.toFixed(1) + 'nm', 124, 22);
-        ctx.fillText((this.status === 'OFF' ? '-----' : (this.abs > 3 ? 'OVER' : this.abs.toFixed(3))) + ' ABS', 124, 50);
+        ctx.fillText((this.status === 'OFF' ? '-----' : (function (a) { return a > 3 ? 'OVER' : a.toFixed(3); })(this.dispAbs == null ? this.abs : this.dispAbs)) + ' ABS', 124, 50);
         ctx.font = '500 13px "JetBrains Mono", monospace'; ctx.textAlign = 'left'; ctx.fillText(this.lam < this.lampSwitch ? 'D2' : 'WI', 40, 77);
         ctx.textAlign = 'right'; ctx.fillStyle = '#4a3fa0'; ctx.font = '500 10px "JetBrains Mono", monospace'; ctx.fillText(this.status, 124, 90);
       } else {
@@ -1413,7 +1477,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
   }
   function goStep(i) {
     cur = Math.max(0, Math.min(TOUR.length - 1, i)); var s = TOUR[cur]; seen[cur] = 1;
-    m.hl = new Set(s.ids); m.beamLimit = s.lim; m.focus(s.v); m.sel = null;
+    m.hl = new Set(s.ids); m.beamLimit = s.lim; m.focus(INIT.slave ? [s.v[0], Math.min(s.v[1], 26), s.v[2] * 0.6, s.v[3]] : s.v); m.sel = null;
     $('#tt').textContent = (cur + 1) + '. ' + s.t; $('#tx').innerHTML = '<div class="kv"><b>Fungsi</b><span>' + s.f + '</span><b>Prinsip</b><span>' + s.p + '</span><b>Material / jenis</b><span>' + s.m + '</span><b>Hubungan dengan pengukuran</b><span>' + s.h + '</span></div>';
     document.querySelectorAll('#steps button').forEach(function (b, k) { b.classList.toggle('on', k === cur); b.classList.toggle('seen', k !== cur && !!seen[k]); });
     $('#prev').disabled = cur === 0; $('#next').textContent = cur === TOUR.length - 1 ? 'Ulangi tur ↺' : 'Berikutnya ▶';
@@ -1426,6 +1490,24 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
     $('#conc').addEventListener('input', meter); $('#lam2').addEventListener('input', function (e) { setLam(+e.target.value); });
     INIT.xray = true;
   }
+  var LST = ['1. Lampu D₂/WI memancarkan radiasi kontinu; cermin memilih sumber.', '2. Celah masuk membentuk berkas sempit menuju monokromator.', '3. Kisi difraksi menguraikan cahaya menjadi spektrum.', '4. Celah keluar meloloskan satu panjang gelombang (monokromatik).', '5. Berkas menuju pembagi berkas.', '6. Pembagi membelah berkas: referensi melewati blanko, sampel melewati kuvet sampel dan sebagian diserap (titik oranye).', '7. Fotodioda menghitung cahaya yang tiba: I₀ (referensi) dan I (sampel).', '8. Sinyal listrik dari fotodioda menuju PCB dan LCD.', '9. Rangkaian elektronik menghitung A = log(I₀/I); nilai tampil di layar LCD.'];
+  if (INIT.tour) {
+    m.onLight = function (s) {
+      $('#lstage').textContent = LST[s.stage]; $('#lb0').style.width = (s.arrR / s.N * 100) + '%'; $('#lb1').style.width = (s.arrS / s.N * 100) + '%';
+      $('#lv0').textContent = s.arrR; $('#lv1').textContent = s.arrS;
+      if (s.done) { var A = m.abs, T = Math.pow(10, -A); $('#lvT').textContent = fm(T * 100, 1) + ' %'; $('#lvA').textContent = fm(A, 3) + '  (A = log I₀/I)'; $('#lplay').textContent = '↺ Ulangi animasi'; }
+    };
+    $('#lplay').addEventListener('click', function () {
+      m.hl = new Set(['d2', 'wi', 'mirror', 'slit1', 'grating', 'slit2', 'split', 'holderR', 'holderS', 'detR', 'detS', 'pcb', 'lcd']); m.beamLimit = 9; m.labels = false; m.sel = null;
+      $('#lv0').textContent = 0; $('#lv1').textContent = 0; $('#lb0').style.width = '0'; $('#lb1').style.width = '0'; $('#lvT').textContent = '–'; $('#lvA').textContent = '–';
+      $('#lplay').textContent = '… animasi berjalan'; m.lightStart(); sync();
+    });
+  }
+  if (INIT.slave) {
+    $('#wrap').classList.add('slave');
+    window.addEventListener('message', function (e) { var d = e.data; if (!d || d.src !== 'uv1700') return;
+      if (d.cmd === 'tour') goStep(d.k); else if (d.cmd === 'lam') setLam(d.v); else if (d.cmd === 'abs') { m.abs = d.v; m._kick(); } else if (d.cmd === 'sol') { m.solColor = d.v; m._kick(); } });
+  }
   m.toggle('beam', true); if (INIT.xray) m.toggle('xray', true); if (INIT.lid) m.toggle('lid', true); if (INIT.auto) m.toggle('auto', true);
   setLam(INIT.lam); sync(); if (INIT.tour) { meter(); goStep(0); }
   document.addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return;
@@ -1435,6 +1517,7 @@ var INIT = Object.assign({tour: false, lam: 550, abs: 0, status: "READY", solCol
   $('#lam').addEventListener('input', function(e){ setLam(+e.target.value); });
 })();
 </script></body></html>
+
 
 '''
 
@@ -1459,9 +1542,9 @@ canvas#c{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 .hud{display:none;position:absolute;right:8px;top:8px;background:rgba(20,18,58,.9);color:#fff;border-radius:12px;padding:8px 12px;font:600 11px 'JetBrains Mono',monospace;text-align:right;min-width:150px}
 .hud .sc{font-size:22px;line-height:1.1}.hud .tm{color:#a5b4fc}
 .bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a3e635);width:0}
-.toast{position:absolute;left:50%;top:50px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
+.toast{z-index:7;position:absolute;left:50%;top:50px;transform:translateX(-50%);max-width:86%;padding:9px 14px;border-radius:12px;font-weight:500;box-shadow:0 10px 26px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 .toast.show{opacity:1}.toast.info{background:#14123a;color:#fff}.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#e11d48;color:#fff}.toast.warn{background:#f59e0b;color:#1f1300}
-.modal{position:absolute;inset:0;background:rgba(20,18,58,.45);display:none;align-items:center;justify-content:center;z-index:5}
+.modal{position:absolute;inset:0;background:rgba(20,18,58,.45);display:none;align-items:center;justify-content:center;z-index:8}
 .modal.show{display:flex}
 .mcard{background:#fff;border-radius:18px;padding:20px 22px;width:min(520px,92%);box-shadow:0 30px 60px -20px rgba(0,0,0,.5);max-height:94%;overflow:auto}
 .mcard h2{margin:0 0 6px;font:700 20px 'Space Grotesk',Inter,sans-serif}.mcard p{margin:4px 0 10px;color:var(--muted)}
@@ -1496,7 +1579,7 @@ select,input[type=number],input[type=text]{width:100%;font:inherit;padding:6px 8
 .seg{display:flex;gap:4px;margin:6px 0}.seg label{flex:1;text-align:center;border:1px solid var(--line);border-radius:9px;padding:5px;cursor:pointer;font-size:12px}
 .seg input{display:none}.seg label:has(input:checked){border-color:var(--acc);background:#eef0ff;color:#3f37c9;font-weight:600}
 .bottom{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
-.pip{position:absolute;right:8px;bottom:8px;width:35%;min-width:250px;max-width:460px;background:#111214;border-radius:12px;padding:5px 6px 7px;box-shadow:0 14px 34px -10px rgba(0,0,0,.65),inset 0 0 0 2px #2a2c31;z-index:3;transition:width .25s}
+.pip{z-index:6;position:absolute;right:8px;bottom:8px;width:35%;min-width:250px;max-width:460px;background:#111214;border-radius:12px;padding:5px 6px 7px;box-shadow:0 14px 34px -10px rgba(0,0,0,.65),inset 0 0 0 2px #2a2c31;transition:width .25s}
 .pip.big{width:70%;max-width:none}.pip.hide{display:none}
 .pip .ph{display:flex;justify-content:space-between;align-items:center;color:#9aa1b5;font:500 10px 'JetBrains Mono',monospace;letter-spacing:.1em;padding:0 2px 4px}
 .pip .ph button{border:0;background:#2a2c31;color:#cfd3e4;border-radius:6px;padding:2px 7px;font:500 10px 'JetBrains Mono',monospace;cursor:pointer;margin-left:4px}
@@ -1512,6 +1595,22 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
 .prints img{width:100%;display:block}
 .row{display:flex;gap:6px;align-items:center}.hint{color:var(--muted);font-size:12px}
 @media (max-width:980px){.top,.bottom{grid-template-columns:1fr}.side{height:auto}.stage{height:520px}.pip{width:62%}}
+.ctl{display:flex;gap:5px;margin:7px 0}
+.ctl button{flex:1;min-width:0;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 3px;font:600 12px Inter,sans-serif;cursor:pointer;color:var(--fg);white-space:nowrap}
+.ctl button.pri{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-color:transparent;flex:1.4}
+.ctl button:disabled{opacity:.45;cursor:not-allowed}
+.ctl button.on{background:#eef0ff;border-color:var(--acc);color:#3f37c9}
+.ctl .lb{flex:none;align-self:center;font:600 10.5px 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
+.sub{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);max-width:58%;background:rgba(20,18,58,.88);color:#fff;border-radius:10px;padding:6px 12px;font:500 12.5px/1.35 Inter,sans-serif;z-index:2;pointer-events:none;text-align:center}
+.sub:empty{display:none}
+.inner{position:absolute;inset:0;background:#f4f5fb;z-index:4;opacity:0;pointer-events:none;transition:opacity .4s}
+.inner.show{opacity:1;pointer-events:auto}
+.inner iframe{position:absolute;left:0;right:0;top:46px;bottom:0;width:100%;height:calc(100% - 46px);border:0}
+.inner .itop{position:absolute;left:8px;right:8px;top:8px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.inner .ibadge{background:#14123a;color:#fff;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.08em;padding:6px 10px;border-radius:9px}
+.inner .itop button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font:600 12px Inter,sans-serif;cursor:pointer}
+.inner .icap{position:absolute;left:12px;bottom:12px;max-width:50%;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:12px;padding:8px 12px;z-index:2;box-shadow:0 10px 26px -14px rgba(0,0,0,.4)}
+.inner .icap b{display:block;font:700 14px Inter,sans-serif;color:#1e1b4b;margin-bottom:2px}.inner .icap span{color:#4a5072;font-size:12.5px}
 </style></head><body>
 <div class="top">
   <div class="stage"><canvas id="c" aria-label="Meja praktikum 3D"></canvas>
@@ -1523,6 +1622,8 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
     <div class="tools"><button data-t="xray" aria-pressed="false">Tembus pandang</button><button data-t="sound" aria-pressed="true">Suara</button><button data-t="pip">Layar komputer</button></div>
     <div class="pip" id="pip"><div class="ph"><span>MONITOR · <span id="pcst" style="color:#8b93b8">MATI</span></span><span><button data-t="pipbig" id="pipbig">Perbesar</button><button data-t="pipx">Tutup</button></span></div><canvas id="pc" width="1040" height="610"></canvas></div>
     <div class="toast" id="toast"></div>
+    <div class="sub" id="sub"></div>
+    <div class="inner" id="inner"><div class="itop"><span class="ibadge" id="ibadge"></span><button id="icx"></button></div><iframe id="innerf" title="UV-1700"></iframe><div class="icap"><b id="icT"></b><span id="icF"></span></div></div>
     <div class="modal" id="logm"><div class="mcard">
       <h2>Log Book Alat UV-1700</h2><p>Catat semua kejadian selama penggunaan dan tanda tangani dengan nama jelas (IK C.1).</p>
       <label>Tanggal</label><input id="lg_t" readonly><label>Nama pengguna</label><input id="lg_n">
@@ -1532,7 +1633,10 @@ textarea{width:100%;height:110px;font:12px 'JetBrains Mono',monospace;border:1px
   </div>
   <div class="side">
     <div class="card now"><div class="sec" id="nowsec">LANGKAH SEKARANG</div><div class="tx" id="nowtx"></div><div class="prog"><i id="prog2"></i></div><div class="why" id="nowwhy"></div>
-      <button class="go" id="gobtn">Kerjakan langkah ini</button></div>
+      <div class="ctl"><button id="b_play" class="pri" style="padding:10px 4px;font-size:13px"></button></div>
+      <div class="ctl"><button id="b_rst"></button><button id="b_prev"></button><button id="b_next"></button></div>
+      <div class="ctl"><span class="lb" id="lb_spd"></span><button data-spd="0.5">0,5×</button><button data-spd="1">1×</button><button data-spd="2">2×</button><span class="lb" id="lb_lng" style="margin-left:6px"></span><button data-lng="id">ID</button><button data-lng="en">EN</button></div>
+      <button class="go" id="gobtn" style="display:none">Kerjakan</button></div>
     <div class="card"><details class="man"><summary>Semua langkah IK/LAB.INST/6 <span id="ikn"></span></summary><div class="ik" id="iklist" style="margin-top:6px"></div>
       <div class="hint" style="margin-top:6px"><span class="rk">REK</span> halaman 1 IK belum difoto; langkah bagian A dan B-Spektrum 1–5 disusun dari prosedur baku UVProbe dan perlu dicocokkan dengan IK asli.</div></details></div>
     <div class="card"><details class="man"><summary>Status alat <span id="ident" style="text-transform:none;letter-spacing:0"></span></summary><div class="chips" id="chips" style="margin-top:6px"></div></details></div>
@@ -2158,12 +2262,13 @@ function drawDlg(c, Wp, Hp) {
 }
 
 /* ================= animasi & utilitas ================= */
-const tweens = [];
-function tween(dur, fn) { return new Promise(res => tweens.push({ t0: performance.now(), dur: dur * 1000, fn, res })); }
+const tweens = []; let SPD = 1, PAUSED = false, FAST = false;
+function flushTweens() { while (tweens.length) { const tw = tweens.shift(); try { tw.fn(1); } catch (e) { } tw.res(); } dirty = true; }
+function tween(dur, fn) { if (FAST) { try { fn(1); } catch (e) { console.error(e); } return Promise.resolve(); } return new Promise(res => tweens.push({ el: 0, dur: dur * 1000, fn, res })); }
 const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-const wait = s => tween(s, () => { });
+const wait = s => { if (FAST && ST.inst === 'warm') { ST.warmLeft = 0; ST.inst = 'ready'; } return tween(s, () => { }); };
 let audio = null;
-function beep(f, d) { if (!ST.sound) return; try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = f || 880; g.gain.value = 0.05; o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + (d || 0.12)); } catch (e) { } }
+function beep(f, d) { if (!ST.sound || FAST) return; try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = f || 880; g.gain.value = 0.05; o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + (d || 0.12)); } catch (e) { } }
 let toastT = 0;
 function toast(msg, kind) { const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (kind || 'info'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3800); }
 function log(msg, kind) { const el = $('#log'); const d = document.createElement('div'); if (kind) d.className = kind; d.textContent = mmss((performance.now() - ST.t0) / 1000) + '  ' + msg; el.insertBefore(d, el.firstChild); }
@@ -2545,7 +2650,7 @@ const STEPS = [
 function isDone(s) { if (!s._d && s.done()) s._d = true; return !!s._d; }
 function curStep() { return STEPS.findIndex(s => !isDone(s)); }
 function openLog() { return new Promise(res => { const m = $('#logm'); $('#lg_t').value = dstr; $('#lg_n').value = ID.nama; $('#lg_k').value = 'Alat berfungsi normal. Pengukuran ' + AN.nama + ' pada ' + fx(ST.pmethod ? ST.pmethod.lam : AN.lam_ref, 1) + ' nm; ' + ST.stdTable.filter(r => r.A != null).length + ' standar, ' + ST.unkTable.filter(r => r.A != null).length + ' sampel. Tidak ada kendala.';
-  $('#lg_s').value = ID.nama; m.classList.add('show'); setView('log'); logResolve = res; }); }
+  $('#lg_s').value = ID.nama; m.classList.add('show'); setView('log'); logResolve = res; if (PL.on || FAST) setTimeout(() => { const b = $('#lg_ok'); if (b.click) b.click(); }, FAST ? 0 : 2200 / SPD); }); }
 let logResolve = null;
 
 /* ================= panel ================= */
@@ -2561,20 +2666,20 @@ function sync() { pipSync();
   chip('Sampel: ' + (S.content ? SOL[S.content].short || S.content : 'kosong') + ' · ' + S.where + (S.dirty ? ' · belum dilap' : ''), S.where === 'sel' ? 2 : 1);
   $('#chips').innerHTML = ch.join('');
   const ci = curStep(); const st = STEPS[ci];
-  if (st) { $('#nowsec').textContent = st.sec.toUpperCase() + ' · ' + (st.no ? 'LANGKAH ' + st.no : 'LANGKAH') + (st.rk ? ' (REK)' : '') + (st.prog ? ' · ' + st.prog() : '');
-    $('#nowtx').textContent = st.t; $('#nowwhy').textContent = ST.busy ? (ST.busyMsg || 'Sedang dikerjakan… perhatikan animasi 3D dan layar komputer.') : 'Tekan tombol di bawah; atau coba sendiri lewat Kontrol manual.';
+  if (st) { $('#nowsec').textContent = secT(st.sec).toUpperCase() + ' · ' + U('step') + ' ' + (ci + 1) + '/' + STEPS.length + (st.prog ? ' · ' + st.prog() : '');
+    $('#nowtx').textContent = stepT(ci); $('#nowwhy').textContent = ST.busy ? U('busy') : U('idle');
     $('#gobtn').textContent = st.multi ? 'Kerjakan (' + st.prog() + ')' : 'Kerjakan langkah ini'; $('#prog2').style.width = (100 * ci / STEPS.length) + '%'; }
-  else { $('#nowsec').textContent = 'SELESAI'; $('#nowtx').textContent = 'Seluruh langkah Instruksi Kerja selesai. '; $('#nowwhy').textContent = 'Salin data ke Kurva Kalibrasi untuk mengolah hasil.'; $('#gobtn').textContent = 'Selesai'; }
+  else { $('#nowsec').textContent = U('done'); $('#nowtx').textContent = U('donetx'); $('#nowwhy').textContent = U('donewhy'); $('#gobtn').textContent = 'Selesai'; }
   $('#gobtn').disabled = ST.busy || !st;
   let html = '', last = '';
-  STEPS.forEach((s, i) => { if (s.sec !== last) { html += '<div class="grp">' + s.sec + '</div>'; last = s.sec; }
-    const d = isDone(s); html += '<div class="it ' + (d ? 'done' : (i === ci ? 'cur' : '')) + '" data-i="' + i + '"><span class="d">' + (d ? '✓' : (s.no || '•')) + '</span><span>' + s.t + (s.rk ? '<span class="rk">REK</span>' : '') + (s.multi && !d ? ' <b>(' + s.prog() + ')</b>' : '') + '</span></div>'; });
+  STEPS.forEach((s, i) => { if (s.sec !== last) { html += '<div class="grp">' + secT(s.sec) + '</div>'; last = s.sec; }
+    const d = isDone(s); html += '<div class="it ' + (d ? 'done' : (i === ci ? 'cur' : '')) + '" data-i="' + i + '"><span class="d">' + (d ? '✓' : (s.no || '•')) + '</span><span>' + stepT(i) + (s.rk ? '<span class="rk">REK</span>' : '') + (s.multi && !d ? ' <b>(' + s.prog() + ')</b>' : '') + '</span></div>'; });
   $('#iklist').innerHTML = html; const nd = STEPS.filter(isDone).length; $('#ikn').textContent = nd + '/' + STEPS.length; $('#prog').style.width = (100 * nd / STEPS.length) + '%';
   $$('button.a').forEach(b => { b.disabled = ST.busy && !['copy', 'csv'].includes(b.dataset.act); });
   $('#score').textContent = ST.score; $('#ident').textContent = (ID.nama || 'Praktikan') + ' · ' + ID.kelas + ' · Kel. ' + ID.kel;
   const [lo, hi] = scanRange(); $('#scaninfo').textContent = 'Rentang scan: ' + lo + '–' + hi + ' nm · λ referensi metode ' + AN.lam_ref + ' nm.';
   if (ci >= 0) { const el = $('#iklist .cur'); if (el && el.scrollIntoView && ST.autoScroll) el.scrollIntoView({ block: 'nearest' }); }
-  dirty = true;
+  updateCtl(); dirty = true;
 }
 async function run(fn, label) {
   if (ST.busy) return; ST.busy = true; ST.busyMsg = label || null; sync();
@@ -2586,12 +2691,12 @@ async function run(fn, label) {
 let last = performance.now(), lastPC = 0;
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
-  for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; const t = Math.min(1, (now - tw.t0) / tw.dur); tw.fn(t); dirty = true; if (t >= 1) { tweens.splice(i, 1); tw.res(); } }
+  for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; tw.el += PAUSED ? 0 : dt * 1000 * SPD; const t = tw.dur <= 0 ? 1 : Math.min(1, tw.el / tw.dur); tw.fn(t); dirty = true; if (t >= 1) { tweens.splice(i, 1); tw.res(); } }
   const e = (cur, tgt, sp) => { const d = tgt - cur; return Math.abs(d) < 0.002 ? tgt : cur + d * Math.min(1, dt * sp); };
   const nx = e(ST.xray, ST.xrayT, 5); if (nx !== ST.xray) { ST.xray = nx; dirty = true; }
-  if (camAnim) { const a = camAnim; a.t = Math.min(1, a.t + dt * 1.6); const k = ease(a.t); let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
+  if (camAnim) { const a = camAnim; a.t = Math.min(1, a.t + (PAUSED ? 0 : dt * 1.6 * Math.max(1, SPD))); const k = ease(a.t); let dy = a.to[0] - a.from[0]; while (dy > 180) dy -= 360; while (dy < -180) dy += 360;
     CAM.yaw = a.from[0] + dy * k; CAM.pitch = a.from[1] + (a.to[1] - a.from[1]) * k; CAM.dist = a.from[2] + (a.to[2] - a.from[2]) * k; CAM.target = lerp3(a.from[3], a.to[3], k); if (a.t >= 1) camAnim = null; dirty = true; }
-  if (ST.inst === 'warm' && !ST.warmSkipped) { ST.warmLeft -= dt * 90; if (ST.warmLeft <= 0) { ST.warmLeft = 0; ST.inst = 'ready'; beep(1400, 0.2); ok('Pemanasan selesai: lampu stabil.'); sync(); } dirty = true; }
+  if (ST.inst === 'warm' && !ST.warmSkipped) { ST.warmLeft -= PAUSED ? 0 : dt * 90 * SPD; if (ST.warmLeft <= 0) { ST.warmLeft = 0; ST.inst = 'ready'; beep(1400, 0.2); ok('Pemanasan selesai: lampu stabil.'); sync(); } dirty = true; }
   if (now - lastPC > 200) { lastPC = now; if (ST.pc && ST.pcSeen !== ST.pc && ST.pc === 1) ST.pipClosed = false; ST.pcSeen = ST.pc; pipSync(); $('#clock').textContent = mmss((now - ST.t0) / 1000); if (ST.inst === 'warm') sync(); drawPC(); dirty = true; }
   if (dirty) { dirty = false; draw(); }
   requestAnimationFrame(loop);
@@ -2618,6 +2723,8 @@ function pickAt(x, y) {
     const b = pcBtns.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h); if (!b) return;
     if (b.act.startsWith('tab')) { ACT[b.act](); drawPC(); } else if (ACT[b.act]) run(() => ACT[b.act]()); });
   document.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'b_play') { onPlay(); return; } if (b.id === 'b_next') { onNext(); return; } if (b.id === 'b_prev') { onPrev(); return; } if (b.id === 'b_rst') { onReset(); return; }
+    if (b.dataset.spd) { SPD = +b.dataset.spd; updateCtl(); return; } if (b.dataset.lng) { LANG = b.dataset.lng; sync(); return; } if (b.id === 'icx') { INNER.closed = true; showInner(false); return; }
     if (b.id === 'gobtn') { const i = curStep(); if (i >= 0) { ST.autoScroll = true; run(() => STEPS[i].run(), 'Mengerjakan: ' + STEPS[i].t); } return; }
     if (b.id === 'lg_ok') { ST.logbook = { t: dstr, n: $('#lg_n').value, k: $('#lg_k').value, s: $('#lg_s').value }; $('#logm').classList.remove('show'); ok('Log Book tercatat dan ditandatangani oleh ' + (ST.logbook.s || '-') + '.'); if (logResolve) { logResolve(); logResolve = null; } sync(); return; }
     if (b.dataset.act) { const a = b.dataset.act; if (ACT[a]) run(() => ACT[a]()); return; }
@@ -2628,11 +2735,85 @@ function pickAt(x, y) {
   $('#lam').value = AN.lam_ref;
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { dirty = true; }).observe(cv.parentElement);
 })();
+
+/* ================= pemutar otomatis, bahasa, tampilan dalam ================= */
+let LANG = 'id'; const PL = { on: false, loop: false };
+const INNER = { closed: false, shown: false };
+const BOOT = (() => { try { return JSON.parse(window.name || '{}') || {}; } catch (e) { return {}; } })();
+if (BOOT.lang) LANG = BOOT.lang; if (BOOT.spd) SPD = BOOT.spd;
+const STEN = ["Check and connect the cables: wall socket → extension cord → UPS; UV-1700, CPU, and monitor to the UPS; printer to the extension cord; VGA, USB, and RS-232C cables.", "Press the ON button on the UPS and wait for the green indicator to light.", "Open the sample compartment lid, take out the silica gel, then close the lid again.", "Press the power button on the left side of the UV-1700; wait until initialization finishes and all checks are OK.", "Turn on the CPU, monitor, and printer.", "On the UV-1700 press MODE, then select PC CONTROL.", "Double-click the UVProbe icon, then click Connect; wait until the instrument check finishes (Pass).", "Let the lamps warm up for about 15–30 minutes so that the intensity stabilizes (time accelerated).", "Click Window → Spectrum.", "Click Edit → Method; set the wavelength range, scan speed, and sampling interval → OK.", "Fill the reference and sample cuvettes with blank, wipe them with tissue, place them in the cells, close the compartment → click Baseline.", "Replace the sample cuvette with the standard solution (mid concentration) → click Start.", "Click Operations → Peak Pick to show the peak table; record λmax.", "Click File → Save As → name the spectrum as Date_Class_Group → Save.", "Click once on the peak pick table, right-click → Print.", "Click Window → Photometric.", "Click Edit → Method.", "In the Wavelength (nm) column type the desired wavelength (λmax) → Add.", "Click Next.", "In the Type column choose the method: Multi Point (more than one standard concentration).", "In the Unit column type the desired unit.", "In the WL1 column select the desired wavelength.", "Click Zero Interception → click Next 3×.", "In the File name field click (...) → choose the folder → name it Date_Class_Group → Open → Finish.", "In the Standard Table type the standard name in the Sample ID column and its concentration in the Conc column.", "Replace the cuvette content in the sample compartment with blank → click Auto Zero.", "Replace with a standard → click Read Std (repeat for the whole standard series).", "Click Sample Table → enter the sample name in the Sample ID column.", "Replace with the sample → click Read Unk (repeat for all samples; here in triplicate).", "After all measurements are finished click File → Save.", "Right-click the Standard Table → Print.", "Right-click the Sample Table → Print.", "Record all events in the instrument Log Book and sign with a legible name.", "Click Disconnect.", "Click File → Exit.", "Click the Windows menu → press the Shut down button.", "Press the power button of the computer monitor and the printer.", "Press MODE on the UV-1700 (leave PC CONTROL).", "Press the power button on the left side of the UV-1700, close the UV-1700 monitor, and put the silica gel back into the compartment.", "Press the OFF button on the UPS.", "Unplug the cables from the extension cord, except the UPS cable.", "Tidy the work area around the instrument and computer; remove the samples and standards.", "Move the chair in the work area to a safe place.", "After the instrument is off, dry the cuvettes by rinsing with ethanol then acetone; turn the cuvettes upside down (safe position) and wait until completely dry."];
+const SECEN = { 'A. Menyalakan Alat': 'A. Powering On the Instrument', 'B. Pengukuran Spektrum': 'B. Spectrum Measurement', 'B. Analisa Sampel': 'B. Sample Analysis', 'B. Print Data': 'B. Printing Data', 'B. Print Data Sampel': 'B. Printing Sample Data', 'B. Print Kurva Kalibrasi Standar': 'B. Printing the Standard Calibration Curve', 'C. Mematikan Alat': 'C. Shutting Down', 'D. Mengeringkan Kuvet': 'D. Drying the Cuvettes' };
+const UI = {
+  id: { step: 'LANGKAH', busy: 'Sedang berjalan… perhatikan animasi 3D, layar komputer, dan tampilan bagian dalam alat.', idle: 'Tekan Putar untuk menjalankan otomatis, atau Berikutnya untuk satu langkah.', done: 'SELESAI', donetx: 'Seluruh langkah Instruksi Kerja selesai.', donewhy: 'Salin data ke Kurva Kalibrasi untuk mengolah hasil.', play: '▶ Putar', pause: '❚❚ Jeda', prev: '◀ Sebelumnya', next: 'Berikutnya ▶', rst: '⟲ Ulang', spd: 'Kecepatan', lng: 'Bahasa', badge: 'BAGIAN DALAM UV-1700 · ZOOM', close: 'Tutup' },
+  en: { step: 'STEP', busy: 'Running… watch the 3D animation, the computer screen, and the inside view of the instrument.', idle: 'Press Play to run automatically, or Next for a single step.', done: 'FINISHED', donetx: 'All steps of the work instruction are complete.', donewhy: 'Copy the data to the Calibration Curve to process the results.', play: '▶ Play', pause: '❚❚ Pause', prev: '◀ Previous', next: 'Next ▶', rst: '⟲ Restart', spd: 'Speed', lng: 'Language', badge: 'INSIDE THE UV-1700 · ZOOM', close: 'Close' } };
+const U = k => UI[LANG][k];
+const stepT = i => LANG === 'en' && STEN[i] ? STEN[i] : STEPS[i].t;
+const secT = s => LANG === 'en' && SECEN[s] ? SECEN[s] : s;
+const TT = [
+  { t: ['Lampu D₂ dan WI', 'D₂ and WI lamps'], f: ['Menyediakan radiasi kontinu UV (D₂) dan tampak–inframerah dekat (WI).', 'Provide continuous UV (D₂) and visible–near-IR (WI) radiation.'] },
+  { t: ['Cermin pemilih sumber dan celah masuk', 'Source-selector mirror and entrance slit'], f: ['Memilih berkas lampu aktif dan membentuk berkas sempit menuju monokromator.', 'Select the active lamp beam and form a narrow beam toward the monochromator.'] },
+  { t: ['Kisi difraksi (monokromator)', 'Diffraction grating (monochromator)'], f: ['Memisahkan cahaya polikromatik menjadi panjang gelombang tunggal.', 'Disperse polychromatic light into single wavelengths.'] },
+  { t: ['Celah keluar', 'Exit slit'], f: ['Meneruskan pita sempit di sekitar λ terpilih.', 'Pass a narrow band around the selected λ.'] },
+  { t: ['Pembagi berkas', 'Beam splitter'], f: ['Membagi berkas menjadi berkas referensi dan berkas sampel.', 'Split the beam into reference and sample beams.'] },
+  { t: ['Kompartemen sampel dan kuvet', 'Sample compartment and cuvettes'], f: ['Menempatkan blanko dan sampel pada jalur berkas.', 'Place the blank and sample in the beam path.'] },
+  { t: ['Detektor fotodioda', 'Photodiode detectors'], f: ['Mengubah intensitas cahaya menjadi arus listrik.', 'Convert light intensity into electric current.'] },
+  { t: ['Pengolahan sinyal', 'Signal processing'], f: ['Menguatkan, mendigitalkan, dan mengoreksi sinyal detektor.', 'Amplify, digitize, and correct the detector signal.'] },
+  { t: ['Layar dan keluaran', 'Display and output'], f: ['Menampilkan λ, absorbansi atau %T, dan lampu aktif.', 'Display λ, absorbance or %T, and the active lamp.'] }];
+const INNER_SRC = /*__INNER__*/"";
+const INNER_ON = typeof INNER_SRC === 'string' && INNER_SRC.length > 50;
+if (INNER_ON) $('#innerf').srcdoc = INNER_SRC;
+function postInner(m) { try { $('#innerf').contentWindow.postMessage(Object.assign({ src: 'uv1700' }, m), '*'); } catch (e) { } }
+function showInner(on) { INNER.shown = on; $('#inner').classList.toggle('show', on); $('#sub').style.visibility = on ? 'hidden' : 'visible'; }
+function innerCap(k) { const L = LANG === 'en' ? 1 : 0; $('#icT').textContent = (k + 1) + '. ' + TT[k].t[L]; $('#icF').textContent = TT[k].f[L]; }
+async function innerSeq(ks, dwell) {
+  if (!INNER_ON || FAST || INNER.closed) return;
+  const S = ST.cuv.S, col = (S.content && SOL[S.content] && SOL[S.content].col) || '#d9f3f7'; let A = 0; try { A = Math.max(0, readAt(ST.pmethod ? ST.pmethod.lam : AN.lam_ref)); } catch (e) { }
+  postInner({ cmd: 'sol', v: col }); postInner({ cmd: 'lam', v: ST.lam || AN.lam_ref }); postInner({ cmd: 'abs', v: isFinite(A) ? A : 0 });
+  showInner(true); await wait(0.5);
+  for (const k of ks) { if (INNER.closed || FAST) break; postInner({ cmd: 'tour', k }); innerCap(k); await wait(dwell); }
+  showInner(false);
+}
+const INNER_MAP = { 3: [[0], 3.5], 7: [[0, 1], 3.5], 10: [[0, 1, 2, 3, 4, 5, 6, 7, 8], 3.2], 11: [[1, 2, 5, 6], 3], 25: [[0, 5, 6], 2.6], 26: [[0, 5, 6], 2.6], 28: [[0, 5, 6], 2.6] };
+Object.keys(INNER_MAP).forEach(k => { const s = STEPS[k], f = s.run, [ks, d] = INNER_MAP[k]; s.run = async () => { const p = f(); await Promise.all([p, innerSeq(ks, d)]); }; });
+function updateCtl() {
+  const ci = curStep(), playing = PL.on && !PAUSED;
+  $('#b_play').textContent = playing ? U('pause') : U('play'); $('#b_prev').textContent = U('prev'); $('#b_next').textContent = U('next'); $('#b_rst').textContent = U('rst'); $('#lb_spd').textContent = U('spd'); $('#lb_lng').textContent = U('lng');
+  $('#b_prev').disabled = ci === 0 && !ST.busy; $('#b_next').disabled = ci < 0 && !ST.busy; $('#b_play').disabled = ci < 0;
+  $$('[data-spd]').forEach(b => b.classList.toggle('on', +b.dataset.spd === SPD)); $$('[data-lng]').forEach(b => b.classList.toggle('on', b.dataset.lng === LANG));
+  $('#ibadge').textContent = U('badge'); $('#icx').textContent = U('close');
+  $('#sub').textContent = ci >= 0 ? (ci + 1) + '. ' + stepT(ci) : '';
+}
+async function advance() {
+  const i = curStep(); if (i < 0 || ST.busy) return false; const s = STEPS[i]; let g = 0; INNER.closed = false;
+  do { await run(() => s.run(), 'Mengerjakan: ' + s.t); g++; } while (curStep() === i && s.multi && g < 40);
+  return true;
+}
+async function playLoop() {
+  if (PL.loop) return; PL.loop = true;
+  try { while (PL.on && curStep() >= 0) { const i = curStep(); await advance(); if (curStep() === i) { PL.on = false; break; } if (!PL.on) break; await wait(0.9); } }
+  finally { PL.loop = false; if (curStep() < 0) PL.on = false; updateCtl(); }
+}
+function onPlay() {
+  if (PL.on && !PAUSED) { PAUSED = true; updateCtl(); return; }
+  if (PAUSED) { PAUSED = false; PL.on = true; updateCtl(); if (!PL.loop) playLoop(); return; }
+  PL.on = true; ST.autoScroll = true; updateCtl(); playLoop();
+}
+async function finishFast() { FAST = true; flushTweens(); const t0 = performance.now(); while ((ST.busy || PL.loop) && performance.now() - t0 < 30000) { await new Promise(r => setTimeout(r, 15)); flushTweens(); } FAST = false; showInner(false); }
+async function onNext() {
+  if (PL.nb) return; PL.nb = true;
+  try { PL.on = false; PAUSED = false; if (ST.busy || PL.loop) await finishFast(); else { ST.autoScroll = true; await advance(); } }
+  finally { PL.nb = false; updateCtl(); }
+}
+function restartTo(n) { try { window.name = JSON.stringify({ replay: Math.max(0, n), lang: LANG, spd: SPD }); location.reload(); } catch (e) { toast('Muat ulang halaman untuk mengulang.', 'warn'); } }
+function onPrev() { const i = curStep() < 0 ? STEPS.length : curStep(); restartTo(i - 1); }
+function onReset() { restartTo(0); }
 window.LAB = { ST, ACT, STEPS, run, curStep, readAt, ID, finishLog: () => { ST.logbook = { t: dstr, n: ID.nama, k: 'uji', s: ID.nama }; if (logResolve) { logResolve(); logResolve = null; } } };
 log('Praktikum virtual: ' + AN.nama + '. Ikuti kotak "Langkah sekarang".');
 updateOut(); sync(); drawPC(); requestAnimationFrame(loop);
+if (BOOT.replay > 0) { (async () => { FAST = true; for (let k = 0; k < BOOT.replay && curStep() >= 0; k++) { const b = curStep(); await advance(); if (curStep() === b) break; } FAST = false; ST.t0 = performance.now(); sync(); })(); }
 })();
 </script></body></html>
+
 
 '''
 
@@ -3047,7 +3228,9 @@ def page_lab():
     init = {"seed": int(S["seed"]) % 2147483647, "hidden": hidden_conc(akey, S["seed"]), "dec": S["settings"]["dec"], "unit": "mg/L",
             "analyte": {"nama": a["nama"], "rumus": a["rumus"], "pelarut": a["pelarut"], "lam_ref": a["lam_ref"], "k": float(a["k"]), "warna": a["warna"],
                         "bands": [list(b) for b in a["bands"]], "std": [float(x) for x in a["std"]]}}
-    components.html(LAB_HTML.replace("/*__LAB__*/null", json.dumps(init)), height=900, scrolling=True)
+    child = MODEL3D_HTML.replace("/*__INIT__*/null", json.dumps({"tour": True, "slave": True, "lam": 550.0, "abs": 0.3, "solColor": "#d9f3f7", "lampSwitch": 340.8, "xray": True}))
+    inner = json.dumps(child).replace("</", "<\\/").replace("<!--", "<\\!--")
+    components.html(LAB_HTML.replace('/*__INNER__*/""', inner).replace("/*__LAB__*/null", json.dumps(init)), height=900, scrolling=True)
     st.caption("Mengganti percobaan atau memuat ulang halaman mengulang praktikum dari awal; salin data dari panel di bawah 3D sebelum berpindah. "
                "Tanda REK = langkah disusun dari prosedur baku UVProbe karena halaman 1 IK belum tersedia.")
     with st.container(border=True):
